@@ -1,0 +1,29 @@
+@use "../../global/index" as g;
+
+.c-header {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    background-color: g.$color-white;
+    @include g.media('>phone') {
+        height: g.get_vw(40);
+    }
+    @include g.media('<=phone') {
+        height: g.get_vw(72);
+    }
+    &__name {
+        position: relative;
+        @include g.media('>phone') {
+            padding: 0 1.8rem;
+        }
+        @include g.media('<=phone') {
+            padding: 0 3rem;
+        }
+    }
+    &__name-text {
+        line-height: 1;
+        font-weight: 500;
+        @include g.font-size(1.8rem, 3.2rem);
+    }
+}

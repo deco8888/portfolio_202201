@@ -1,0 +1,185 @@
+@use "../../../global/index" as g;
+
+/***********************
+ *
+ * 格付けバトル
+ *
+ ***********************/
+.p-rating-question {
+    &__wrap {
+        $parent: &;
+        position: relative;
+        margin: 0 auto;
+        z-index: 2;
+        @include g.media('>phone') {
+            padding: g.get_per(33) 0 0;
+            width: g.get_per(800);
+        }
+        @include g.media('<=phone') {
+            padding: g.get_per(77) 0 0;
+            width: g.get_per(650);
+        }
+    }
+    &__title {
+        color: g.$color-white;
+        font-weight: bold;
+        text-align: center;
+        @include g.line-height(1.6, 1.2);
+        @include g.font-size(3rem, 6rem);
+    }
+    &__notion {
+        color: g.$color-white;
+        line-height: 1;
+        @include g.font-size(1.6rem, 1.4rem);
+        @include g.media('>phone') {
+            margin: g.get_per(33, 800) 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(79, 650) 0 0;
+        }
+    }
+    &__head {
+        display: flex;
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+    &__rank {
+        position: relative;
+        @include g.media('>phone') {
+            margin: 0 0 0 g.get_per(4);
+            width: g.get_per(146);
+        }
+        @include g.media('<=phone') {
+            margin: 0 0 0 g.get_per(4);
+            width: g.get_per(262);
+        }
+    }
+    &__side {
+        @include g.media('>phone') {
+            position: absolute;
+            margin: 0 0 0 g.get_per(43);
+            padding: g.get_per(17) 0 0;
+            width: g.get_per(221);
+        }
+        @include g.media('<=phone') {
+            position: relative;
+            margin: 0 0 0 g.get_per(36);
+            padding: g.get_per(36) 0 0;
+            width: g.get_per(418, 650);
+        }
+    }
+    &__contents-name {
+        color: g.$color-white;
+        line-height: 1.33;
+        font-weight: bold;
+        @include g.font-size(1.8rem, 3.2rem);
+    }
+    &__list {
+        display: flex;
+        align-items: center;
+        @include g.media('>phone') {
+            margin: g.get_per(33, 800) 0 0;
+        }
+        @include g.media('<=phone') {
+            flex-direction: column;
+            margin: g.get_per(40, 650) 0 0;
+        }
+    }
+    &__item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        @include g.media('>phone') {
+            width: g.get_per(380, 800);
+        }
+        @include g.media('<=phone') {
+            width: 100%;
+        }
+        &:not(:first-child) {
+            @include g.media('>phone') {
+                margin: 0 0 0 g.get_per(41, 800);
+            }
+            @include g.media('<=phone') {
+                margin: g.get_per(98, 650) 0 0;
+            }
+        }
+    }
+    &__alphabet {
+        &--a {
+            @include g.media('>phone') {
+                width: g.get_per(50, 380);
+            }
+            @include g.media('<=phone') {
+                width: g.get_per(100, 650);
+            }
+        }
+        &--b {
+            @include g.media('>phone') {
+                width: g.get_per(43, 380);
+            }
+            @include g.media('<=phone') {
+                width: g.get_per(100, 650);
+            }
+        }
+    }
+    &__image {
+        width: 100%;
+        cursor: pointer;
+        @include g.media('>phone') {
+            margin: g.get_per(14, 380) 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(40, 650) 0 0;
+        }
+    }
+    &__button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: solid 2px g.$color-white;
+        border-radius: 1rem;
+        @include g.media('>phone') {
+            margin: g.get_per(37, 380) auto 0;
+            padding: g.get_per(20, 380) 0;
+            width: g.get_per(224, 380);
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(79, 650) auto 0;
+            padding: g.get_per(20, 650) 0;
+            width: g.get_per(300, 650);
+        }
+        &--a {
+            background-color: g.$color-two;
+        }
+        &--b {
+            background-color: g.$color-nice-blue;
+        }
+        @include g.before-scale-down();
+        @include g.hover-only() {
+            @include g.after-scale-down();
+        }
+    }
+    &__button-text {
+        display: inline-block;
+        color: g.$color-white;
+        line-height: 1;
+        font-weight: bold;
+        @include g.font-size(2.1rem, 4rem);
+    }
+    &__message {
+        color: g.$color-white;
+        line-height: 1;
+        font-weight: bold;
+        @include g.font-size(1.6rem, 1.6rem);
+        @include g.media('>phone') {
+            margin: g.get_per(16, 800) 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(16, 800) 0 0;
+        }
+    }
+}

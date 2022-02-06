@@ -1,0 +1,93 @@
+@use 'sass:math';
+@use "../../../global/index" as g;
+
+/***********************
+ *
+ * Countdown
+ *
+ ***********************/
+.p-countdown {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 2;
+    @include g.media('>phone') {
+        top: g.get_vw(530);
+    }
+    @include g.media('<=phone') {
+        top: g.get_vw(386);
+    }
+    @include g.scroll-fadein-before(-50%, 15px);
+    &.is-active {
+        @include g.scroll-fadein-after(-50%, 0, 1.4s);
+    }
+    &__wrap {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        @include g.media('>phone') {
+            margin: 1.8rem 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: 1.8rem 0 0;
+        }
+    }
+    &__start {
+        width: 100%;
+        color: g.$color-white;
+        line-height: 1;
+        font-family: 'Helvetica Neue', 'Noto Sans JP', Meiryo, sans-serif;
+        font-weight: bold;
+        text-align: center;
+        @include g.font-size(3.6rem, 2.8rem);
+    }
+    &__list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        &:not(:first-child) {
+            @include g.media('>phone') {
+                margin: 0 0 0 g.get_per(80);
+            }
+            @include g.media('<=phone') {
+                margin: 0 0 0 g.get_per(42);
+            }
+            &::after {
+                content: ':';
+                position: absolute;
+                color: g.$color-white;
+                line-height: 1;
+                font-family: 'Helvetica Neue', 'Noto Sans JP', Meiryo, sans-serif;
+                font-weight: bold;
+                text-shadow: 0.7rem 0.7rem 0 rgba(0, 0, 0, 0.59);
+                z-index: -1;
+                @include g.font-size(11.5rem, 8.5rem);
+                @include g.media('>phone') {
+                    right: 98%;
+                }
+                @include g.media('<=phone') {
+                    right: 98%;
+                }
+            }
+        }
+    }
+    &__item {
+        display: flex;
+    }
+    &__number {
+        color: g.$color-white;
+        line-height: 1;
+        font-family: 'Helvetica Neue', 'Noto Sans JP', Meiryo, sans-serif;
+        font-weight: bold;
+        text-shadow: 0.7rem 0.7rem 0 rgba(0, 0, 0, 0.59);
+        @include g.font-size(11.5rem, 8.5rem);
+    }
+    &__text {
+        color: g.$color-white;
+        line-height: 1;
+        font-family: 'Helvetica Neue', 'Noto Sans JP', Meiryo, sans-serif;
+        font-weight: 500;
+        @include g.font-size(1.8rem, 1.8rem);
+    }
+}

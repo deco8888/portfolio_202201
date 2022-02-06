@@ -1,0 +1,9 @@
+@use '../settings/easing' as e;
+
+@mixin before-scale-down() {
+    transition: transform 0.4s e.ease(OutSine);
+}
+@mixin after-scale-down($x: 0.95, $delay: 0s) {
+    transform: scale($x);
+    transition-delay: $delay;
+}

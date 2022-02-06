@@ -1,0 +1,10 @@
+@use "../global/index" as g;
+
+.p-page {
+    @include g.media('>phone') {
+        padding: g.get_per(100) 0 0;
+    }
+    @include g.media('<=phone') {
+        padding: g.get_per(100) 0 0;
+    }
+}

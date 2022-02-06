@@ -1,0 +1,123 @@
+@use "../../../global/index" as g;
+
+/***********************
+ *
+ * ソレ当てチャレンジ 数値入力フォーム
+ *
+ ***********************/
+.p-percent-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    @include g.media('>phone') {
+        margin: g.get_per(33, 800) 0 0;
+    }
+    @include g.media('<=phone') {
+        margin: g.get_per(53, 650) 0 0;
+    }
+    &__input-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+    &__input-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        @include g.media('>phone') {
+            width: g.get_per(100, 800);
+        }
+        @include g.media('<=phone') {
+            width: g.get_per(180, 650);
+        }
+    }
+    &__input {
+        display: flex;
+        justify-content: center;
+        position: relative;
+        border: solid 1px g.$color-white;
+        background-color: g.$color-black;
+        color: g.$color-warm-grey;
+        text-align: center;
+        @include g.font-size(2.8rem, 5rem);
+        @include g.media('>phone') {
+            right: 4%;;
+            padding: g.get_per(5, 100) 0;
+            width: 100%;
+        }
+        @include g.media('<=phone') {
+            right: 4%;
+            padding: g.get_per(10, 180) 0;
+            width: 100%;
+            line-height: 0.86;
+        }
+    }
+    &__input-percent {
+        position: absolute;
+        color: g.$color-white;
+        line-height: 1;
+        @include g.font-size(3.6rem, 6.2rem);
+        @include g.media('>phone') {
+            left: 106%;
+        }
+        @include g.media('<=phone') {
+            left: 110%;
+        }
+    }
+    &__input-text {
+        color: g.$color-white;
+        line-height: 1;
+        @include g.font-size(1.3rem, 2.4rem);
+        @include g.media('>phone') {
+            margin: g.get_per(16, 800) 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(29, 650) 0 0;
+        }
+    }
+    &__button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: g.$color-two;
+        border: solid 2px g.$color-white;
+        @include g.media('>phone') {
+            margin: g.get_per(24, 800) auto 0;
+            padding: g.get_per(20, 800) 0;
+            width: g.get_per(224, 800);
+            border-radius: 1rem;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(61, 650) auto 0;
+            padding: g.get_per(20, 650) 0;
+            width: g.get_per(300, 650);
+            border-radius: 2rem;
+        }
+        @include g.before-scale-down();
+        @include g.hover-only() {
+            @include g.after-scale-down();
+        }
+    }
+    &__button-text {
+        display: inline-block;
+        color: g.$color-white;
+        line-height: 1;
+        font-weight: bold;
+        @include g.font-size(2.1rem, 4rem);
+    }
+    &__message {
+        color: g.$color-white;
+        line-height: 1;
+        font-weight: bold;
+        @include g.font-size(1.6rem, 2.4rem);
+        @include g.media('>phone') {
+            margin: g.get_per(16, 800) 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(29, 650) 0 0;
+        }
+    }
+}

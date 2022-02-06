@@ -1,0 +1,21 @@
+// Design sizes
+$pc-base-size: 1400;
+$tablet-base-size: 1025;
+$sp-base-size: 750;
+
+$min-vw: 769px;
+$max-vw: 1920px;
+
+$breakpoints: (
+    'phone': 768px,
+    'mobile': 768px,
+    'small': 840px,
+    'middle': 1120px,
+    'tablet': 1400px,
+    'pc': 1400px,
+    'desktop': 1920px,
+) !default;
+
+@forward '~include-media/dist/_include-media.scss' with(
+    $breakpoints: $breakpoints
+);

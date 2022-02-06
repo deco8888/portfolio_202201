@@ -1,0 +1,66 @@
+@use '../../global/index' as g;
+
+.p-error {
+    $parent: &;
+    position: relative;
+    z-index: 2;
+    @include g.media('>tablet') {
+        margin: 0 auto;
+        width: g.get_per(800);
+    }
+    @include g.media('<=tablet', '>phone') {
+        margin: 0 auto;
+        width: 90%;
+        max-width: 800px;
+    }
+    @include g.media('<=phone') {
+        margin: 0 auto;
+        width: g.get_per(650);
+    }
+    &__text {
+        display: block;
+        position: relative;
+        color: g.$color-white;
+        line-height: 1.33;
+        font-weight: bold;
+        text-align: center;
+        @include g.font-size(3rem, 5rem);
+        z-index: 1;
+    }
+    &__button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        border-radius: 1rem;
+        // pointer-events: none;
+        z-index: 1;
+        @include g.media('>phone') {
+            margin: g.get_per(84, 800) auto 0;
+            padding: g.get_per(22, 800) 0;
+            width: g.get_per(220, 800);
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(79, 650) auto 0;
+            padding: g.get_per(52, 650) 0;
+            width: 90%;
+        }
+        &.is-active {
+            background-color: g.$color-white;
+            // pointer-events: visible;
+        }
+        @include g.before-scale-down();
+        @include g.hover-only() {
+            @include g.after-scale-down();
+        }
+    }
+    &__button-text {
+        display: inline-block;
+        color: g.$color-greyish-brown;
+        line-height: 1;
+        font-weight: bold;
+        text-align: center;
+        @include g.font-size(1.8rem, 3.6rem);
+    }
+}

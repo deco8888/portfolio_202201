@@ -1,0 +1,49 @@
+@use '../settings/easing' as e;
+
+@mixin scroll-fadein-before($x: 0, $y: 15px) {
+    opacity: 0;
+    transform: translate($x, $y);
+}
+
+@mixin scroll-fadein-after($x: 0, $y: 0, $delay: 0.3s) {
+    opacity: 1;
+    transform: translate($x, $y);
+    transition: opacity 1s e.ease(OutSine), transform 1s e.ease(OutSine);
+    transition-delay: $delay;
+}
+
+@mixin scroll-blur-before($i: 15px) {
+    opacity: 0;
+    filter: blur($i);
+}
+
+@mixin scroll-blur-after($delay: 0.6s) {
+    opacity: 1;
+    filter: blur(0);
+    transition: opacity 0.5s e.ease(OutSine), filter 1s e.ease(OutQuart);
+    transition-delay: $delay;
+}
+
+@mixin scroll-scale-before() {
+    opacity: 0;
+    transform: scale(0);
+}
+
+@mixin scroll-scale-after($delay: 0.3s) {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.6s e.ease(InQuart), transform 0.8s e.ease(OutBack);
+    transition-delay: $delay;
+}
+
+@mixin scroll-bounce-before() {
+    opacity: 0;
+    transform: scale(0);
+}
+
+@mixin scroll-bounce-after($delay: 0.3s) {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.6s e.ease(InQuart), transform 0.8s e.ease(OutBack);
+    transition-delay: $delay;
+}

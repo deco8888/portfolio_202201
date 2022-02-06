@@ -1,0 +1,98 @@
+@use "../../../global/index" as g;
+
+/***********************
+ *
+ * Indexページ クイズ開始ボタン
+ *
+ ***********************/
+.p-contents-buttons {
+    $parent: &;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    @include g.media('>phone') {
+        margin: g.get_per(33) 0 0;
+    }
+    @include g.media('<=phone') {
+        flex-direction: column;
+        margin: g.get_per(80) auto 0;
+        width: g.get_per(650);
+    }
+    &__item {
+        display: flex;
+        flex-direction: column;
+        @include g.media('>phone') {
+            width: g.get_per(220);
+        }
+        @include g.media('<=phone') {
+            width: 100%;
+        }
+        &:not(:first-child) {
+            @include g.media('>phone') {
+                margin: 0 0 0 g.get_per(70);
+            }
+            @include g.media('<=phone') {
+                margin: g.get_per(80) 0 0;
+            }
+        }
+    }
+    &__button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        background-color: g.$color-greyish-brown;
+        border-radius: 1rem;
+        height: 100%;
+        pointer-events: none;
+        cursor: none;
+        // pointer-events: none;
+        @include g.media('>phone') {
+            padding: g.strip_lh(16, 1.8rem, 1.33, 220) 0;
+            width: 100%;
+        }
+        @include g.media('<=phone') {
+            padding: g.strip_lh(30, 3.45rem, 1.33, 650) 0;
+            width: 100%;
+            min-height: g.get_vw(140);
+        }
+        &.is-active {
+            background-color: g.$color-white;
+            // pointer-events: visible;
+        }
+        &.is-start {
+            pointer-events: visible;
+            cursor: pointer;
+        }
+        @include g.before-scale-down();
+        @include g.hover-only() {
+            @include g.after-scale-down();
+        }
+    }
+    &__button-text {
+        display: inline-block;
+        color: g.$color-greyish;
+        line-height: 1.33;
+        font-weight: bold;
+        text-align: center;
+        @include g.font-size(1.8rem, 3.45rem);
+        .is-active & {
+            color: g.$color-deep-red;
+        }
+    }
+    &__schedule {
+        display: block;
+        color: g.$color-white;
+        line-height: 1;
+        text-align: center;
+        @include g.font-size(1.4rem, 2.8rem);
+        @include g.media('>phone') {
+            margin: g.get_per(14, 220) 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(14, 650) 0 0;
+        }
+    }
+}

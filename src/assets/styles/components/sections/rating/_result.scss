@@ -1,0 +1,192 @@
+@use "../../../global/index" as g;
+
+/***********************
+ *
+ * 格付けバトル 結果発表
+ *
+ ***********************/
+.p-rating-result {
+    &__wrap {
+        $parent: &;
+        position: relative;
+        margin: 0 auto;
+        z-index: 2;
+        @include g.media('>phone') {
+            padding: g.get_per(36) 0 0;
+            width: g.get_per(800);
+        }
+        @include g.media('<=phone') {
+            padding: g.get_per(65) 0 0;
+            width: g.get_per(650);
+        }
+    }
+    &__time-over {
+        display: none;
+        color: g.$color-white;
+        line-height: 1;
+        font-weight: bold;
+        text-align: center;
+        @include g.font-size(3rem, 5.5rem);
+        @include g.media('>phone') {
+            margin: 0 0 g.get_per(10, 800);
+        }
+        @include g.media('<=phone') {
+            margin: 0 0 g.get_per(35, 650);
+        }
+        &.is-active {
+            display: block;
+        }
+    }
+    &__title {
+        position: relative;
+        @include g.media('>phone') {
+            margin: 0 auto;
+            width: g.get_per(454, 800);
+        }
+        @include g.media('<=phone') {
+            margin: 0 auto;
+            width: g.get_per(613, 650);
+        }
+    }
+    &__message {
+        color: g.$color-white;
+        line-height: 1.75;
+        @include g.font-size(1.7rem, 3rem);
+        @include g.media('>phone') {
+            margin: g.get_per(43, 800) 0 0;
+            text-align: center;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(88, 650) 0 0;
+            text-align: left;
+        }
+    }
+    &__note {
+        color: g.$color-white;
+        line-height: 1;
+        @include g.line-height(1, 1.75);
+        @include g.font-size(1.3rem, 2.2rem);
+        @include g.media('>phone') {
+            margin: g.get_per(25, 800) 0 0;
+            text-align: center;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(67, 650) 0 0;
+            text-align: left;
+        }
+    }
+    &__rank-list {
+        display: flex;
+        justify-content: center;
+        @include g.media('>phone') {
+            margin: g.get_per(50, 800) 0 0;
+            width: 100%;
+        }
+        @include g.media('<=phone') {
+            flex-direction: column;
+            align-items: center;
+            margin: g.get_per(100, 650) 0 0;
+            width: 100%;
+        }
+    }
+    &__rank-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        &--all {
+            @include g.media('>phone') {
+                width: g.get_per(281, 800);
+            }
+            @include g.media('<=phone') {
+                margin: g.get_per(87, 650) 0 0;
+                width: g.get_per(405, 650);
+                order: 2;
+            }
+        }
+        &--you {
+            @include g.media('>phone') {
+                margin: g.get_per(90, 800) 0 0 g.get_per(90, 800);
+                width: g.get_per(354, 800);
+            }
+            @include g.media('<=phone') {
+                width: g.get_per(510, 650);
+                order: 1;
+            }
+        }
+    }
+    &__rank-text {
+        color: g.$color-white;
+        line-height: 1;
+        font-weight: bold;
+        @include g.font-size(2.4rem, 3.6rem);
+    }
+    &__rank-image {
+        display: block;
+        position: relative;
+        @include g.media('>phone') {
+            width: 100%;
+        }
+        @include g.media('<=phone') {
+            width: 100%;
+        }
+        &:first-of-type {
+            @include g.media('>phone') {
+                margin: g.get_per(13, 281) 0 0;
+            }
+            @include g.media('<=phone') {
+                margin: g.get_per(17, 405) 0 0;
+            }
+        }
+        &.is-yourrank {
+            &::before,
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                transform: translate(0, -50%);
+                background-size: contain;
+                background-position: center center;
+                background-repeat: no-repeat;
+                @include g.media('>phone') {
+                    width: g.get_vw(18);
+                    height: g.get_vw(27);
+                }
+                @include g.media('<=phone') {
+                    width: g.get_vw(27);
+                    height: g.get_vw(40);
+                }
+            }
+            &::before {
+                @include g.media('>phone') {
+                    right: 105%;
+                    background-image: url(~@/assets/images/rating/pc/rank_l.png);
+                }
+                @include g.media('<=phone') {
+                    right: 105%;
+                    background-image: url(~@/assets/images/rating/sp/rank_l.png);
+                }
+            }
+            &::after {
+                @include g.media('>phone') {
+                    left: 105%;
+                    background-image: url(~@/assets/images/rating/pc/rank_r.png);
+                }
+                @include g.media('<=phone') {
+                    left: 105%;
+                    background-image: url(~@/assets/images/rating/sp/rank_r.png);
+                }
+            }
+        }
+    }
+    &__your-rank-image {
+        display: block;
+        @include g.media('>phone') {
+            margin: g.get_per(24, 354) 0 0;
+            width: 100%;
+        }
+        @include g.media('<=phone') {
+            margin: g.get_per(33, 510) 0 0;
+            width: 100%;
+        }
+    }
+}
