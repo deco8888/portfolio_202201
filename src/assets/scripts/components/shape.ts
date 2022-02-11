@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import Webgl from './webgl';
+// import * as THREE from 'three';
+// import Webgl from './webgl';
 
 import EventBus from '~/utils/event-bus';
 

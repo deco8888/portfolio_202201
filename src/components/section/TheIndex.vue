@@ -22,6 +22,6 @@ export default Vue.extend({
     left: 0;
     width: 100%;
     height: 100%;
-    background: #106280;
+    background: linear-gradient(180deg, #043e6b, #578bb3);
 }
 </style>

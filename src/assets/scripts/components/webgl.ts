@@ -1,12 +1,15 @@
 import * as THREE from 'three';
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap, { Power2 } from 'gsap';
-import vertexshader from '../glsl/vertexshader.vert';
+import { BufferGeometry, Points } from 'three';
+import vertexShader from '../glsl/vertexshader.vert';
 import fragmentShader from '../glsl/fragmentShader.frag';
+import starVertexShader from '../glsl/star/vertexshader.vert';
+import starFragmentShader from '../glsl/star/fragmentShader.frag';
 import { throttle } from '../utils/throttle';
 import { lerp } from '../utils/math';
 import { name } from '../const/name';
-import { BufferGeometry, Points } from 'three';
+// import { BufferGeometry, Points } from 'three';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -25,6 +28,7 @@ export default class Webgl {
         camera: THREE.PerspectiveCamera | null;
         scene: THREE.Scene;
         mesh: THREE.Mesh | null;
+        stars: THREE.Points | null;
         renderer: THREE.WebGLRenderer | null;
         object: THREE.Object3D | null;
         // control: OrbitControls | null;
@@ -38,11 +42,14 @@ export default class Webgl {
     };
     elemInfo: elemInfoOptions;
     meshList: THREE.Mesh[];
+    sizeList: number[];
+    step: number;
     constructor() {
         this.three = {
             camera: null,
             scene: new THREE.Scene(),
             mesh: null,
+            stars: null,
             renderer: null,
             object: null,
             // control: null,
@@ -67,6 +74,8 @@ export default class Webgl {
             parallax: 1,
         };
         this.meshList = [];
+        this.sizeList = [];
+        this.step = 0;
     }
     init(canvas: HTMLCanvasElement): void {
         this.setSize();
@@ -82,6 +91,7 @@ export default class Webgl {
         this.viewport = this.initViewport();
         // メッシュを作成
         this.three.object = this.initMesh();
+        this.initStars();
         // メッシュをシーンに追加
         this.three.scene.add(this.three.object);
         // カメラを制御
@@ -101,18 +111,74 @@ export default class Webgl {
     initCamera(): THREE.PerspectiveCamera {
         const camera = new THREE.PerspectiveCamera(
             45, // 画角
-            this.winSize.width / this.winSize.height, //縦横比
-            1, //視点から最も近い面までの距離
-            100000 //視点から最も遠い面までの距離
+            this.winSize.width / this.winSize.height, // 縦横比
+            1, // 視点から最も近い面までの距離
+            100000 // 視点から最も遠い面までの距離
         );
         camera.position.set(0, 0, 50);
-        // どの位置からでも指定した座標に強制的に向かせることができる命令m
+        // どの位置からでも指定した座標に強制的に向かせることができる命令
         camera.lookAt(this.three.scene.position);
         return camera;
     }
+    initStars() {
+        const LENGTH = 4000;
+        const TOTAL = 30000;
+        const SIZE = 5.0;
+        const vertices = [];
+        // const colors = [];
+        for (let i = 0; i < LENGTH; i++) {
+            const positonX = TOTAL * (Math.random() - 0.5);
+            const positonY = TOTAL * (Math.random() - 0.5);
+            const positonZ = TOTAL * -Math.abs(Math.random() - 0.2);
+            vertices.push(positonX, positonY, positonZ);
+
+            const size = SIZE * Math.abs(Math.random() - 0.5);
+            this.sizeList.push(size);
+            // const r = Math.random() - 0.5;
+            // const b = Math.random() - 0.5;
+            // const g = Math.random() - 0.5;
+            // colors[i * 3] = r;
+            // colors[i * 3 + 1] = b;
+            // colors[i * 3 + 2] = g;
+        }
+        // 形状データを作成
+        // const geometry = new THREE.PlaneBufferGeometry(1, 1);
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        geometry.setAttribute('size', new THREE.Float32BufferAttribute(this.sizeList, 1));
+        const stars = require("../../imgs/pc/star.png");
+        const uniforms = {
+            uTex: {
+                type: "t",
+                value: new THREE.TextureLoader().load(stars)
+            },
+            // uPointSize: {
+            //     type: "f",
+            //     value: 2.0
+            // }
+        }
+        const material = new THREE.ShaderMaterial({
+            uniforms,
+            vertexShader: starVertexShader,
+            fragmentShader: starFragmentShader,
+            transparent: true,
+            opacity: 0.3,
+            // ブレンドモード: AdditiveBlending➡加算合成
+            blending: THREE.AdditiveBlending,
+            // 陰面処理を有効化するかのフラグ。陰面処理とは "ある視点から見えない部分の面を消去する" という処理のこと。
+            depthTest: true
+        });
+        // const mesh = new THREE.Mesh(geometry, material);
+        this.three.stars = new Points(geometry, material);
+        // const object = new THREE.Object3D();
+        // object.add(mesh);
+        console.log(this.three.scene);
+        this.three.scene.add(this.three.stars);
+        console.log(this.three.scene);
+    }
     initRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
         const renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
+            canvas,
             alpha: true,
             antialias: true, // 物体の輪郭を滑らかにする
         });
@@ -136,8 +202,8 @@ export default class Webgl {
             const height = Math.tan(fov / 2) * this.three.camera.position.z * 2;
             const width = height * this.three.camera.aspect;
             this.viewport = {
-                width: width,
-                height: height,
+                width,
+                height,
             };
         }
         return this.viewport;
@@ -178,15 +244,16 @@ export default class Webgl {
             vertices.push(positonX, -positonY, 10);
         }
         // 形状データを作成
-        const geometry = new THREE.PlaneBufferGeometry(1, 1);
-        // const geometry = new BufferGeometry();
+        // const geometry = new THREE.PlaneBufferGeometry(1, 1);
+        const geometry = new BufferGeometry();
 
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         // geometry.setAttribute('color', new THREE.Float32BufferAttribute(vertices, 3));
         const material = new THREE.ShaderMaterial({
+            // eslint-disable-next-line object-shorthand
             uniforms: uniforms,
-            vertexShader: vertexshader,
-            fragmentShader: fragmentShader,
+            vertexShader,
+            fragmentShader,
             transparent: true,
         });
         // const material = new THREE.MeshBasicMaterial({
@@ -196,22 +263,22 @@ export default class Webgl {
         //     color: 0xffff00,
         //     opacity: 0.6,
         // });
-        this.three.mesh = new THREE.Mesh(geometry, material);
-        // const mesh = new Points(geometry, material);
+        // this.three.mesh = new THREE.Mesh(geometry, material);
+        const mesh = new Points(geometry, material);
         const object = new THREE.Object3D();
-        // object.add(mesh);
+        object.add(mesh);
         // const object = new THREE.Object3D();
-        for (let i = 0; i < LENGTH; i += 2) {
-            this.three.mesh = new THREE.Mesh(geometry, material);
-            const positionX = Math.random() * 10 - 10;
-            const positionY = Math.random() * 10 - 10;
-            const positionZ = Math.random() * 10 - 10;
-            this.three.mesh.position.set(positionX, -positionY, positionZ);
-            this.meshList.push(this.three.mesh);
-            object.add(this.three.mesh);
-        }
+        // for (let i = 0; i < LENGTH; i += 2) {
+        //     // this.three.mesh = new THREE.Mesh(geometry, material);
+        //     const positionX = Math.random() * 10 - 10;
+        //     const positionY = Math.random() * 10 - 10;
+        //     const positionZ = Math.random() * 10 - 10;
+        //     this.three.mesh.position.set(positionX, -positionY, positionZ);
+        //     this.meshList.push(this.three.mesh);
+        //     object.add(this.three.mesh);
+        // }
         this.elemInfo = {
-            object: object,
+            object,
             current: 0,
             previous: 0,
             ease: 0.1,
@@ -219,7 +286,7 @@ export default class Webgl {
         };
         return object;
     }
-    update(): void {}
+    update(): void { }
     scroll(): void {
         window.addEventListener('wheel', (e) => {
             this.setWheel(e);
@@ -313,7 +380,18 @@ export default class Webgl {
         }
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
+
+        this.step++;
+        const sizes = this.three.stars?.geometry.attributes.size;
+        if (sizes) {
+            for (let i = 0; i < sizes.array.length; i++) {
+                sizes.array[i] = this.sizeList[i] * (1 + Math.sin(0.1 * i + this.step * 0.025));
+                
+            }
+            sizes.needsUpdate = true;
+        }
     }
 }
 
-new Webgl();
+// eslint-disable-next-line no-new
+// new Webgl();

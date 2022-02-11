@@ -15,6 +15,7 @@ export default class Art {
     }
     init(): void {
         this.webgl.init(this.params.canvas);
+        // eslint-disable-next-line no-new
         new Shape();
         window.addEventListener('resize', this.resize.bind(this));
         this.webgl.render();

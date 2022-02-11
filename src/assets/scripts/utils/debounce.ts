@@ -5,7 +5,7 @@ export function debounce<F extends Args>(
     fn: F,
     interval: number
 ): (this: ThisParameterType<F>, ...args: Parameters<F>) => void {
-    let timerId: ReturnType<typeof setTimeout> | undefined;
+    let timerId: ReturnType<typeof setTimeout>;
     return function (this: ThisParameterType<F>, ...args: Parameters<F>): void {
         // debounce関数ががinterval秒内で複数呼び出されても、都度clearTimeout → 最後の1回だけ実行
         clearTimeout(timerId);

@@ -82,7 +82,7 @@ const nuxtConfig: NuxtConfig = {
                             useBuiltIns: 'usage',
                             // polyfillを利用するcore-jsのバージョンを指定
                             corejs: {
-                                version: 3.2,
+                                version: 3.21,
                             },
                         },
                     ],
@@ -94,6 +94,7 @@ const nuxtConfig: NuxtConfig = {
             if (isClient) {
                 config.devtool = isDev ? 'source-map' : false;
             }
+            // eslint-disable-next-line no-extra-boolean-cast
             if (!!config.module) {
                 config.module.rules.push({
                     test: /\.(vert|frag)$/i,
