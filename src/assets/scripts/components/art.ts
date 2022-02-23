@@ -1,8 +1,10 @@
 import Shape from './shape';
-import Webgl from './webgl';
+// import Webgl from './webgl';
+import Webgl from './mv';
 
 interface ArtOptions {
-    canvas: HTMLCanvasElement;
+    canvas?: HTMLCanvasElement;
+    ctx?: CanvasRenderingContext2D;
 }
 
 export default class Art {
@@ -11,10 +13,12 @@ export default class Art {
     constructor(props: ArtOptions) {
         this.params = props;
         this.webgl = new Webgl();
-        this.init();
+        window.addEventListener('load', () => {
+            this.init();
+        })
     }
     init(): void {
-        this.webgl.init(this.params.canvas);
+        this.webgl.init(this.params.canvas, this.params.ctx);
         // eslint-disable-next-line no-new
         new Shape();
         window.addEventListener('resize', this.resize.bind(this));

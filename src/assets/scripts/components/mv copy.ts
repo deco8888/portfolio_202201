@@ -1,15 +1,12 @@
 import * as THREE from 'three';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap, { Power2 } from 'gsap';
 import { BufferGeometry, Points } from 'three';
-import vertexShader from '../glsl/vertexshader.vert';
-import fragmentShader from '../glsl/fragmentShader.frag';
-import starVertexShader from '../glsl/star/vertexshader.vert';
-import starFragmentShader from '../glsl/star/fragmentShader.frag';
+import vertexShader from '../glsl/name/vertexshader.vert';
+import fragmentShader from '../glsl/name/fragmentShader.frag';
 import { throttle } from '../utils/throttle';
 import { lerp } from '../utils/math';
 import { name } from '../const/name';
-// import { BufferGeometry, Points } from 'three';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -24,15 +21,25 @@ interface elemInfoOptions {
 }
 
 export default class Webgl {
+    canvas: HTMLCanvasElement;
+    wrapper: HTMLElement;
+    context: {
+        ctx: CanvasRenderingContext2D;
+    }
+    image: {
+        el: HTMLImageElement;
+        width: number;
+        height: number;
+    }
     three: {
-        camera: THREE.PerspectiveCamera | null;
+        camera: THREE.PerspectiveCamera;
         scene: THREE.Scene;
-        mesh: THREE.Mesh | null;
-        stars: THREE.Points | null;
-        renderer: THREE.WebGLRenderer | null;
-        object: THREE.Object3D | null;
-        // control: OrbitControls | null;
-        clock: THREE.Clock | null;
+        mesh: THREE.Mesh;
+        stars: THREE.Points;
+        renderer: THREE.WebGLRenderer;
+        object: THREE.Object3D;
+        control: OrbitControls;
+        clock: THREE.Clock;
     };
     winSize: ThreeNumber;
     time: ThreeNumber;
@@ -44,7 +51,22 @@ export default class Webgl {
     meshList: THREE.Mesh[];
     sizeList: number[];
     step: number;
+    name: {
+        imageList: {
+            [key: string]: number[]
+        },
+        promiseList: []
+    }
     constructor() {
+        this.canvas = null;
+        this.context = {
+            ctx: null,
+        }
+        this.image = {
+            el: null,
+            width: 0,
+            height: 0,
+        }
         this.three = {
             camera: null,
             scene: new THREE.Scene(),
@@ -52,7 +74,7 @@ export default class Webgl {
             stars: null,
             renderer: null,
             object: null,
-            // control: null,
+            control: null,
             clock: null,
         };
         this.winSize = {
@@ -76,109 +98,87 @@ export default class Webgl {
         this.meshList = [];
         this.sizeList = [];
         this.step = 0;
+        this.name = {
+            imageList: {},
+            promiseList: []
+        }
     }
-    init(canvas: HTMLCanvasElement): void {
+    init(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void {
+        this.canvas = canvas;
         this.setSize();
         // カメラを作成
         this.three.camera = this.initCamera();
         // カメラをシーンに追加
         this.three.scene.add(this.three.camera);
-        // レンダラーを作成
-        this.three.renderer = this.initRenderer(canvas);
-        // HTMLに追加
-        // canvas.appendChild(this.three.renderer.domElement);
+
         // ビューポート計算
         this.viewport = this.initViewport();
         // メッシュを作成
-        this.three.object = this.initMesh();
-        this.initStars();
+        // this.three.object = this.initMesh();
+        this.initImage(ctx);
+
+        // レンダラーを作成
+        // this.three.renderer = this.initRenderer();
+
+        // this.initStars();
         // メッシュをシーンに追加
-        this.three.scene.add(this.three.object);
+        // this.three.scene.add(this.three.object);
         // カメラを制御
         // this.three.control = new OrbitControls(this.three.camera, this.three.renderer.domElement);
         // this.three.control.enableDamping = true;
         this.elemInfo.current = this.three.camera.position.z;
         this.test();
-        this.update();
+        // this.update();
 
         this.three.clock = new THREE.Clock();
         this.three.clock.start();
 
-        // window.addEventListener('wheel', (e) => {
-        //     this.setWheel(e);
-        // });
+        window.addEventListener('wheel', (e) => {
+            this.setWheel(e);
+        });
+        this.handleEvent();
+        window.addEventListener(
+            'resize',
+            throttle(() => {
+                this.handleResize();
+            }, 100),
+            false
+        );
     }
     initCamera(): THREE.PerspectiveCamera {
         const camera = new THREE.PerspectiveCamera(
             45, // 画角
             this.winSize.width / this.winSize.height, // 縦横比
-            1, // 視点から最も近い面までの距離
-            100000 // 視点から最も遠い面までの距離
+            0.1, // 視点から最も近い面までの距離
+            2000 // 視点から最も遠い面までの距離
         );
-        camera.position.set(0, 0, 50);
+        camera.position.set(0, 0, 1000);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
         camera.lookAt(this.three.scene.position);
         return camera;
     }
     initStars() {
-        const LENGTH = 4000;
-        const TOTAL = 30000;
-        const SIZE = 5.0;
-        const vertices = [];
-        // const colors = [];
-        for (let i = 0; i < LENGTH; i++) {
-            const positonX = TOTAL * (Math.random() - 0.5);
-            const positonY = TOTAL * (Math.random() - 0.5);
-            const positonZ = TOTAL * -Math.abs(Math.random() - 0.2);
-            vertices.push(positonX, positonY, positonZ);
-
-            const size = SIZE * Math.abs(Math.random() - 0.5);
-            this.sizeList.push(size);
-            // const r = Math.random() - 0.5;
-            // const b = Math.random() - 0.5;
-            // const g = Math.random() - 0.5;
-            // colors[i * 3] = r;
-            // colors[i * 3 + 1] = b;
-            // colors[i * 3 + 2] = g;
-        }
-        // 形状データを作成
-        // const geometry = new THREE.PlaneBufferGeometry(1, 1);
         const geometry = new BufferGeometry();
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        geometry.setAttribute('size', new THREE.Float32BufferAttribute(this.sizeList, 1));
-        const stars = require("../../imgs/pc/star.png");
-        const uniforms = {
-            uTex: {
-                type: "t",
-                value: new THREE.TextureLoader().load(stars)
-            },
-            // uPointSize: {
-            //     type: "f",
-            //     value: 2.0
-            // }
-        }
-        const material = new THREE.ShaderMaterial({
-            uniforms,
-            vertexShader: starVertexShader,
-            fragmentShader: starFragmentShader,
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.name.imageList.position, 3));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.name.imageList.color, 3));
+        geometry.setAttribute('alpha', new THREE.Float32BufferAttribute(this.name.imageList.alpha, 1));
+        const material = new THREE.RawShaderMaterial({
+            vertexShader,
+            fragmentShader,
             transparent: true,
-            opacity: 0.3,
             // ブレンドモード: AdditiveBlending➡加算合成
-            blending: THREE.AdditiveBlending,
+            // blending: THREE.AdditiveBlending,
             // 陰面処理を有効化するかのフラグ。陰面処理とは "ある視点から見えない部分の面を消去する" という処理のこと。
-            depthTest: true
+            // depthTest: true
         });
-        // const mesh = new THREE.Mesh(geometry, material);
         this.three.stars = new Points(geometry, material);
-        // const object = new THREE.Object3D();
-        // object.add(mesh);
-        console.log(this.three.scene);
-        this.three.scene.add(this.three.stars);
-        console.log(this.three.scene);
+        const object = new THREE.Object3D();
+        this.three.object = object.add(this.three.stars);
+        this.three.scene.add(this.three.object);
+        this.three.renderer = this.initRenderer();
     }
-    initRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
+    initRenderer(): THREE.WebGLRenderer {
         const renderer = new THREE.WebGLRenderer({
-            canvas,
             alpha: true,
             antialias: true, // 物体の輪郭を滑らかにする
         });
@@ -188,8 +188,10 @@ export default class Webgl {
          * https://ics.media/tutorial-three/renderer_resize/
          */
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setClearColor(0xeaf2f5, 0);
+        renderer.setClearColor(new THREE.Color(0xeaf2f5), 0);
         renderer.setSize(this.winSize.width, this.winSize.height);
+        this.wrapper = document.querySelector('.p-mv__title');
+        this.wrapper.appendChild(renderer.domElement);
         return renderer;
     }
     initViewport(): ThreeNumber {
@@ -208,85 +210,69 @@ export default class Webgl {
         }
         return this.viewport;
     }
-    initMesh(): THREE.Object3D {
-        const uniforms = {
-            uResolution: {
-                value: new THREE.Vector2(window.innerWidth, window.innerHeight),
-            },
-            uShape: {
-                value: new THREE.Vector2(2, 2),
-            },
-            // uProgress: {
-            //     value: 1.0,
-            // },
-            // uSpeed: {
-            //     value: 0.0,
-            // },
-            // uWave: {
-            //     value: 0.0,
-            // },
-            // uTIme: {
-            //     value: 0.0,
-            // },
-        };
-        const LENGTH = name.length;
-        const vertices = [];
-        for (let i = 0; i < LENGTH; i += 2) {
-            let positonX;
-            let positonY;
-            if (i < 192) {
-                positonX = name[i];
-                positonY = name[i + 1];
-            } else {
-                positonX = name[i] - 35;
-                positonY = name[i + 1] + 6;
-            }
-            vertices.push(positonX, -positonY, 10);
-        }
-        // 形状データを作成
-        // const geometry = new THREE.PlaneBufferGeometry(1, 1);
-        const geometry = new BufferGeometry();
-
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-        // geometry.setAttribute('color', new THREE.Float32BufferAttribute(vertices, 3));
-        const material = new THREE.ShaderMaterial({
-            // eslint-disable-next-line object-shorthand
-            uniforms: uniforms,
-            vertexShader,
-            fragmentShader,
-            transparent: true,
+    initImage(_: CanvasRenderingContext2D) {
+        // this.context.ctx = ctx;
+        this.image.el = new Image();
+        this.image.el.src = require("../../imgs/pc/name.png");
+        this.image.el.crossOrigin = "anonymous";
+        this.image.el.addEventListener('load', async () => {
+            await this.renderImage();
         });
-        // const material = new THREE.MeshBasicMaterial({
-        //     // 三角形の表と裏の両面を描画する指定
-        //     side: THREE.DoubleSide,
-        //     transparent: true,
-        //     color: 0xffff00,
-        //     opacity: 0.6,
-        // });
-        // this.three.mesh = new THREE.Mesh(geometry, material);
-        const mesh = new Points(geometry, material);
-        const object = new THREE.Object3D();
-        object.add(mesh);
-        // const object = new THREE.Object3D();
-        // for (let i = 0; i < LENGTH; i += 2) {
-        //     // this.three.mesh = new THREE.Mesh(geometry, material);
-        //     const positionX = Math.random() * 10 - 10;
-        //     const positionY = Math.random() * 10 - 10;
-        //     const positionZ = Math.random() * 10 - 10;
-        //     this.three.mesh.position.set(positionX, -positionY, positionZ);
-        //     this.meshList.push(this.three.mesh);
-        //     object.add(this.three.mesh);
-        // }
-        this.elemInfo = {
-            object,
-            current: 0,
-            previous: 0,
-            ease: 0.1,
-            parallax: 1,
-        };
-        return object;
     }
-    update(): void { }
+    // eslint-disable-next-line require-await
+    async renderImage(): Promise<void> {
+        this.canvas = document.createElement("canvas");
+        this.context.ctx = this.canvas.getContext("2d");
+        // Canvasサイズ設定
+        this.canvas.width = this.winSize.width;
+        this.canvas.height = this.winSize.height;
+
+        this.context.ctx.fillStyle = "#ffffff";
+        this.context.ctx.fillText('Nakamura', 0, 0, 100);
+        // const data = this.context.ctx.getImageData(0, 0, 100, 30).data;
+        this.context.ctx.fill();
+        const texture = new THREE.Texture(this.canvas)
+        texture.needsUpdate = true;
+
+        // 実際の画像サイズ設定
+        // this.image.width = this.image.el.width;
+        // this.image.height = this.image.el.height;
+        // // リサイズ後画像サイズ設定
+        // const width = this.winSize.width;
+        // const height = this.winSize.width * (this.image.height / this.image.width);
+        // this.context.ctx.drawImage(this.image.el, 0, 0, this.image.width, this.image.height, 0, 0, width, height);
+        // const imageData = this.context.ctx.getImageData(0, 0, width, height);
+        // const data = imageData.data;
+        // const position = [];
+        // const color = [];
+        // const alpha = [];
+        // for (let y = 0; y < height; y += 5.0) {
+        //     for (let x = 0; x < width; x += 5.0) {
+        //         const index = (y * width + x) * 4;
+        //         const r = data[index] / 255;
+        //         const g = data[index + 1] / 255;
+        //         const b = data[index + 2] / 255;
+        //         const a = data[index + 3] / 255;
+        //         const pX = x - width / 2;
+        //         const pY = -(y - height / 2);
+        //         const pZ = 0;
+        //         a > 0 ? color.push(1.0, 0.0, 1.0) : color.push(r, g, b);
+        //         // if (a !== 0) {
+        //         //     color.push(1.0, 0.0, 1.0);
+        //         // } else {
+        //         //     color.push(r, g, b);
+        //         // }
+        //         position.push(pX, pY, pZ);
+        //         alpha.push(a);
+        //     }
+        // }
+        // this.name.imageList = {
+        //     position,
+        //     color,
+        //     alpha
+        // }
+        // this.initStars();
+    }
     scroll(): void {
         window.addEventListener('wheel', (e) => {
             this.setWheel(e);
@@ -294,7 +280,7 @@ export default class Webgl {
     }
     setWheel(e: WheelEvent) {
         if (this.three.camera) {
-            this.elemInfo.current += e.deltaY * 0.07;
+            this.elemInfo.current -= e.deltaY * 0.07;
         }
         const LENGTH = name.length;
         for (let i = 0; i < LENGTH; i += 2) {
@@ -323,7 +309,7 @@ export default class Webgl {
             this.elemInfo.previous = lerp(this.elemInfo.previous, this.elemInfo.current, this.elemInfo.ease);
             this.elemInfo.previous = Math.floor(this.elemInfo.previous * 100) / 100;
             const tl = gsap.timeline();
-            const diff = this.three.camera.position.z - this.elemInfo.current;
+            const diff = Math.abs(this.three.camera.position.z) - Math.abs(this.elemInfo.current);
             if (Math.abs(diff) > 0) {
                 if (diff > 0) {
                     tl.to(this.three.camera.position, {
@@ -367,9 +353,11 @@ export default class Webgl {
             this.three.camera.updateProjectionMatrix();
             if (this.three.renderer) this.three.renderer.setSize(this.winSize.width, this.winSize.height);
         }
-        // if (this.three.mesh) {
-        //     const material = this.three.mesh.material;
-        // }
+        if (this.three.object) this.updateObject();
+    }
+    updateObject(): void {
+        this.three.object.scale.x = this.winSize.width / this.canvas.width;
+        this.three.object.scale.y = this.winSize.width / this.canvas.width;
     }
     render(): void {
         requestAnimationFrame(this.render.bind(this));
@@ -386,12 +374,9 @@ export default class Webgl {
         if (sizes) {
             for (let i = 0; i < sizes.array.length; i++) {
                 // sizes.array[i] = this.sizeList[i] * (1 + Math.sin(0.1 * i + this.step * 0.025));
-                
+
             }
             sizes.needsUpdate = true;
         }
     }
 }
-
-// eslint-disable-next-line no-new
-// new Webgl();

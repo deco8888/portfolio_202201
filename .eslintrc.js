@@ -15,6 +15,7 @@ module.exports = {
   // add your custom rules here
   rules: {
     "vue/multi-word-component-names": "off",
-    "lines-between-class-members": "off"
+    "lines-between-class-members": "off",
+    "eslint-disable-next-line": "off",
   },
 }

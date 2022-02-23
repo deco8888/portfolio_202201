@@ -1,4 +1,7 @@
 module.exports = {
+  plugins: [
+    "stylelint-scss"
+  ],
   customSyntax: 'postcss-html',
   extends: [
     'stylelint-config-standard',
@@ -8,6 +11,9 @@ module.exports = {
   // add your custom config here
   // https://stylelint.io/user-guide/configuration
   rules: {
-    "custom-property-no-missing-var-function": null
+    'at-rule-no-unknown': null,  // scssで使える@includeなどにエラーがでないようにする 
+    'scss/at-rule-no-unknown': true, // scssでもサポートしていない@ルールにはエラーを出す
+    'custom-property-no-missing-var-function': null,
   },
+  ignoreFiles: ['**/node_modules/**'],
 }

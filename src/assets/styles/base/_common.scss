@@ -39,6 +39,7 @@ body {
     -webkit-print-color-adjust: exact;
     overflow-x: hidden;
     width: 100vw;
+    height: 10000px;
     &.is-hidden {
         overflow: hidden;
     }

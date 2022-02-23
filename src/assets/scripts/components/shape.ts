@@ -11,6 +11,10 @@ export default class Shape {
         EventBus.$on('TRANSITION', this.onTransition.bind(this));
     }
     onTransition(path: string) {
-        console.log('path: ' + path);
+        switch (path) {
+            case "mv":
+                console.log(path);
+                break;
+        }
     }
 }
