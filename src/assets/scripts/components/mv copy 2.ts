@@ -57,6 +57,7 @@ export default class Webgl {
         },
         promiseList: []
     }
+    materials: THREE.MeshPhongMaterial[];
     constructor() {
         this.canvas = null;
         this.context = {
@@ -102,6 +103,7 @@ export default class Webgl {
             imageList: {},
             promiseList: []
         }
+        this.materials = [];
     }
     init(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void {
         this.canvas = canvas;
@@ -133,9 +135,9 @@ export default class Webgl {
         this.three.clock = new THREE.Clock();
         this.three.clock.start();
 
-        window.addEventListener('wheel', (e) => {
-            this.setWheel(e);
-        });
+        // window.addEventListener('wheel', (e) => {
+        //     this.setWheel(e);
+        // });
         this.handleEvent();
         window.addEventListener(
             'resize',
@@ -152,7 +154,7 @@ export default class Webgl {
             0.1, // 視点から最も近い面までの距離
             2000 // 視点から最も遠い面までの距離
         );
-        camera.position.set(0, 0, 1000);
+        camera.position.set(0, 0, 50);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
         camera.lookAt(this.three.scene.position);
         return camera;
@@ -210,14 +212,49 @@ export default class Webgl {
         }
         return this.viewport;
     }
-    initImage(_: CanvasRenderingContext2D) {
-        // this.context.ctx = ctx;
-        this.image.el = new Image();
-        this.image.el.src = require("../../imgs/pc/name.png");
-        this.image.el.crossOrigin = "anonymous";
-        this.image.el.addEventListener('load', async () => {
-            await this.renderImage();
-        });
+    async initImage(_: CanvasRenderingContext2D) {
+        await this.setMaterials();
+        await this.renderImage();
+    }
+    // eslint-disable-next-line require-await
+    async setMaterials() {
+        // const circleCanvas = await this.createPaticleTexture();
+        for (let i = 0; i < 20; i++) {
+            const material = new THREE.MeshPhongMaterial({
+                map: new THREE.Texture(this.createPaticleTexture()),
+                blending: THREE.AdditiveBlending,
+                transparent: true
+            });
+            material.map.needsUpdate = true;
+            this.materials.push(material);
+        }
+    }
+    // eslint-disable-next-line require-await
+    createPaticleTexture() {
+        const canvas = document.createElement('canvas');
+        const SIZE = 64;
+        const HALF = SIZE / 2;
+        const CENTER = SIZE / 2;
+        canvas.width = SIZE;
+        canvas.height = SIZE;
+
+        const color = new THREE.Color();
+        const h = 200 + 30 * Math.random();
+        const s = 40 + 20 * Math.random();
+        const l = 50 + 20 * Math.random();
+        color.setHSL(h / 360, s / 100, l / 100);
+
+        const context = canvas.getContext('2d');
+        const grad = context.createRadialGradient(CENTER, CENTER, 0, CENTER, CENTER, HALF);
+        grad.addColorStop(0, color.getStyle());
+        grad.addColorStop(1, '#000000');
+        context.lineWidth = 0;
+        context.beginPath();
+        context.arc(CENTER, CENTER, HALF, 0, 2 * Math.PI, false);
+        context.fillStyle = grad;
+        context.fill();
+        context.closePath();
+        return canvas;
     }
     // eslint-disable-next-line require-await
     async renderImage(): Promise<void> {
@@ -226,50 +263,77 @@ export default class Webgl {
         // Canvasサイズ設定
         this.canvas.width = this.winSize.width;
         this.canvas.height = this.winSize.height;
-
-        // 実際の画像サイズ設定
-        this.image.width = this.image.el.width;
-        this.image.height = this.image.el.height;
-        // リサイズ後画像サイズ設定
-        const width = this.winSize.width;
-        const height = this.winSize.width * (this.image.height / this.image.width);
-        this.context.ctx.drawImage(this.image.el, 0, 0, this.image.width, this.image.height, 0, 0, width, height);
-        const imageData = this.context.ctx.getImageData(0, 0, width, height);
-        const data = imageData.data;
-        const position = [];
-        const color = [];
-        const alpha = [];
-        for (let y = 0; y < height; y += 5.0) {
-            for (let x = 0; x < width; x += 5.0) {
-                const index = (y * width + x) * 4;
-                const r = data[index] / 255;
-                const g = data[index + 1] / 255;
-                const b = data[index + 2] / 255;
-                const a = data[index + 3] / 255;
-                const pX = x - width / 2;
-                const pY = -(y - height / 2);
-                const pZ = 0;
-                a > 0 ? color.push(1.0, 0.0, 1.0) : color.push(r, g, b);
-                // if (a !== 0) {
-                //     color.push(1.0, 0.0, 1.0);
-                // } else {
-                //     color.push(r, g, b);
-                // }
-                position.push(pX, pY, pZ);
-                alpha.push(a);
+        this.context.ctx.font = "30px 'Open sans";
+        this.context.ctx.fillStyle = "#ffffff";
+        this.context.ctx.textAlign = "center";
+        this.context.ctx.fillText('NA', this.canvas.width / 2, this.canvas.height / 2);
+        const data = this.context.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
+        const values: THREE.Mesh[] = [];
+        for (let x = 0; x < this.canvas.width; x++) {
+            for (let y = 0; y < this.canvas.height; y++) {
+                // eslint-disable-next-line eqeqeq
+                if (data[(x + y * this.canvas.width) * 4 + 3] == 0) {
+                    continue;
+                }
+                const geometry = new THREE.PlaneBufferGeometry(1, 1);
+                const material = this.materials[Math.floor(this.materials.length * Math.random())];
+                console.log(this.materials[Math.floor(this.materials.length * Math.random())]);
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(x - this.canvas.width / 2, -(y - this.canvas.height / 2.1), 0);
+                values.push(mesh);
+                this.three.scene.add(mesh);
             }
         }
-        this.name.imageList = {
-            position,
-            color,
-            alpha
-        }
-        this.initStars();
+
+        // const object = new THREE.Object3D();
+        // this.three.object = object.add(values);
+
+        this.three.renderer = this.initRenderer();
+
+        // 実際の画像サイズ設定
+        // this.image.width = this.image.el.width;
+        // this.image.height = this.image.el.height;
+        // // リサイズ後画像サイズ設定
+        // const width = this.winSize.width;
+        // const height = this.winSize.height;
+        // // const height = this.winSize.width * (this.image.height / this.image.width);
+        // // this.context.ctx.drawImage(this.image.el, 0, 0, this.image.width, this.image.height, 0, 0, width, height);
+        // // const imageData = this.context.ctx.getImageData(0, 0, width, height);
+        // // const data = imageData.data;
+        // const position = [];
+        // const color = [];
+        // const alpha = [];
+        // for (let y = 0; y < height; y += 1.0) {
+        //     for (let x = 0; x < width; x += 1.0) {
+        //         const index = (y * width + x) * 4;
+        //         const r = data[index] / 255;
+        //         const g = data[index + 1] / 255;
+        //         const b = data[index + 2] / 255;
+        //         const a = data[index + 3] / 255;
+        //         const pX = x - width / 2;
+        //         const pY = -y;
+        //         const pZ = 0;
+        //         a > 0 ? color.push(1.0, 0.0, 1.0) : color.push(r, g, b);
+        //         // if (a !== 0) {
+        //         //     color.push(1.0, 0.0, 1.0);
+        //         // } else {
+        //         //     color.push(r, g, b);
+        //         // }
+        //         position.push(pX, pY, pZ);
+        //         alpha.push(a);
+        //     }
+        // }
+        // this.name.imageList = {
+        //     position,
+        //     color,
+        //     alpha
+        // }
+        // this.initStars();
     }
     scroll(): void {
-        window.addEventListener('wheel', (e) => {
-            this.setWheel(e);
-        });
+        // window.addEventListener('wheel', (e) => {
+        //     this.setWheel(e);
+        // });
     }
     setWheel(e: WheelEvent) {
         if (this.three.camera) {

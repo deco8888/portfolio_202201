@@ -18,11 +18,12 @@ export default class Art {
         })
     }
     init(): void {
-        this.webgl.init(this.params.canvas, this.params.ctx);
+        // this.webgl.init(this.params.canvas, this.params.ctx);
+        this.webgl.init();
         // eslint-disable-next-line no-new
         new Shape();
         window.addEventListener('resize', this.resize.bind(this));
-        this.webgl.render();
+        // this.webgl.render();
     }
     resize(): void {
         this.webgl.handleResize();
