@@ -12,7 +12,10 @@ export default class Shape {
     }
     onTransition(path: string) {
         switch (path) {
-            case "mv":
+            case 'mv':
+                console.log(path);
+                break;
+            case 'index':
                 console.log(path);
                 break;
         }

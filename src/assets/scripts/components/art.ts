@@ -1,5 +1,5 @@
 import Shape from './shape';
-// import Webgl from './webgl';
+// import Test from './webgl';
 import Webgl from './mv';
 
 interface ArtOptions {
@@ -12,14 +12,15 @@ export default class Art {
     webgl: Webgl;
     constructor(props: ArtOptions) {
         this.params = props;
+        // new Test();
         this.webgl = new Webgl();
         window.addEventListener('load', () => {
             this.init();
-        })
+        });
     }
     init(): void {
-        // this.webgl.init(this.params.canvas, this.params.ctx);
         this.webgl.init();
+        // this.webgl.init(this.params.canvas);
         // eslint-disable-next-line no-new
         new Shape();
         window.addEventListener('resize', this.resize.bind(this));

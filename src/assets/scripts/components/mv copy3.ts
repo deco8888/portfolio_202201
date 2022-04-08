@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap, { Power2 } from 'gsap';
-import { BufferGeometry, Points } from 'three';
+import { BufferGeometry, Float32BufferAttribute, Points, Vector2 } from 'three';
 import vertexShader from '../glsl/name/vertexshader.vert';
 import fragmentShader from '../glsl/name/fragmentShader.frag';
 import { throttle } from '../utils/throttle';
@@ -20,17 +20,32 @@ interface elemInfoOptions {
     parallax: number;
 }
 
+interface UniformsType {
+    [key: string]: {
+        type: string;
+        value: number | Vector2;
+    };
+}
+
+interface MaterialType {
+    [key: string]: UniformsType;
+}
+
 export default class Webgl {
     canvas: HTMLCanvasElement;
     wrapper: HTMLElement;
     context: {
         ctx: CanvasRenderingContext2D;
-    }
+    };
     image: {
         el: HTMLImageElement;
         width: number;
         height: number;
-    }
+    };
+    display: {
+        width: number;
+        height: number;
+    };
     three: {
         camera: THREE.PerspectiveCamera;
         scene: THREE.Scene;
@@ -53,20 +68,26 @@ export default class Webgl {
     step: number;
     name: {
         imageList: {
-            [key: string]: number[]
-        },
-        promiseList: []
-    }
+            [key: string]: number[];
+        };
+        promiseList: [];
+    };
+    fontSize: number;
+    mouse: Vector2;
     constructor() {
         this.canvas = null;
         this.context = {
             ctx: null,
-        }
+        };
         this.image = {
             el: null,
             width: 0,
             height: 0,
-        }
+        };
+        this.display = {
+            width: 0,
+            height: 0,
+        };
         this.three = {
             camera: null,
             scene: new THREE.Scene(),
@@ -100,11 +121,12 @@ export default class Webgl {
         this.step = 0;
         this.name = {
             imageList: {},
-            promiseList: []
-        }
+            promiseList: [],
+        };
+        this.fontSize = 150;
+        this.mouse = new Vector2(0.5, 0.5);
     }
-    init(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void {
-        this.canvas = canvas;
+    init(): void {
         this.setSize();
         // カメラを作成
         this.three.camera = this.initCamera();
@@ -115,7 +137,7 @@ export default class Webgl {
         this.viewport = this.initViewport();
         // メッシュを作成
         // this.three.object = this.initMesh();
-        this.initImage(ctx);
+        this.initImage();
 
         // レンダラーを作成
         // this.three.renderer = this.initRenderer();
@@ -133,9 +155,9 @@ export default class Webgl {
         this.three.clock = new THREE.Clock();
         this.three.clock.start();
 
-        window.addEventListener('wheel', (e) => {
-            this.setWheel(e);
-        });
+        // window.addEventListener('wheel', (e) => {
+        //     this.setWheel(e);
+        // });
         this.handleEvent();
         window.addEventListener(
             'resize',
@@ -152,7 +174,7 @@ export default class Webgl {
             0.1, // 視点から最も近い面までの距離
             2000 // 視点から最も遠い面までの距離
         );
-        camera.position.set(0, 0, 1000);
+        camera.position.set(0, 0, 1400);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
         camera.lookAt(this.three.scene.position);
         return camera;
@@ -162,9 +184,37 @@ export default class Webgl {
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.name.imageList.position, 3));
         geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.name.imageList.color, 3));
         geometry.setAttribute('alpha', new THREE.Float32BufferAttribute(this.name.imageList.alpha, 1));
+
+        const randomList = [];
+        const vertices = this.name.imageList.position.length / 3;
+        for (let i = 0; i < vertices; i++) {
+            randomList.push((Math.random() - 1.0) * 2.0, (Math.random() - 1.0) * 2.0);
+            geometry.setAttribute('random', new Float32BufferAttribute(randomList, 2));
+        }
+
+        const uniforms: UniformsType = {
+            uAspect: {
+                type: 'f',
+                value: this.winSize.width / this.winSize.height,
+            },
+            uRatio: {
+                type: 'f',
+                value: 0.0,
+            },
+            uTime: {
+                type: 'f',
+                value: 0.0,
+            },
+            uMouse: {
+                type: 'v2',
+                value: this.mouse,
+            },
+        };
+
         const material = new THREE.RawShaderMaterial({
             vertexShader,
             fragmentShader,
+            uniforms: uniforms,
             transparent: true,
             // ブレンドモード: AdditiveBlending➡加算合成
             // blending: THREE.AdditiveBlending,
@@ -172,10 +222,21 @@ export default class Webgl {
             // depthTest: true
         });
         this.three.stars = new Points(geometry, material);
+        console.log(material);
         const object = new THREE.Object3D();
         this.three.object = object.add(this.three.stars);
-        this.three.scene.add(this.three.object);
+        this.three.scene.add(this.three.stars);
         this.three.renderer = this.initRenderer();
+
+        const starsMaterial = this.three.stars.material as any as MaterialType;
+        console.log(starsMaterial.uniforms.uRatio);
+        gsap.to(starsMaterial.uniforms.uRatio, {
+            value: 1.0,
+            duration: 1.8,
+            ease: Power2.easeInOut,
+            repeat: 1,
+            yoyo: true,
+        });
     }
     initRenderer(): THREE.WebGLRenderer {
         const renderer = new THREE.WebGLRenderer({
@@ -200,7 +261,7 @@ export default class Webgl {
             // 角度をラジアンに変更
             const fov = this.three.camera.fov * (Math.PI / 180);
             // https://kou.benesse.co.jp/nigate/math/a14m0313.html
-            // tanΘ(高さの半分 / 奥行) * 奥行 * 2
+            // tanΘ(角度 / 2) * 奥行 * 2
             const height = Math.tan(fov / 2) * this.three.camera.position.z * 2;
             const width = height * this.three.camera.aspect;
             this.viewport = {
@@ -210,60 +271,76 @@ export default class Webgl {
         }
         return this.viewport;
     }
-    initImage(_: CanvasRenderingContext2D) {
-        // this.context.ctx = ctx;
+    initImage() {
         this.image.el = new Image();
-        this.image.el.src = require("../../imgs/pc/name.png");
-        this.image.el.crossOrigin = "anonymous";
+        this.image.el.src = require('../../imgs/pc/name.png');
+        this.image.el.crossOrigin = 'anonymous';
         this.image.el.addEventListener('load', async () => {
             await this.renderImage();
         });
     }
     // eslint-disable-next-line require-await
     async renderImage(): Promise<void> {
-        this.canvas = document.createElement("canvas");
-        this.context.ctx = this.canvas.getContext("2d");
-        // Canvasサイズ設定
-        this.canvas.width = this.winSize.width;
-        this.canvas.height = this.winSize.height;
+        this.canvas = document.createElement('canvas');
+        this.context.ctx = this.canvas.getContext('2d');
 
         // 実際の画像サイズ設定
         this.image.width = this.image.el.width;
         this.image.height = this.image.el.height;
+
         // リサイズ後画像サイズ設定
-        const width = this.winSize.width;
-        const height = this.winSize.width * (this.image.height / this.image.width);
-        this.context.ctx.drawImage(this.image.el, 0, 0, this.image.width, this.image.height, 0, 0, width, height);
-        const imageData = this.context.ctx.getImageData(0, 0, width, height);
+        this.display.width = window.innerWidth; // 0.08313679245283019
+        this.display.height = this.display.width * (this.image.height / this.image.width);
+        console.log(this.image.height / this.image.width);
+        console.log(this.display.height / this.display.width);
+
+        // Canvasサイズ設定
+        this.canvas.width = this.display.width;
+        this.canvas.height = this.display.height;
+
+        this.context.ctx.drawImage(
+            this.image.el,
+            0,
+            0,
+            this.image.width,
+            this.image.height,
+            0,
+            0,
+            this.display.width,
+            this.display.height
+        );
+        const imageData = this.context.ctx.getImageData(0, 0, this.display.width, this.display.height);
         const data = imageData.data;
+
         const position = [];
         const color = [];
         const alpha = [];
-        for (let y = 0; y < height; y += 5.0) {
-            for (let x = 0; x < width; x += 5.0) {
-                const index = (y * width + x) * 4;
+
+        for (let y = 0; y < this.display.height; y += 5) {
+            for (let x = 0; x < this.display.width; x += 5) {
+                const index = (y * this.display.width + x) * 4;
                 const r = data[index] / 255;
                 const g = data[index + 1] / 255;
                 const b = data[index + 2] / 255;
-                const a = data[index + 3] / 255;
-                const pX = x - width / 2;
-                const pY = -(y - height / 2);
+                let a = data[index + 3] / 255;
+
+                const pX = x - this.display.width / 2;
+                const pY = -(y - this.display.height / 2);
                 const pZ = 0;
-                a > 0 ? color.push(1.0, 0.0, 1.0) : color.push(r, g, b);
-                // if (a !== 0) {
-                //     color.push(1.0, 0.0, 1.0);
-                // } else {
-                //     color.push(r, g, b);
-                // }
+                // a > 0 ? color.push(1.0, 0.0, 1.0) : color.push(r, g, b);
+                if (a > 0.7) a = 0.6;
+                // color.push(70 / 255, 93 / 255, 115 / 255);
+                color.push(Math.random(), Math.max(Math.random() * 0.8, 0.5), Math.max(Math.random() * 0.9, 0.8));
                 position.push(pX, pY, pZ);
                 alpha.push(a);
             }
         }
+
         this.name.imageList = {
             position,
             color,
-            alpha
-        }
+            alpha,
+        };
         this.initStars();
     }
     scroll(): void {
@@ -337,6 +414,10 @@ export default class Webgl {
             }, 100),
             false
         );
+        window.addEventListener('mousemove', (e: MouseEvent) => {
+            this.moveMouse(e.clientX, e.clientY);
+        });
+        this.render();
     }
     handleResize(): void {
         this.setSize();
@@ -367,9 +448,20 @@ export default class Webgl {
         if (sizes) {
             for (let i = 0; i < sizes.array.length; i++) {
                 // sizes.array[i] = this.sizeList[i] * (1 + Math.sin(0.1 * i + this.step * 0.025));
-
             }
             sizes.needsUpdate = true;
         }
+
+        if (this.three.stars) {
+            const starsMaterial = this.three.stars.material as any as MaterialType;
+            let timeValue = starsMaterial.uniforms.uTime.value as number;
+            timeValue += 0.01;
+            starsMaterial.uniforms.uTime.value = timeValue;
+        }
+    }
+
+    moveMouse(x: number, y: number) {
+        this.mouse.x = x - this.winSize.width / 2;
+        this.mouse.y = -y + this.winSize.height / 2;
     }
 }

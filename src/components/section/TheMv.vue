@@ -23,27 +23,31 @@
 
 <script lang="ts">
 import Vue from 'vue';
-// import TheCanvas from '../common/TheCanvas.vue';
 import gsap from 'gsap';
-import { ScrollToPlugin } from 'gsap/dist/ScrollToPlugin';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import Art from '~/assets/scripts/components/art';
 
 export default Vue.extend({
-    // components: {
-    //     TheCanvas,
-    // },
+    data() {
+        return {
+            mvAnim: {
+                previous: 0,
+                current: 0,
+                ease: 0.1,
+            },
+        };
+    },
     mounted() {
         // eslint-disable-next-line no-new
         new Art({
             canvas: null,
             ctx: null,
         });
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-        this.test();
+        gsap.registerPlugin(ScrollTrigger);
+        this.moveLine();
     },
     methods: {
-        test() {
+        moveLine(): void {
             const horizontalLine = gsap.utils.toArray<HTMLElement>("[data-horizontal='bg-line']");
             horizontalLine.forEach((line) => {
                 const pinWrap = line.querySelector("[data-horizontal='pin']");
@@ -58,50 +62,27 @@ export default Vue.extend({
                     },
                     {
                         x: () => xEnd(),
-                        ease: 'none',
+                        // ease: 'none',
                         scrollTrigger: {
                             trigger: '.js-trigger',
                             start: 'top top',
-                            end: () => '+=' + (animWrap.scrollWidth - window.innerWidth),
+                            end: () => {
+                                return '+=' + (animWrap.scrollWidth - window.innerWidth);
+                            },
                             pin: true,
+                            anticipatePin: 1, // 素早くスクロールしたときにピン留めが少し遅れ、ガタつくのを防ぐ。
                             invalidateOnRefresh: true, // リサイズに関係する
-                            scrub: 0.3, // スクロール量に合わせてアニメーション
+                            scrub: 0.3, // スクロールの進捗とアニメーションの進捗をリンクさせる
                         },
-                        // stagger: {
-                        //     from: 'start',
-                        //     amount: 0
-                        // },
+                        duration: 3,
                     }
                 );
             });
-            // tl.to('.to-right', {
-            //     x: -document.querySelector('.to-right').scrollWidth,
-            //     ease: 'none',
-            //     scrollTrigger: {
-            //         trigger: '.js-trigger',
-            //         start: 'top top',
-            //         end: () => '+=' + (document.querySelector('.to-right').scrollWidth - window.innerWidth / 2),
-            //         pin: true,
-            //         invalidateOnRefresh: true, // リサイズに関係する
-            //         scrub: 0.3, // スクロール量に合わせてアニメーション
-            //     },
-            // }).to(
-            //     '.to-left',
-            //     {
-            //         x: document.querySelector('.to-left').scrollWidth,
-            //         ease: 'none',
-            //         scrollTrigger: {
-            //             trigger: '.js-trigger',
-            //             start: 'top top',
-            //             end: () => '+=' + (document.querySelector('.to-left').scrollWidth - window.innerWidth / 2),
-            //             pin: true,
-            //             invalidateOnRefresh: true, // リサイズに関係する
-            //             scrub: 0.3, // スクロール量に合わせてアニメーション
-            //         },
-            //     },
-            //     '<'
-            // );
         },
+        // setEnd(): void {
+        //     this.mvAnim.current = animWrap.scrollWidth - window.innerWidth:
+
+        // }
     },
 });
 </script>

@@ -78,6 +78,8 @@ export default class Webgl {
         this.step = 0;
     }
     init(canvas: HTMLCanvasElement): void {
+        if(!canvas) canvas = document.querySelector(".p-index__canvas");
+        console.log(canvas);
         this.setSize();
         // カメラを作成
         this.three.camera = this.initCamera();
@@ -146,7 +148,7 @@ export default class Webgl {
         const geometry = new BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         geometry.setAttribute('size', new THREE.Float32BufferAttribute(this.sizeList, 1));
-        const stars = require("../../imgs/pc/star.png");
+        const stars = require("assets/images/pc/star.png");
         const uniforms = {
             uTex: {
                 type: "t",

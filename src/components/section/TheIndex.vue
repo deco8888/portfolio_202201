@@ -1,16 +1,16 @@
 <template>
     <section class="p-index">
-        <!-- <TheCanvas /> -->
+        <TheCanvas :sectionName="'index'"/>
     </section>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-// import TheCanvas from '../common/TheCanvas.vue';
+import TheCanvas from '../common/TheCanvas.vue';
 
 export default Vue.extend({
     components: {
-        // TheCanvas,
+        TheCanvas,
     },
 });
 </script>
