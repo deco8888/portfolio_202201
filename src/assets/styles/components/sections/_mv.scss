@@ -43,10 +43,10 @@
             width: 200vw;
             height: 50vh;
             &--top {
-                background: linear-gradient(0deg, #d4daf5, #ffffff);
+                background: linear-gradient(0deg, #d4daf5, #d4daf5);
             }
             &--bottom {
-                background: linear-gradient(180deg, #d4daf5, #ffffff);
+                background: linear-gradient(180deg, #d4daf5, #d4daf5);
             }
         }
         &-anim {

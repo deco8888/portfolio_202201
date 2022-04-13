@@ -88,7 +88,7 @@ export default class Webgl {
         // レンダラーを作成
         this.three.renderer = this.initRenderer(canvas);
         // HTMLに追加
-        // canvas.appendChild(this.three.renderer.domElement);
+        canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
         // メッシュを作成
@@ -100,15 +100,17 @@ export default class Webgl {
         // this.three.control = new OrbitControls(this.three.camera, this.three.renderer.domElement);
         // this.three.control.enableDamping = true;
         this.elemInfo.current = this.three.camera.position.z;
+        // 描写する
+        this.render();
         this.test();
         this.update();
 
         this.three.clock = new THREE.Clock();
         this.three.clock.start();
 
-        // window.addEventListener('wheel', (e) => {
-        //     this.setWheel(e);
-        // });
+        window.addEventListener('wheel', (e) => {
+            this.setWheel(e);
+        });
     }
     initCamera(): THREE.PerspectiveCamera {
         const camera = new THREE.PerspectiveCamera(
@@ -148,7 +150,7 @@ export default class Webgl {
         const geometry = new BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         geometry.setAttribute('size', new THREE.Float32BufferAttribute(this.sizeList, 1));
-        const stars = require("assets/images/pc/star.png");
+        const stars = require("~/assets/images/pc/star.png");
         const uniforms = {
             uTex: {
                 type: "t",
@@ -178,9 +180,8 @@ export default class Webgl {
         this.three.scene.add(this.three.stars);
         console.log(this.three.scene);
     }
-    initRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
+    initRenderer(_: HTMLCanvasElement): THREE.WebGLRenderer {
         const renderer = new THREE.WebGLRenderer({
-            canvas,
             alpha: true,
             antialias: true, // 物体の輪郭を滑らかにする
         });
@@ -384,11 +385,11 @@ export default class Webgl {
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
 
         this.step++;
-        const sizes = this.three.stars?.geometry.attributes.size;
+        const geometry = <THREE.BufferGeometry>this.three.stars?.geometry;
+        const sizes = geometry.attributes.size;
         if (sizes) {
-            for (let i = 0; i < sizes.array.length; i++) {
-                // sizes.array[i] = this.sizeList[i] * (1 + Math.sin(0.1 * i + this.step * 0.025));
-                
+            for(const [index, size] of Object.entries(sizes.array)) {
+                size = size * (1 + Math.sin(0.1 * parseInt(index) + this.step * 0.025));
             }
             sizes.needsUpdate = true;
         }

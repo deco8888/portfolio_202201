@@ -10,6 +10,7 @@ import { throttle } from '../utils/throttle';
 import { lerp } from '../utils/math';
 import { Vector2, Vector3 } from 'three';
 import { debounce } from '../utils/debounce';
+import { Cursor } from './cursor';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -30,7 +31,7 @@ export default class Photo {
         camera: THREE.PerspectiveCamera;
         scene: THREE.Scene;
         mesh: THREE.Mesh;
-        bgMesh: THREE.Mesh;
+        bgMesh: THREE.Mesh[];
         textureList: THREE.Texture[];
         renderer: THREE.WebGLRenderer;
         object: THREE.Object3D;
@@ -52,14 +53,17 @@ export default class Photo {
     viewport!: ThreeNumber;
     rectList: DOMRect[];
     flg: {
+        isScroll: boolean;
         isMove: boolean;
     };
     scrollList: ScrollOptions[];
     meshList: THREE.Mesh[];
     bgMeshList: THREE.Mesh[][];
     srcList: string[];
+    url: string;
     imagePath: string;
     targetY: number;
+    cursor: Cursor;
     constructor() {
         this.three = {
             camera: null,
@@ -92,14 +96,16 @@ export default class Photo {
             y: 0,
         };
         this.flg = {
+            isScroll: false,
             isMove: false,
         };
         this.scrollList = [];
         this.meshList = [];
         this.bgMeshList = [];
         this.srcList = [];
-        this.imagePath = 'assets/images/pc/';
+        this.url = '';
         this.targetY = 0;
+        this.cursor = new Cursor();
     }
     init(): void {
         for (const el of Object.values(this.elms)) {
@@ -141,14 +147,16 @@ export default class Photo {
         });
     }
     async set(index: number): Promise<void> {
-        // メッシュを作成
+        // メッシュを作成(画像)
         this.three.mesh = this.initMesh(index);
         this.meshList.push(this.three.mesh);
-        // this.bgMeshList.push(this.three.bgMesh);
-        // this.three.object = new THREE.Object3D().add(this.three.mesh, this.three.bgMesh);
+        // メッシュを作成(画像背景用図形)
+        this.three.bgMesh = this.initBgMesh();
+        this.bgMeshList.push(this.three.bgMesh);
         // メッシュをシーンに追加
-        this.three.scene.add(this.three.mesh);
-        // this.three.scene.add(this.bgMeshList[index]);
+        this.three.scene.add(this.three.mesh, this.three.bgMesh[0], this.three.bgMesh[1]);
+        // リンクを取得
+        this.three.mesh.userData.url = this.setLink(index);
         // HTML要素の情報を取得、3Dモデルの更新
         this.update(index);
         this.scrollList[index].previous = this.meshList[index].position.x;
@@ -237,17 +245,20 @@ export default class Photo {
             transparent: false,
         });
         const mesh = new THREE.Mesh(geometry, material);
-        const bgMeshList = [] as THREE.Mesh[];
-        for (let i = 0; i < 2; i++) {
-            const bgMesh = this.initBgMesh();
-            bgMeshList.push(bgMesh);
-            this.three.scene.add(bgMesh);
-        }
-        console.log(bgMeshList);
-        this.bgMeshList.push(bgMeshList);
         return mesh;
     }
-    initBgMesh(): THREE.Mesh {
+    setLink(index: number): string {
+        return this.elms.images[index].getAttribute('data-study-link');
+    }
+    initBgMesh(): THREE.Mesh[] {
+        const bgMeshList = [] as THREE.Mesh[];
+        for (let i = 0; i < 2; i++) {
+            const bgMesh = this.createBgMesh();
+            bgMeshList.push(bgMesh);
+        }
+        return bgMeshList;
+    }
+    createBgMesh(): THREE.Mesh {
         const uniforms = {
             uResolution: {
                 value: new THREE.Vector2(0.0, 0.0), // 画面サイズ
@@ -282,7 +293,6 @@ export default class Photo {
             transparent: true,
         });
         const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
-
         return bgMesh;
     }
     update(index: number): void {
@@ -366,9 +376,21 @@ export default class Photo {
             false
         );
         window.addEventListener(
+            'mousedown',
+            async (e: MouseEvent) => {
+                e.preventDefault();
+                await this.openPage();
+            },
+            false
+        );
+
+        window.addEventListener(
             'scroll',
             throttle(() => {
                 this.handleScroll();
+                setTimeout(() => {
+                    this.flg.isScroll = false;
+                }, 10);
             }, 10),
             {
                 capture: false,
@@ -396,14 +418,13 @@ export default class Photo {
                 this.rectList[i] = currentRect;
                 const material = this.getMaterial(this.meshList[i]);
                 material.uniforms.uResolution.value = new Vector2(currentRect.width, currentRect.height);
-                console.log(currentRect.width);
             }
         }
     }
     render(): void {
         requestAnimationFrame(this.render.bind(this));
         this.moveImages();
-        if (window.scrollY > this.elms.mv.scrollHeight) this.setRaycaster();
+        // if (window.scrollY > this.elms.mv.scrollHeight) this.setRaycaster();
         // 画面に描画する
         this.three.renderer.render(this.three.scene, this.three.camera);
     }
@@ -456,7 +477,7 @@ export default class Photo {
                     for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
                         const diff = parseInt(index) > 0 ? -10 : 10;
                         const bgMaterial = this.getMaterial(bgMesh);
-                        bgMaterial.uniforms.uTime.value = scroll.current - scroll.previous;
+                        bgMaterial.uniforms.uTime.value = 0;
                         tl.to(
                             bgMesh.position,
                             {
@@ -471,30 +492,39 @@ export default class Photo {
             tl.play();
         }
     }
-    setRaycaster(): void {
+    async setRaycaster(): Promise<void> {
         this.three.raycaster.setFromCamera(this.mouse, this.three.camera);
         // 交差するオブジェクトを計算
         const intersectObjects = this.three.raycaster.intersectObjects(this.three.scene.children);
-        for (const [index, object] of Object.entries(intersectObjects)) {
+        for (const object of Object.values(intersectObjects)) {
             const intersectObject = <THREE.Mesh>object.object;
             const intersectMaterial = this.getMaterial(intersectObject);
-            // console.log(index);
             for (const mesh of Object.values(this.meshList)) {
                 const material = this.getMaterial(mesh);
                 if (intersectMaterial.id === material.id) {
+                    this.url = mesh.userData.url;
                     material.uniforms.uMoz.value = lerp(material.uniforms.uMoz.value, 0.0, 0.08);
+                    !this.flg.isScroll && this.flg.isMove ? this.cursor.mouseover(true) : this.cursor.mouseover(false);
                 }
             }
         }
         if (intersectObjects.length === 0) {
+            this.url = '';
             for (const mesh of Object.values(this.meshList)) {
                 const material = this.getMaterial(mesh);
                 material.uniforms.uMoz.value = lerp(material.uniforms.uMoz.value, 0.02, 0.2);
+                this.cursor.mouseover(false);
             }
         }
     }
+    async openPage(): Promise<void> {
+        if (this.url) window.location.href = this.url;
+        this.url = '';
+    }
     // スクロール
     handleScroll(): void {
+        this.flg.isScroll = true;
+        this.flg.isMove = false;
         const targetY = window.scrollY - this.elms.mv.scrollHeight;
         for (const [index, rect] of Object.entries(this.rectList)) {
             const i = parseInt(index);
@@ -518,10 +548,19 @@ export default class Photo {
         this.targetY = targetY;
     }
     handleMouse(e: MouseEvent): void {
+        if (!this.flg.isScroll) this.flg.isMove = true;
         this.mouse = {
             x: (e.clientX / window.innerWidth) * 2 - 1,
             y: -(e.clientY / window.innerHeight) * 2 + 1,
         };
+        this.setRaycaster();
+    }
+    handleClick(e: MouseEvent): void {
+        this.mouse = {
+            x: (e.clientX / window.innerWidth) * 2 - 1,
+            y: -(e.clientY / window.innerHeight) * 2 + 1,
+        };
+        // this.setRaycaster();
     }
     getMaterial(mesh: THREE.Mesh): THREE.ShaderMaterial {
         return <THREE.ShaderMaterial>mesh.material;

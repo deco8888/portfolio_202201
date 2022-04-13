@@ -29,8 +29,8 @@ void main() {
 
     vec2 offset = vec2(vTime * 0.0003, 0.0);
     vec3 color = texture2D(uTexture, uv).rgb;
-    color.g = texture2D(uTexture, uv + offset + vNoise * 0.1).g;
-    color.b = texture2D(uTexture, uv + offset + vNoise * 0.2).b;
+    color.g = texture2D(uTexture, uv + offset + vProgress * vNoise * 0.1).g;
+    color.b = texture2D(uTexture, uv + offset + vProgress * vNoise * 0.2).b;
 
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, 0.8);
 }

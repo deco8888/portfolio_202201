@@ -6,13 +6,28 @@
             <div class="p-study__wrap" data-horizontal="wrapper">
                 <div class="p-study__list" data-horizontal="list">
                     <div class="p-study__image-wrap p-study__image-wrap--image1">
-                        <div class="p-study__image" data-study="image" data-study-image="sakura.jpg"></div>
+                        <div
+                            class="p-study__image"
+                            data-study="image"
+                            data-study-image="sakura.jpg"
+                            data-study-link="https://hatarakigai.info/project/"
+                        ></div>
                     </div>
                     <div class="p-study__image-wrap p-study__image-wrap--image2">
-                        <div class="p-study__image" data-study="image" data-study-image="sakura.jpg"></div>
+                        <div
+                            class="p-study__image"
+                            data-study="image"
+                            data-study-image="sakura.jpg"
+                            data-study-link="https://works.yuta-takahashi.dev/"
+                        ></div>
                     </div>
                     <div class="p-study__image-wrap p-study__image-wrap--image3">
-                        <div class="p-study__image" data-study="image" data-study-image="sakura.jpg"></div>
+                        <div
+                            class="p-study__image"
+                            data-study="image"
+                            data-study-image="sakura.jpg"
+                            data-study-link="https://nuxtjs.org/ja/docs/concepts/views/#layouts"
+                        ></div>
                     </div>
                 </div>
             </div>
@@ -42,11 +57,6 @@ export default Vue.extend({
         };
     },
     mounted() {
-        // eslint-disable-next-line no-new
-        // new Art({
-        //     canvas: null,
-        //     ctx: null,
-        // });
         gsap.registerPlugin(ScrollTrigger);
         this.test();
         new Study();

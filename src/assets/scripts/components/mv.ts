@@ -6,6 +6,11 @@ import { Vec3 } from './vec3';
 export default class WebGl {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
+    textImage: {
+        canvas: HTMLCanvasElement;
+        ctx: CanvasRenderingContext2D;
+        data: ImageData;
+    };
     layers: number;
     gap: number;
     size: number;
@@ -45,7 +50,11 @@ export default class WebGl {
         front: string;
         back: string;
     };
-    fontSize: number;
+    font: {
+        wight: number;
+        size: number;
+        family: string;
+    };
     horizontal: number;
     particleX: number[];
     text: string;
@@ -55,9 +64,14 @@ export default class WebGl {
     constructor() {
         this.canvas = document.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.layers = 4;
+        this.textImage = {
+            canvas: null,
+            ctx: null,
+            data: null,
+        };
+        this.layers = 5;
         this.gap = 0;
-        this.size = 0;
+        this.size = 0.2;
         this.particles = [];
         this.targets = [];
         this.fov = 2000;
@@ -87,12 +101,16 @@ export default class WebGl {
             y: window.innerHeight / 2,
         };
         this.color = {
-            front: "144 108 209",
+            front: '144 108 209',
             // front: '88 88 88',
             back: '255, 152, 0',
             // back: '156, 156, 156',
         };
-        this.fontSize = 150;
+        this.font = {
+            wight: 800,
+            size: 150,
+            family: 'Arial',
+        };
         this.horizontal = 0;
         this.particleX = [];
         this.text = 'PORTFOLIO';
@@ -109,46 +127,77 @@ export default class WebGl {
     }
     set(): boolean {
         cancelAnimationFrame(this.animFrame);
+        this.setTextImage();
+        this.setStartPos();
+        this.textImage.data = this.getImageData();
+        this.targets = this.getTarget(this.textImage.data);
+        this.loop();
+        return false;
+    }
+    getImageData(): ImageData {
+        const c = this.textImage.canvas;
+        const ctx = this.textImage.ctx;
+        // フォントを設定・取得
+        ctx.font = this.getFont();
+        // テキストの描画幅をを測定する
+        let w = this.measureTextWidth();
+        const h = this.font.size * 1.5;
+        this.gap = 7;
+        // Adjust font and particle size to git text on screen
+        w = this.adjustSize(w, ctx);
+        // テキスト用のcanvasサイズを設定
+        c.width = w;
+        c.height = h;
+        // 差分の再計算(文字を構成する1マスの大きさが変わる)
+        this.gap = this.setGap();
+        this.size = Math.max(this.gap / 2, 1);
+        // フォントを設定・取得
+        ctx.font = this.getFont();
+        // 指定した座標にテキスト文字列を描画し、その文字を現在のfillStyleで塗りつぶす
+        ctx.fillText(this.text, 0, this.font.size);
+        // Canvasに現在描かれている画像データを取得
+        return ctx.getImageData(0, 0, c.width, c.height);
+    }
+    setTextImage(): void {
+        this.textImage.canvas = document.createElement('canvas');
+        this.textImage.ctx = this.textImage.canvas.getContext('2d');
+    }
+    setStartPos(): void {
         this.start = {
             x: window.innerWidth / 2,
             y: window.innerHeight / 2,
         };
-        // Create temporary canvas for the text, draw it and get the image data.
-        const c = document.createElement('canvas');
-        const ctx = c.getContext('2d');
+    }
+    // フォントを設定・取得
+    getFont(): string {
         // font-weight font-size font-family
-        ctx.font = `900 ${this.fontSize}px Arial`;
-        // measureText(text)：テキストの描画幅をを測定する
-        let w = ctx.measureText(this.text).width;
-        const h = this.fontSize * 1.5;
-        this.gap = 7;
-
-        // Adjust font and particle size to git text on screen
+        return `${this.font.wight} ${this.font.size}px ${this.font.family}`;
+    }
+    // テキストの描画幅をを測定する
+    measureTextWidth(): number {
+        return this.textImage.ctx.measureText(this.text).width;
+    }
+    adjustSize(width: number, ctx: CanvasRenderingContext2D): number {
+        let w = width;
         while (w > window.innerWidth * 0.8) {
-            this.fontSize -= 1;
-            ctx.font = `900 ${this.fontSize}px Arial`;
-            w = ctx.measureText(this.text).width;
+            this.font.size -= 1;
+            // フォントを設定・取得
+            ctx.font = this.getFont();
+            // // テキストの描画幅をを測定する
+            w = this.measureTextWidth();
         }
-        // 差分の再計算(文字を構成する1マスの大きさが変わる)
-        this.gap = this.setGap();
-        this.size = Math.max(this.gap / 2, 1);
-        c.width = w;
-        c.height = h;
+        return w;
+    }
+    getTarget(data: ImageData): Vec3[] {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        this.start.x = Math.floor(this.start.x - w / 2);
+        this.start.x = Math.floor(this.start.x - this.textImage.canvas.width / 2);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        this.start.y = Math.floor(this.start.y - h / 2);
-
-        ctx.font = `900 ${this.fontSize}px Arial`;
-        ctx.fillText(this.text, 0, this.fontSize);
-        const data = ctx.getImageData(0, 0, w, h);
+        this.start.y = Math.floor(this.start.y - this.textImage.canvas.height / 2);
         // Iterate the image data and determine target coordinates for the flying particles
         for (let i = 0; i < data.data.length; i += 4) {
             const rw = data.width * 4;
-            const rh = data.height * 4;
             const x = this.start.x + Math.floor((i % rw) / 4);
             const y = this.start.y + Math.floor(i / rw);
-
             if (data.data[i + 3] > 0 && x % this.gap === 0 && y % this.gap === 0) {
                 // layerの数だけ間隔を空けて１列に並べる
                 for (let j = 0; j < this.layers; j++) {
@@ -156,21 +205,19 @@ export default class WebGl {
                 }
             }
         }
-        this.targets = this.targets.sort((a, b) => a.x - b.x);
-        this.loop();
-        return false;
+        return this.targets.sort((a, b) => a.x - b.x);
     }
     setGap(): number {
         switch (true) {
-            case this.fontSize >= 70:
+            case this.font.size >= 70:
                 return 8;
-            case this.fontSize >= 40 && this.fontSize < 70:
+            case this.font.size >= 40 && this.font.size < 70:
                 return 6;
-            case this.fontSize < 40:
+            case this.font.size < 40:
                 return 4;
         }
     }
-    loop() {
+    loop(): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.setTargetPosition();
         this.setParticle();
@@ -183,11 +230,11 @@ export default class WebGl {
                 const x = this.canvas.width / 2 + target.x * 10;
                 const y = this.canvas.height / 2;
                 const z = 0;
-
+                // positionを設定
                 const position = Vec3.fromScreenCoords(this.canvas, x, y, z);
                 // interpolant: 挿入箇所
                 const interpolant = 0;
-
+                
                 this.particles.push({
                     position,
                     target,
@@ -288,9 +335,14 @@ export default class WebGl {
         Vec3.resetValue();
         this.canvas = document.querySelector('canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.layers = 4;
+        this.textImage = {
+            canvas: null,
+            ctx: null,
+            data: null,
+        };
+        this.layers = 5;
         this.gap = 0;
-        this.size = 0;
+        this.size = 0.2;
         this.particles = [];
         this.targets = [];
         this.fov = 2000;
@@ -319,7 +371,11 @@ export default class WebGl {
             x: 0,
             y: 0,
         };
-        this.fontSize = 150;
+        this.font = {
+            wight: 800,
+            size: 150,
+            family: 'Arial',
+        };
         this.horizontal = 0;
         this.particleX = [];
         this.text = '';

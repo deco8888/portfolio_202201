@@ -1,5 +1,5 @@
 <template>
-    <canvas ref="canvas" :class="`p-${sectionName}__canvas`"></canvas>
+    <div ref="canvas" :class="`p-${sectionName}__canvas`"></div>
 </template>
 
 <script lang="ts">
@@ -22,12 +22,10 @@ export default Vue.extend({
     },
     mounted() {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d');
-        console.log(canvas);
         // eslint-disable-next-line no-new
+        console.log(canvas);
         new Art({
             canvas,
-            ctx,
         });
         EventBus.$emit('TRANSITION', this.sectionName);
     },

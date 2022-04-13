@@ -6,22 +6,18 @@
     // @include g.media('>phone') {
     //     padding: g.get_vw(300) 0 0;
     // }
+    background-image: linear-gradient(0deg, transparent calc(100% - 1px), #9bf0a2 calc(100% - 1px)),
+        linear-gradient(90deg, transparent calc(100% - 1px), #9bf0a2 calc(100% - 1px));
+    background-position: top center;
+    background-repeat: repeat;
+    background-size: g.get_vw(50) g.get_vw(50);
+    background-attachment: fixed;
+    overflow: hidden;
     &__inner {
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
-    }
-    &__title {
-        display: block;
-        position: absolute;
-        top: 0;
-        z-index: 10;
-
-        @include g.media('<=phone') {
-            margin: 0 auto;
-            width: g.get_per(650);
-        }
     }
     &__wrap {
         position: relative;
@@ -33,7 +29,8 @@
         position: absolute;
         top: 0;
         left: 0;
-        padding: 0 g.get_vw(100) 0 150vw;
+        padding: 0 g.get_vw(100) 0 200vw;
+        user-select: none;
     }
     &__image {
         position: absolute;
