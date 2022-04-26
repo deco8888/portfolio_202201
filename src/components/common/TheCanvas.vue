@@ -23,7 +23,6 @@ export default Vue.extend({
     mounted() {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
         // eslint-disable-next-line no-new
-        console.log(canvas);
         new Art({
             canvas,
         });

@@ -8,11 +8,20 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import EventBus from '~/utils/event-bus';
+import Common from '~/assets/scripts/components/common';
 
 export default Vue.extend({
-    // name: 'cursor',
-    // components: {
-    //     Cursor,
-    // },
+    watch: {
+        '$route.name': function (_new, _old) {
+            console.log("_new : " + _new);
+            EventBus.$emit('TRANSITION', _new);
+        },
+    },
+    mounted() {
+        EventBus.$emit('TRANSITION', this.$route.name);
+        EventBus.$on('TRANSITION', () => this.$route.name);
+        new Common();
+    },
 });
 </script>

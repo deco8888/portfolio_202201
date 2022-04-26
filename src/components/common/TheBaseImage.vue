@@ -20,7 +20,7 @@ export default Vue.extend({
         },
         folder: {
             type: String,
-            required: true,
+            required: false,
             default: '',
         },
         alt: {

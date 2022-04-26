@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { addClass, removeClass } from '../utils/classList';
+import { addClass, isContains, removeClass } from '../utils/classList';
 import { debounce } from '../utils/debounce';
 import { hasClass } from '../utils/hasClass';
 import { lerp } from '../utils/math';
@@ -40,6 +40,7 @@ export class Cursor {
     flg: {
         isScroll: boolean;
         isScaleUp: boolean;
+        isRaycaster: boolean;
     };
     animFrame: number;
     constructor(props: Partial<CursorOption> = {}) {
@@ -77,6 +78,7 @@ export class Cursor {
         this.flg = {
             isScroll: false,
             isScaleUp: false,
+            isRaycaster: false,
         };
         this.animFrame = 0;
         this.init();
@@ -97,7 +99,7 @@ export class Cursor {
             window.addEventListener(
                 'scroll',
                 throttle(() => {
-                    this.handelScroll();
+                    // this.handelScroll();
                 }, 30),
                 {
                     capture: false,
@@ -115,29 +117,54 @@ export class Cursor {
         if (this.rect && !this.flg.isScroll) {
             this.styles.transX.current = this.mouse.x - this.rect.width * 0.5;
             this.styles.transY.current = this.mouse.y - this.rect.height * 0.5;
-            this.styles.scale.current = this.flg.isScaleUp ? 3 : 1;
             for (const styles of Object.values(this.styles)) {
                 styles.previous = lerp(styles.previous, styles.current, styles.amt);
             }
-            gsap.set(this.elms.cursor, {
-                left: this.styles.transX.previous,
-                top: this.styles.transY.previous,
-            });
+
+            if (this.flg.isRaycaster) {
+                gsap.to(this.elms.cursor, {
+                    duration: 0,
+                    left: this.styles.transX.previous,
+                    top: this.styles.transY.previous,
+                    scaleX: 3,
+                    scaleY: 3,
+                });
+            } else {
+                this.styles.scale.current = this.flg.isScaleUp ? 3 : 1;
+                gsap.to(this.elms.cursor, {
+                    left: this.styles.transX.previous,
+                    top: this.styles.transY.previous,
+                    scaleX: this.styles.scale.current,
+                    scaleY: this.styles.scale.current,
+                });
+            }
         }
         this.animFrame = requestAnimationFrame(this.render.bind(this));
     }
     event(): void {
         document.addEventListener('mousemove', (e: MouseEvent) => {
-            this.mouse.x = e.offsetX;
-            this.mouse.y = e.offsetY;
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+        this.elms.targets.forEach((target) => {
+            target.addEventListener('mouseenter', () => this.enter());
+            target.addEventListener('mouseleave', () => this.leave());
         });
     }
-    handelScroll(): void {
-        this.mouse.x = this.mouse.x;
-        this.mouse.y = this.mouse.y;
-    }
+    // handelScroll(): void {
+    //     this.mouse.x = this.mouse.x;
+    //     this.mouse.y = this.mouse.y;
+    // }
     mouseover(flg: boolean): void {
-        flg ? addClass(this.elms.cursor, hasClass.active) : removeClass(this.elms.cursor, hasClass.active);
+        if (flg) {
+            // addClass(this.elms.cursor, hasClass.active);
+            this.styles.scale.current = 3;
+            this.flg.isRaycaster = true;
+        } else {
+            // removeClass(this.elms.cursor, hasClass.active);
+            this.styles.scale.current = 1;
+            this.flg.isRaycaster = false;
+        }
     }
     getTarget(): void {
         this.elms.targets = document.querySelectorAll(this.params.targetSelector);
@@ -148,5 +175,13 @@ export class Cursor {
         const headerHeight = header ? header.clientHeight : 0;
         const pankuzuHeight = pankuzu ? pankuzu.clientHeight : 0;
         this.headerHeight = headerHeight + pankuzuHeight;
+    }
+    enter(): void {
+        addClass(this.elms.cursor, hasClass.active);
+        this.flg.isScaleUp = true;
+    }
+    leave(): void {
+        removeClass(this.elms.cursor, hasClass.active);
+        this.flg.isScaleUp = false;
     }
 }

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 // import { BufferGeometry, Mesh } from 'three';
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import gsap, { Power2 } from 'gsap';
+import gsap from 'gsap';
 import photoVertexShader from '../glsl/photo/vertexshader.vert';
 import photoFragmentShader from '../glsl/photo/fragmentShader.frag';
 import photoBgVertexShader from '../glsl/photo/bg/vertexshader.vert';
@@ -11,6 +11,7 @@ import { lerp } from '../utils/math';
 import { Vector2, Vector3 } from 'three';
 import { debounce } from '../utils/debounce';
 import { Cursor } from './cursor';
+import Webgl from './webgl';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -26,7 +27,8 @@ interface UniformOptions {
     [uniform: string]: THREE.IUniform;
 }
 
-export default class Photo {
+export default class Photo extends Webgl {
+    [x: string]: any;
     three: {
         camera: THREE.PerspectiveCamera;
         scene: THREE.Scene;
@@ -64,7 +66,9 @@ export default class Photo {
     imagePath: string;
     targetY: number;
     cursor: Cursor;
+    animFrame?: number;
     constructor() {
+        super();
         this.three = {
             camera: null,
             scene: new THREE.Scene(),
@@ -81,7 +85,7 @@ export default class Photo {
         this.elms = {
             canvas: document.querySelector('[data-study="canvas"]'),
             images: document.querySelectorAll('[data-study="image"]'),
-            mv: document.querySelector('.p-mv'),
+            mv: document.querySelector('.p-index-mv'),
         };
         this.winSize = {
             width: 0,
@@ -127,7 +131,7 @@ export default class Photo {
         // 描写する
         this.render();
         // ハンドリング
-        this.handleEvent();
+        // this.handleEvent();
     }
     async load(): Promise<void> {
         for (const [index, image] of Object.entries(this.elms.images)) {
@@ -161,35 +165,20 @@ export default class Photo {
         this.update(index);
         this.scrollList[index].previous = this.meshList[index].position.x;
     }
-    initCamera(): THREE.PerspectiveCamera {
-        // PerspectiveCamera: 遠近感が適用されるカメラ
-        const camera = new THREE.PerspectiveCamera(
-            45, // 画角
-            this.winSize.width / this.winSize.height, // 縦横比
-            0.1, // 視点から最も近い面までの距離
-            2000 // 視点から最も遠い面までの距離
-        );
-        // カメラ位置を設定
-        camera.position.set(0, 0, 1000);
-        // どの位置からでも指定した座標に強制的に向かせることができる命令
-        // camera.lookAt(this.three.scene.position);
-        return camera;
-    }
-    initRenderer(): THREE.WebGLRenderer {
-        const renderer = new THREE.WebGLRenderer({
-            alpha: true, // 背景透明
-            antialias: true, // 物体の輪郭を滑らかにする
-        });
-        /**
-         * デスクトップでは、メインディスプレイ・サブディスプレイでPixelRatioの異なる可能性がある。
-         * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
-         * https://ics.media/tutorial-three/renderer_resize/
-         */
-        renderer.setPixelRatio(window.devicePixelRatio); // デバイスピクセル比
-        renderer.setClearColor(0xffffff, 0); // 背景透過
-        renderer.setSize(this.winSize.width, this.winSize.height);
-        return renderer;
-    }
+    // initCamera(): THREE.PerspectiveCamera {
+    //     // PerspectiveCamera: 遠近感が適用されるカメラ
+    //     const camera = new THREE.PerspectiveCamera(
+    //         45, // 画角
+    //         this.winSize.width / this.winSize.height, // 縦横比
+    //         0.1, // 視点から最も近い面までの距離
+    //         2000 // 視点から最も遠い面までの距離
+    //     );
+    //     // カメラ位置を設定
+    //     camera.position.set(0, 0, 1000);
+    //     // どの位置からでも指定した座標に強制的に向かせることができる命令
+    //     camera.lookAt(this.three.scene.position);
+    //     return camera;
+    // }
     initViewport(): ThreeNumber {
         if (this.three.camera) {
             // fov : Field OF View (カメラの位置から見えるシーンの範囲)
@@ -247,6 +236,7 @@ export default class Photo {
         const mesh = new THREE.Mesh(geometry, material);
         return mesh;
     }
+    // 遷移先リンクを取得
     setLink(index: number): string {
         return this.elms.images[index].getAttribute('data-study-link');
     }
@@ -259,7 +249,7 @@ export default class Photo {
         return bgMeshList;
     }
     createBgMesh(): THREE.Mesh {
-        const uniforms = {
+        const uniforms: UniformOptions = {
             uResolution: {
                 value: new THREE.Vector2(0.0, 0.0), // 画面サイズ
             },
@@ -354,12 +344,12 @@ export default class Photo {
             bgMaterial.uniforms.uResolution.value = new Vector2(rect.width, rect.height);
         }
     }
-    setSize(): void {
-        this.winSize = {
-            width: window.innerWidth,
-            height: window.innerHeight,
-        };
-    }
+    // setSize(): void {
+    //     this.winSize = {
+    //         width: window.innerWidth,
+    //         height: window.innerHeight,
+    //     };
+    // }
     handleEvent(): void {
         window.addEventListener(
             'resize',
@@ -383,11 +373,10 @@ export default class Photo {
             },
             false
         );
-
         window.addEventListener(
             'scroll',
             throttle(() => {
-                this.handleScroll();
+                if (this.elms.mv) this.handleScroll();
                 setTimeout(() => {
                     this.flg.isScroll = false;
                 }, 10);
@@ -422,15 +411,17 @@ export default class Photo {
         }
     }
     render(): void {
-        requestAnimationFrame(this.render.bind(this));
+        this.animFrame = requestAnimationFrame(this.render.bind(this));
         this.moveImages();
-        // if (window.scrollY > this.elms.mv.scrollHeight) this.setRaycaster();
         // 画面に描画する
         this.three.renderer.render(this.three.scene, this.three.camera);
     }
+    cancelAnimFrame(): void {
+        cancelAnimationFrame(this.animFrame);
+    }
     // スクロールに合わせて画像を動かす
     moveImages(): void {
-        const targetY = window.scrollY - this.elms.mv.scrollHeight;
+        const targetY = window.scrollY - this.elms.mv.clientHeight;
         for (const [index, mesh] of Object.entries(this.meshList)) {
             const i = parseInt(index);
             const scroll = this.scrollList[i];
@@ -525,7 +516,8 @@ export default class Photo {
     handleScroll(): void {
         this.flg.isScroll = true;
         this.flg.isMove = false;
-        const targetY = window.scrollY - this.elms.mv.scrollHeight;
+        const targetY = window.scrollY - this.elms.mv.clientHeight;
+        const s = window.scrollY;
         for (const [index, rect] of Object.entries(this.rectList)) {
             const i = parseInt(index);
             // スクロール情報（current/previous/ease）
@@ -542,7 +534,15 @@ export default class Photo {
             const imagePos = currentRect.left - rect.width / 2 - this.winSize.width / 2;
             if (targetY >= 0) {
                 scroll.current =
-                    targetY > this.targetY ? Math.min(imagePos, scroll.previous) : Math.max(imagePos, scroll.previous);
+                    targetY === this.targetY
+                        ? imagePos
+                        : targetY > this.targetY
+                        ? Math.min(imagePos, scroll.previous)
+                        : Math.max(imagePos, scroll.previous);
+                // if (i === 0) {
+                //     console.log(this.meshList[i].position.x);
+                //     console.log(imagePos);
+                // }
             }
         }
         this.targetY = targetY;

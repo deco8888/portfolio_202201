@@ -1,4 +1,5 @@
 import type { NuxtConfig } from '@nuxt/types';
+import { Configuration } from '@nuxt/types/node_modules/@types/webpack';
 import Sass from 'sass';
 
 const environment = process.env.NODE_ENV || 'development';
@@ -37,6 +38,10 @@ const nuxtConfig: NuxtConfig = {
             { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
             { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
             { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Red+Hat+Display&display=swap' },
+            {
+                rel: 'stylesheet',
+                href: 'https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@700&family=Red+Hat+Display&display=swap',
+            },
         ],
     },
 
@@ -44,7 +49,7 @@ const nuxtConfig: NuxtConfig = {
     css: ['ress', '~/assets/styles/app.scss'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-    plugins: [],
+    plugins: [{ src: '~/plugins/routerOption', mode: 'client' }],
 
     publicRuntimeConfig: {
         url: process.env.URL || '',
@@ -94,7 +99,7 @@ const nuxtConfig: NuxtConfig = {
             },
         },
         // webpackの設定を拡張
-        extend(config, { isClient }) {
+        extend(config: Configuration, { isClient }: any) {
             if (isClient) {
                 config.devtool = isDev ? 'source-map' : false;
             }
@@ -113,7 +118,7 @@ const nuxtConfig: NuxtConfig = {
                     ? `[name]${isModern ? '.modern' : ''}.js`
                     : `[name]${isModern ? '.modern' : ''}.[contenthash:7].js`,
             chunk: ({ isDev }) => (isDev ? '[name].js' : '[id].[contenthash].js'),
-            // chunk: ({ isModern }) =>
+            // chunk: ({ isDev, isModern }) =>
             //     isDev
             //         ? `[name]${isModern ? '.modern' : ''}.js`
             //         : `[name]${isModern ? '.modern' : ''}.[contenthash:7].js`,

@@ -1,0 +1,58 @@
+@use '../../global/index' as g;
+
+.p-box {
+    position: fixed;
+    left: g.get_vw(50);
+    bottom: g.get_vw(30);
+    z-index: 1000;
+    @include g.hover-only {
+        img {
+            animation: bound 1s g.ease(OutSine);
+        }
+        @keyframes bound {
+            0% {
+                transform: translateY(0);
+            }
+            25% {
+                transform: translateY(-10px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            75% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    }
+    @include g.media('>phone') {
+        width: g.get_vw(100);
+        height: g.get_vw(100);
+    }
+    @include g.media('<=phone') {
+        width: g.get_vw(150);
+        height: g.get_vw(150);
+    }
+    &__inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        z-index: 1001;
+        // background-color: g.$color-white;
+    }
+    a {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+    img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+}

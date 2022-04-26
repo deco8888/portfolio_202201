@@ -1,0 +1,193 @@
+@use '../../../global/index' as g;
+
+.p-index-mv {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #c6cff8f1;
+    overflow: hidden;
+    @include g.media('>phone') {
+        padding: 0 0 g.get_per(500);
+    }
+    @include g.media('<=phone') {
+        padding: 0 0 g.get_per(300);
+    }
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 200%;
+        background-image: linear-gradient(45deg, transparent 50%, #c6cff8e0 50%),
+            linear-gradient(45deg, transparent 50%, #c6cff8e0 50%);
+        background-position: top center;
+        background-repeat: repeat;
+        background-size: g.get_vw(30) g.get_vw(30);
+        background-attachment: fixed;
+        z-index: -1;
+        // animation: test 3s g.ease(OutSine) infinite;
+    }
+    &__bg {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        // overflow: hidden;
+        z-index: 1002;
+        &-horizontal {
+            position: relative;
+            height: 50vh;
+            overflow: hidden;
+        }
+        &-line {
+            position: relative;
+            width: 200vw;
+            height: 50vh;
+            overflow: hidden;
+            &--top {
+                background-color: #ebeefa; // bdc8f4
+                &::after {
+                    background-position: bottom center;
+                }
+            }
+            &--bottom {
+                background-color: #ebeefa; //ebeefa
+                &::after {
+                    background-position: top center;
+                }
+            }
+            // &::after {
+            //     content: '';
+            //     position: absolute;
+            //     top: 0;
+            //     left: 0;
+            //     width: 100%;
+            //     height: 100%;
+            //     background-image: linear-gradient(0deg, transparent 50%, #d8def7 50%),
+            //         linear-gradient(90deg, transparent 50%, #d8def7 50%);
+            //     background-repeat: repeat;
+            //     background-size: g.get_vw(200) g.get_vw(200);
+            //     background-attachment: fixed;
+            //     // animation: test 3s g.ease(OutSine) infinite;
+            // }
+        }
+        &-anim {
+            display: flex;
+            position: relative;
+            height: 50vh;
+            float: left;
+        }
+        // &::after {
+        //     content: '';
+        //     position: absolute;
+        //     top: 0;
+        //     left: 0;
+        //     width: 100%;
+        //     height: 200%;
+        //     opacity: 0.6;
+        //     background-image: url(~@/assets/images/pc/bg.png);
+        //     background-position: center center;
+        //     background-repeat: repeat repeat;
+        //     background-size: g.get_vw(20);
+        //     z-index: -1;
+        // }
+    }
+    &__canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: solid 10px;
+        border-image: linear-gradient(180deg, #043e6b, #578bb3);
+        border-image-slice: 1;
+        transition: border-color 1s g.ease(OutSine);
+        &.is-active {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+    }
+    &__text {
+        position: relative;
+        width: 100%;
+        height: 50vw;
+    }
+    .pin-spacer {
+        height: 50vh;
+    }
+    &__name {
+        flex: 0 0 auto;
+        padding: 2rem;
+        background: linear-gradient(20deg, rgb(247 156 23 / 50%) 20%, rgb(152 120 210 / 60%) 60%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        white-space: nowrap;
+        letter-spacing: 1rem;
+        font-family: 'BIZ UDPGothic', sans-serif;
+        font-family: 'Red Hat Display', sans-serif;
+        font-weight: g.$font-weight-bold;
+        @include g.font-size(3rem, 20rem);
+        // &:nth-child(odd) {
+        //     animation: loop-odd 30s -15s g.ease(linear) infinite;
+        // }
+        // &:nth-child(even) {
+        //     animation: loop-even 30s g.ease(linear) infinite;
+        // }
+        &-wrap {
+            display: flex;
+            position: absolute;
+            top: 0;
+            right: 0;
+            overflow: hidden;
+            // background-color: #9878d2;
+            // transform: rotate(10deg);
+        }
+    }
+    &__position {
+        flex: 0 0 auto;
+        padding: 2rem;
+        background: linear-gradient(90deg, rgb(152 120 210 / 60%), rgb(247 156 23 / 50%));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        white-space: nowrap;
+        letter-spacing: 1rem;
+        font-family: 'BIZ UDPGothic', sans-serif;
+        font-family: 'Red Hat Display', sans-serif;
+        font-weight: g.$font-weight-bold;
+        @include g.font-size(3rem, 20rem);
+        // &:nth-child(odd) {
+        //     animation: loop-odd 30s -15s g.ease(linear) reverse infinite;
+        // }
+        // &:nth-child(even) {
+        //     animation: loop-even 30s g.ease(linear) reverse infinite;
+        // }
+        &-wrap {
+            display: flex;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            overflow: hidden;
+            // background-color: #9878d2;
+            // transform: rotate(10deg);
+        }
+    }
+    @keyframes loop-odd {
+        0% {
+            transform: translateX(100%);
+        }
+        to {
+            transform: translateX(-100%);
+        }
+    }
+    @keyframes loop-even {
+        0% {
+            transform: translateX(0%);
+        }
+        to {
+            transform: translateX(-200%);
+        }
+    }
+}
