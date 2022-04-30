@@ -1,0 +1,49 @@
+@use '../../global/index' as g;
+
+/***********************
+ *
+ * parts contact
+ *
+ ***********************/
+.p-contact {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    width: 400px;
+    height: 400px;
+    z-index: -1;
+    @include g.scroll-fadein-before(20px, -50%);
+    &.is-active {
+        @include g.scroll-fadein-after(0, -50%, 0s);
+        z-index: 1002;
+    }
+    @include g.media('>phone') {
+        margin: 0 g.get_per(100) 0 0;
+    }
+    @include g.media('<=phone') {
+        margin: 0 g.get_per(100) 0 0;
+    }
+    &__inner {
+        display: grid;
+        width: 100%;
+        height: 100%;
+    }
+    &__item {
+        display: flex;
+        position: relative;
+        width: 400px;
+        height: 400px;
+        background-color: #ebab40;
+        cursor: pointer;
+    }
+    &__content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        visibility: hidden;
+        opacity: 0;
+        // display: none;
+    }
+}

@@ -8,7 +8,7 @@ export default class Webgl {
     three: {
         camera: THREE.PerspectiveCamera | null;
         scene: THREE.Scene;
-        mesh: THREE.Mesh | null;
+        mesh: THREE.Mesh | THREE.Mesh[] | null;
         renderer: THREE.WebGLRenderer | null;
     };
     winSize: ThreeNumber;

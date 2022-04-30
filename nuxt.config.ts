@@ -42,6 +42,10 @@ const nuxtConfig: NuxtConfig = {
                 rel: 'stylesheet',
                 href: 'https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@700&family=Red+Hat+Display&display=swap',
             },
+            {
+                rel: 'stylesheet',
+                href: 'https://fonts.googleapis.com/css?family=M+PLUS+1p',
+            },
         ],
     },
 
@@ -49,7 +53,16 @@ const nuxtConfig: NuxtConfig = {
     css: ['ress', '~/assets/styles/app.scss'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-    plugins: [{ src: '~/plugins/routerOption', mode: 'client' }],
+    plugins: [
+        { src: '~/plugins/routerOption', mode: 'client' },
+        { src: '~/plugins/scroll', mode: 'client' },
+    ],
+
+    router: {
+        scrollBehavior: function (_to, _from, _savedPosition) {
+            return { x: 0, y: 0 };
+        },
+    },
 
     publicRuntimeConfig: {
         url: process.env.URL || '',

@@ -3,12 +3,12 @@
 @mixin scroll-fadein-before($x: 0, $y: 15px) {
     opacity: 0;
     transform: translate($x, $y);
+    transition: opacity 0.65s e.ease(OutSine), transform 0.65s e.ease(OutSine);
 }
 
 @mixin scroll-fadein-after($x: 0, $y: 0, $delay: 0.3s) {
     opacity: 1;
     transform: translate($x, $y);
-    transition: opacity 1s e.ease(OutSine), transform 1s e.ease(OutSine);
     transition-delay: $delay;
 }
 

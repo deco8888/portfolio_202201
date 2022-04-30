@@ -4,6 +4,11 @@
             <!-- <TheCanvas :sectionName="'study'" /> -->
             <div class="p-index-study__canvas" data-study="canvas"></div>
             <div class="p-index-study__wrap" data-horizontal="wrapper">
+                <div class="p-index-study__expansion" data-expansion="canvas">
+                    <div class="p-index-study__content">
+                        <p>TEST</p>
+                    </div>
+                </div>
                 <div class="p-index-study__list" data-horizontal="list">
                     <div class="p-index-study__image-wrap p-index-study__image-wrap--image1">
                         <div
@@ -30,6 +35,7 @@
                         ></div>
                     </div>
                 </div>
+                <TheContact />
             </div>
         </div>
     </section>
@@ -41,7 +47,10 @@ import Vue from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import BaseImage from '~/components/common/TheBaseImage.vue';
+import TheContact from '~/components/parts/TheContact.vue';
 import Study from '~/assets/scripts/components/study';
+import { addClass, removeClass } from '~/assets/scripts/utils/classList';
+import { hasClass } from '~/assets/scripts/utils/hasClass';
 
 interface StudyOptions {
     study: Study;
@@ -53,6 +62,7 @@ interface StudyOptions {
 export default Vue.extend({
     components: {
         BaseImage,
+        TheContact,
     },
     data(): StudyOptions {
         return {
@@ -65,7 +75,6 @@ export default Vue.extend({
         };
     },
     mounted() {
-        console.log("mounted");
         gsap.registerPlugin(ScrollTrigger);
         this.test();
         this.study = new Study();
@@ -74,6 +83,7 @@ export default Vue.extend({
         test() {
             const horizontalWrapper = document.querySelector("[data-horizontal='wrapper']");
             const horizontalList = document.querySelector("[data-horizontal='list']");
+            const box = document.querySelector('.p-contact');
             gsap.to(horizontalList, {
                 x: () => -(horizontalList.clientWidth - horizontalWrapper.clientWidth),
                 ease: 'none',
@@ -82,10 +92,16 @@ export default Vue.extend({
                     // markers: true,
                     start: 'top top',
                     end: () => '+=' + (horizontalList.clientWidth - horizontalWrapper.clientWidth),
+                    onLeave: () => {
+                        addClass(box, hasClass.active);
+                    },
+                    onEnterBack: () => {
+                        removeClass(box, hasClass.active);
+                    },
                     pin: true,
                     anticipatePin: 1, // 素早くスクロールしたときにピン留めが少し遅れ、ガタつくのを防ぐ。
                     invalidateOnRefresh: true, // リサイズに関係する
-                    scrub: true,
+                    scrub: true, // アニメーションをスクロール位置にリンクさせる
                 },
             });
         },

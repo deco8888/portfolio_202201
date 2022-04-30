@@ -1,22 +1,32 @@
 <template>
     <section id="about" class="p-about-intro">
-        <!-- <div class="p-about-intro__title"></div>
-        <div class="p-about-intro__bg js-trigger">
-            <div class="p-about-intro__bg-horizontal" data-horizontal="bg-line">
-                <div data-horizontal="pin">
-                    <div class="p-about-intro__bg-anim to-right" data-horizontal="anim">
-                        <div class="p-about-intro__bg-line p-about-intro__bg-line--top"></div>
-                    </div>
-                </div>
+        <div class="p-about-intro__inner">
+            <div class="p-about-intro__block">
+                <h3 class="p-about-intro__name">AYAKA NAKAMURA</h3>
+                <p class="p-about-intro__desc">
+                    After working as a test engineer for two and a half years,<br />
+                    joined the PR company as an website operator. <br />
+                    After a two-year dispatch period, currently I've been involved in website production.<br /><br />
+                </p>
             </div>
-            <div class="p-about-intro__bg-horizontal" data-horizontal="bg-line">
-                <div data-horizontal="pin">
-                    <div class="p-about-intro__bg-anim to-left" data-horizontal="anim">
-                        <div class="p-about-intro__bg-line p-about-intro__bg-line--bottom"></div>
-                    </div>
-                </div>
+            <div class="p-about-intro__block">
+                <h3 class="p-about-intro__name">SKILLS</h3>
+                <p class="p-about-intro__skills">
+                    <span class="p-about-intro__skill">HTML</span>
+                    <span class="p-about-intro__skill">CSS</span>
+                    <span class="p-about-intro__skill">JavaScript</span>
+                    <span class="p-about-intro__skill">Vue.js</span>
+                    <span class="p-about-intro__skill">Nuxt.js</span>
+                    <span class="p-about-intro__skill">Three.js</span>
+                    <span class="p-about-intro__skill">React.js</span>
+                    <span class="p-about-intro__skill">Typescript</span>
+                    <span class="p-about-intro__skill">PHP</span>
+                    <span class="p-about-intro__skill">Laravel</span>
+                    <span class="p-about-intro__skill">WordPress</span>
+                    <span class="p-about-intro__skill">Docker</span>
+                </p>
             </div>
-        </div> -->
+        </div>
     </section>
 </template>
 
@@ -30,9 +40,7 @@ export default Vue.extend({
         // gsap.registerPlugin(ScrollTrigger);
         // this.moveLine();
     },
-    methods: {
-
-    },
+    methods: {},
 });
 </script>
 

@@ -53,6 +53,6 @@ export default class Title {
         );
     }
     cancel() {
-        if (this.mv.animFrame) this.mv.cancelAnimFrame();
+        if (this.mv.animFrame) this.mv.cancelAnimFrame(true);
     }
 }

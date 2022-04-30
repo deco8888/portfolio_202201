@@ -42,6 +42,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import Title from '~/assets/scripts/components/title';
 import BaseImage from '~/components/common/TheBaseImage.vue';
+import { addClass, removeClass } from '~/assets/scripts/utils/classList';
+import { hasClass } from '~/assets/scripts/utils/hasClass';
 
 export default Vue.extend({
     components: {
@@ -59,9 +61,13 @@ export default Vue.extend({
     mounted() {
         // eslint-disable-next-line no-new
         // new Mv().init();
-        new Title(this.$route.name);
+        const title = new Title(this.$route.name);
         gsap.registerPlugin(ScrollTrigger);
         this.moveLine();
+        this.$router.beforeEach((to, from, next) => {
+            title.cancel();
+            next();
+        });
     },
     methods: {
         moveLine(): void {
@@ -69,6 +75,7 @@ export default Vue.extend({
             horizontalLine.forEach((line) => {
                 const pinWrap = line.querySelector("[data-horizontal='pin']");
                 const animWrap = pinWrap.querySelector("[data-horizontal='anim']");
+                const box = document.querySelector('.p-box');
                 const xStart = (): number => (animWrap.classList.contains('to-right') ? -window.innerWidth : 0);
                 const xEnd = (): number =>
                     animWrap.classList.contains('to-right') ? -animWrap.scrollWidth : window.innerWidth;
@@ -85,6 +92,11 @@ export default Vue.extend({
                             start: 'top top',
                             end: () => {
                                 return '+=' + (animWrap.scrollWidth - window.innerWidth);
+                            },
+                            onUpdate: () => {
+                                window.scrollY >= window.innerWidth / 2.5
+                                    ? addClass(box, hasClass.active)
+                                    : removeClass(box, hasClass.active);
                             },
                             pin: true,
                             anticipatePin: 1, // 素早くスクロールしたときにピン留めが少し遅れ、ガタつくのを防ぐ。

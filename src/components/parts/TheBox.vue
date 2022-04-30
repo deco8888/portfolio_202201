@@ -16,6 +16,12 @@ export default Vue.extend({
     components: {
         BaseImage,
     },
+    mounted() {
+        // @ts-ignore
+        this.$scrollFunction({
+            selector: '[data-scroll]',
+        });
+    },
 });
 </script>
 

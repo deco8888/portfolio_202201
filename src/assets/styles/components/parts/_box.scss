@@ -4,7 +4,11 @@
     position: fixed;
     left: g.get_vw(50);
     bottom: g.get_vw(30);
-    z-index: 1000;
+    @include g.scroll-fadein-before;
+    &.is-active {
+        @include g.scroll-fadein-after;
+        z-index: 1001;
+    }
     @include g.hover-only {
         img {
             animation: bound 1s g.ease(OutSine);

@@ -8,12 +8,11 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { addClass, isContains, removeClass } from '../utils/classList';
-import { debounce } from '../utils/debounce';
-import { hasClass } from '../utils/hasClass';
-import { lerp } from '../utils/math';
-import Letter from './letter';
-import { Vec3 } from './vec3';
+import { addClass, isContains, removeClass } from '../../../utils/classList';
+import { hasClass } from '../../../utils/hasClass';
+import { lerp } from '../../../utils/math';
+import Letter from '../../letter';
+import { Vec3 } from '../../vec3';
 
 interface ParticleOptions {
     position: Vec3;
@@ -23,7 +22,7 @@ interface ParticleOptions {
 
 interface TitleOption {}
 
-export default class WebGl extends Letter {
+export default class Title extends Letter {
     params: TitleOption;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
@@ -80,12 +79,9 @@ export default class WebGl extends Letter {
         study: HTMLElement;
     };
     isStudyArea: boolean;
-    flg: boolean;
-    max: number;
-    count: number;
     constructor() {
         super();
-        this.borderColor = 'rgb(152 120 210)';
+        this.borderColor = 'rgb(81 162 247)';
         this.textImage = {
             canvas: null,
             ctx: null,
@@ -123,28 +119,21 @@ export default class WebGl extends Letter {
             y: window.innerHeight / 2,
         };
         this.color = {
-            // front: '227 244 156',
-            front: '144 108 209',
-            // front: '88 88 88',
-            back: '255, 152, 0',
-            // back: '156, 156, 156',
-            // back: '208, 244, 60',
+            front: '81 162 247',
+            back: '233, 69, 29',
         };
         this.font = {
-            wight: 800,
-            size: 150,
+            wight: 700,
+            size: window.innerWidth * 0.1,
             family: 'Arial',
         };
         this.horizontal = 0;
         this.particleX = [];
-        this.text = 'PORTFOLIO';
+        this.text = 'ABOUT';
         this.elms = {
             study: document.querySelector('.p-index-study'),
         };
         this.isStudyArea = false;
-        this.flg = false;
-        this.max = 0;
-        this.count = 0;
     }
     // eslint-disable-next-line require-await
     init() {
@@ -153,18 +142,17 @@ export default class WebGl extends Letter {
     set(): boolean {
         cancelAnimationFrame(this.animFrame);
         this.setTextImage();
+        console.log(this.textImage.data);
         this.textImage.data = this.getImageData();
-        const test = document.querySelector('.test');
-        console.log(test);
         this.setStartPos();
         this.targets = this.getTarget(this.textImage.data);
-        this.canvas.style.border = 'solid 10px rgb(152 120 210)';
+        this.canvas.style.border = 'solid 10px rgb(81 162 247)';
         this.loop();
         return false;
     }
     setStartPos(): void {
         this.start = {
-            x: window.innerWidth / 2,
+            x: this.textImage.data.width * 0.7,
             y: window.innerHeight / 2,
         };
     }
@@ -188,26 +176,19 @@ export default class WebGl extends Letter {
     }
     setParticle(): void {
         const list = this.particles.sort((pa, pb) => pb.target.z - pa.target.z);
-        const num = list.length;
-        list.forEach(async (p, index) => {
+        list.forEach(async (p) => {
             this.setParticlePosition(p);
             this.rotation.x = lerp(this.rotation.x, this.target.rotation.x, 0.00005);
             this.rotation.y = lerp(this.rotation.y, this.target.rotation.y, 0.00005);
             const particle = p.position.rotateX(this.rotation.x).rotateY(this.rotation.y).pp(this.canvas);
 
-            let s = 1 - p.position.z / this.layers;
-            if (s < 0.6) s = 0.6;
+            const s = 1 - p.position.z / this.layers;
             this.ctx.fillStyle = p.target.z === 0 ? `rgb(${this.color.front})` : `rgba(${this.color.back}, ${s})`;
 
-            let particleX = particle.x - this.horizontal;
-            if (this.isStudyArea && this.particleX[num - 1]) {
-                particleX = lerp(this.particleX[index], particleX, 0.05);
-            }
-            this.ctx.fillRect(particleX, particle.y, s * this.size, s * this.size);
-            this.particleX[index] = particleX;
+            this.ctx.fillRect(particle.x, particle.y, s * this.size, s * this.size);
         });
     }
-    async handleScroll(): Promise<void> {
+    handleScroll(): void {
         const scrollY = window.scrollY;
         const study = document.querySelector('.p-index-study').getBoundingClientRect().top + scrollY;
         if (!isContains(this.elms.study, hasClass.active)) {
@@ -219,16 +200,6 @@ export default class WebGl extends Letter {
                 } else if (scrollY < this.scroll.y) {
                     this.target.rotation.x = this.rotation.x - 0.2;
                 }
-            } else if (scrollY >= study * 0.85) {
-                addClass(this.elms.study, hasClass.active);
-                await this.initValue();
-                this.text = 'STUDY';
-                this.color = {
-                    front: '0 190 8',
-                    back: '255, 135, 232',
-                };
-                this.borderColor = 'rgb(112 216 114)';
-                this.init();
             }
         }
         const current = scrollY - document.querySelector('.p-index-mv').clientHeight;
@@ -236,18 +207,6 @@ export default class WebGl extends Letter {
             if (scrollY > study * 0.85) {
                 this.horizontal = current < window.innerWidth / 2 ? 0 : current * 0.8;
                 this.isStudyArea = true;
-            }
-            if (scrollY < study * 0.85) {
-                removeClass(this.elms.study, hasClass.active);
-                this.isStudyArea = false;
-                await this.initValue();
-                this.text = 'PORTFOLIO';
-                this.color = {
-                    front: '144 108 209',
-                    back: '255, 152, 0',
-                };
-                this.borderColor = 'rgb(152 120 210)';
-                this.init();
             }
         }
         this.scroll.y = scrollY;
@@ -258,8 +217,8 @@ export default class WebGl extends Letter {
     async initValue(): Promise<void> {
         await this.initCommonValue();
         this.font = {
-            wight: 800,
-            size: 150,
+            wight: 700,
+            size: 130,
             family: 'Arial',
         };
     }
