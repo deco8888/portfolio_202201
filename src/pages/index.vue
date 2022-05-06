@@ -1,7 +1,13 @@
 <template>
     <div class="p-page">
         <!-- <TheIndex /> -->
-        <canvas class="p-index-mv__canvas" data-canvas="title"> </canvas>
+        <div class="p-index-mv__canvas" data-canvas="title"></div>
+        <div class="p-index-study__expansion" data-expansion="canvas">
+            <div class="p-index-study__expansion-canvas expansion" data-expansion="expansion"></div>
+            <div class="p-index-study__content">
+                <p>TEST</p>
+            </div>
+        </div>
         <TheMv />
         <TheBox />
         <TheStudy />
@@ -15,18 +21,21 @@ import TheBox from '~/components/parts/TheBox.vue';
 import TheMv from '~/components/section/index/_TheIndexMv.vue';
 import TheStudy from '~/components/section/index/_TheIndexStudy.vue';
 import TheCursor from '../components/parts/TheCursor.vue';
-import TheLottie from '../components/parts/TheLottie.vue';
 import BaseImage from '~/components/common/TheBaseImage.vue';
+import Title from '~/assets/scripts/components/section/index/title';
+import { debounce } from '~/assets/scripts/utils/debounce';
 
 export default Vue.extend({
     head: {
         title: 'TOP',
     },
     data(): {
-        routerChanging: Boolean;
+        title: Title;
+        scrollFlg: boolean;
     } {
         return {
-            routerChanging: true,
+            title: null,
+            scrollFlg: true,
         };
     },
     components: {
@@ -34,29 +43,50 @@ export default Vue.extend({
         TheMv,
         TheStudy,
         TheCursor,
-        TheLottie,
         BaseImage,
     },
-    watch: {
-        // routerChanging(newV) {
-        //     console.log('newV : ' + newV);
-        // },
-    },
     mounted() {
-        this.$router.beforeEach((to, from, next) => {
-            this.routerChanging = true;
-            // new Index().cancel();
+        setTimeout(() => {
+            this.title = new Title();
+            this.title.init();
+            this.handleEvent();
+        }, 100);
+        this.$router.beforeEach(async (_to, _from, next) => {
+            this.scrollFlg = false;
+            await this.title.cancelAnimFrame(true);
             next();
         });
-
-        // this.$router.afterEach(() => {
-        //     document.querySelector('.p-page').scrollTop = 0;
-        // });
     },
     methods: {
-        // start() {
-        //     new Study().init();
-        // },
+        handleEvent(): void {
+            const path = this.$route.name;
+            window.addEventListener(
+                'scroll',
+                () => {
+                    if (path === 'index' && this.scrollFlg) {
+                        this.title.handleScroll();
+                    }
+                },
+                {
+                    capture: false,
+                    passive: true,
+                }
+            );
+            window.addEventListener(
+                'resize',
+                debounce(() => {
+                    this.title.handleResize();
+                }, 10),
+                false
+            );
+            window.addEventListener(
+                'mousemove',
+                (e: MouseEvent) => {
+                    this.title.handleMove(e);
+                },
+                false
+            );
+        },
     },
 });
 </script>

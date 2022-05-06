@@ -40,7 +40,6 @@
 import Vue from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import Title from '~/assets/scripts/components/title';
 import BaseImage from '~/components/common/TheBaseImage.vue';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
@@ -59,15 +58,8 @@ export default Vue.extend({
         };
     },
     mounted() {
-        // eslint-disable-next-line no-new
-        // new Mv().init();
-        const title = new Title(this.$route.name);
         gsap.registerPlugin(ScrollTrigger);
         this.moveLine();
-        this.$router.beforeEach((to, from, next) => {
-            title.cancel();
-            next();
-        });
     },
     methods: {
         moveLine(): void {

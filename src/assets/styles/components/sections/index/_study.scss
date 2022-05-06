@@ -18,6 +18,7 @@
     background-size: g.get_vw(50) g.get_vw(50);
     background-attachment: fixed;
     overflow: hidden;
+    z-index: 1000;
     &__inner {
         display: flex;
         justify-content: center;
@@ -51,13 +52,15 @@
             transform: translate(0, -50%);
             overflow: hidden;
             &--image1 {
-                top: 28vh;
+                top: 42vh;
+                margin: 0 g.get_vw(70) 0 0;
             }
             &--image2 {
-                top: 72vh;
+                top: 75vh;
+                margin: 0 g.get_vw(70) 0 0;
             }
             &--image3 {
-                top: 28vh;
+                top: 42vh;
             }
         }
     }
@@ -67,7 +70,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: 1;
+        // z-index: 1;
     }
     &__image {
         position: absolute;
@@ -76,22 +79,5 @@
         width: 100%;
         height: 100%;
     }
-    &__expansion {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: -1;
-    }
-    &__content {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        visibility: hidden;
-        opacity: 0;
-    }
+    
 }

@@ -118,4 +118,121 @@ a {
     height: 100%;
     z-index: 1003;
     pointer-events: none !important;
+    border: solid 10px;
+    // border-image: linear-gradient(180deg, #043e6b, #578bb3);
+    // border-image-slice: 1;
+    border-image: linear-gradient(180deg, #9a7ad1 50%, #f9b97c 50%);
+    border-image-slice: 1;
 }
+
+.p-index-study {
+    &__expansion {
+        position: fixed;
+        top: 0;
+        left: 0;
+        // width: 100%;
+        // height: 100%;
+        z-index: -1;
+        background: transparent;
+    }
+    &__content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        visibility: hidden;
+        opacity: 0;
+    }
+    &__expansion-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        // border-image
+        transition: border 0s g.ease(OutSine) 0.8s;
+        &.is-active {
+            border: solid 10px;
+            // border-image: linear-gradient(180deg, #043e6b, #578bb3);
+            // border-image-slice: 1;
+        }
+    }
+}
+// .expansion {
+//     --l: 3em;
+//     --joint-stop: calc(100% + 7px);
+//     --large-0: var(--joint-0);
+//     --large-1: var(--joint-1);
+//     --large-2: var(--joint-2);
+//     --large-3: var(--joint-3);
+// }
+// .expansion,
+// .expansion::before,
+// .expansion::after {
+//     --l: 3em;
+//     --strip-stop: 100%;
+//     --strip-f: 1;
+//     --strip-stop-0: calc(var(--strip-f) * var(--strip-stop));
+//     --strip-stop-1: calc(var(--strip-stop) - var(--strip-stop-0));
+//     --strip-end: red;
+//     --strip-mid: transparent;
+//     --strip-list: var(--strip-end) 0, var(--strip-end) var(--strip-stop-0), var(--strip-mid) 0,
+//         var(--strip-mid) var(--strip-stop-1), var(--strip-end) 0, var(--strip-end) var(--strip-stop);
+//     --joint-list: var(--joint-end, red) var(--joint-stop, 100%), var(--joint-mid, transparent) 0;
+//     --joint-0: linear-gradient(135deg, var(--joint-list));
+//     --joint-1: linear-gradient(-135deg, var(--joint-list));
+//     --joint-2: linear-gradient(-45deg, var(--joint-list));
+//     --joint-3: linear-gradient(45deg, var(--joint-list));
+// }
+// .expansion::before,
+// .expansion::after {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     background: linear-gradient(#3f7ea6, #ff9528);
+//     --o: calc(50% - var(--i) * 0.5 * var(--l));
+//     --joint-stop: calc(25% + 4px);
+//     --mask: var(--top, var(--large-0), var(--large-1), var(--large-2), var(--large-3)) var(--joint-0), var(--joint-1),
+//         var(--joint-2), var(--joint-3);
+//     --mask-o: var(--o) var(--o);
+//     --mask-d: var(--l) var(--l);
+//     -webkit-mask-composite: xor;
+//     -webkit-mask-composite: exclude;
+//     --i: 0;
+//     --noti: calc(1 - var(--i));
+//     --sgni: calc(2 * var(--i) - 1);
+//     --c: hsl(0, 0%, 0%, var(--i));
+//     --notc: hsl(0, 0%, 0%, var(--noti));
+//     --joint-end: var(--notc);
+//     --joint-mid: var(--c);
+//     --fill: linear-gradient(var(--c), var(--c));
+//     --c0: RGB(
+//         calc(var(--i) * 63 + var(--noti) * 255),
+//         calc(var(--i) * 126 + var(--noti) * 149),
+//         calc(var(--i) * 166 + var(--noti) * 40)
+//     );
+//     --c1: RGB(
+//         calc(var(--i) * 255 + var(--noti) * 63),
+//         calc(var(--i) * 149 + var(--noti) * 126),
+//         calc(var(--i) * 40 + var(--noti) * 166)
+//     );
+//     -webkit-mask: var(--mask);
+//     mask: var(--mask);
+//     -webkit-mask-position: var(--mask-o, 50% 50%);
+//     -webkit-mask-position: var(--mask-o, 50% 50%);
+//     -webkit-mask-size: var(--mask-d);
+//     -webkit-mask-size: var(--mask-d);
+// }
+// .expansion::after {
+//     background-size: 100% calc(0.5 * var(--l));
+//     --joint-stop: 5%;
+//     --top: ;
+//     --i: 1;
+// }

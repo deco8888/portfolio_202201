@@ -52,7 +52,7 @@ export default class Title extends Letter {
     isStudyArea: boolean;
     constructor() {
         super();
-        this.borderColor = 'rgb(81 162 247)';
+        this.borderColor = 'rgb(101 141 172)'; //'rgb(81 162 247)';
         this.textImage = {
             canvas: null,
             ctx: null,
@@ -82,22 +82,22 @@ export default class Title extends Letter {
             y: 0,
         };
         this.color = {
-            front: '#51a2f7',
-            back: '#e9451d',
+            front: '#facb04',
+            back: '#7caed4', //#5174b3',
         };
         this.font = {
             wight: 700,
             size: window.innerWidth * 0.1,
             family: 'Nippo',
         };
-        this.text = 'ABOUT';
+        this.text = 'CONTACT';
     }
     init(): void {
-        this.canvas = document.querySelector('[data-canvas="title"]');
+        this.canvas = document.querySelector('[data-expansion="expansion"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
-        this.setBorderStyle('152 120 210');
         // 描写する
+        this.setBorderStyle('124 174 212');
         this.render();
         this.three.clock = new THREE.Clock();
         this.three.clock.start();
@@ -109,7 +109,7 @@ export default class Title extends Letter {
             this.time.delta = this.three.clock.getDelta();
             this.time.total += this.time.delta;
         }
-        // if (this.three.object) this.three.object.rotation.y += 0.005;
+        if (this.three.object) this.three.object.rotation.y += 0.005;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
         if (this.three.points) this.update();
@@ -122,8 +122,8 @@ export default class Title extends Letter {
         for (let i = 0; i < positionList.length / 3; i++) {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
-            const lastX = secondList[i * 2] - window.innerWidth * 0.5 * 0.47;
-            const lastY = secondList[i * 2 + 1];
+            const lastX = secondList[i * 2];
+            const lastY = secondList[i * 2 + 1] + window.innerHeight * 0.5 * 0.5;
             const currentX = lerp(previousX, lastX, 0.1);
             const currentY = lerp(previousY, lastY, 0.08);
             geometryPosition.setX(i, currentX);

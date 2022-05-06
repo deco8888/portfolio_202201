@@ -20,6 +20,17 @@ export class Vec3 {
         const z = _z !== undefined ? _z : 0;
         return new Vec3(x, y, z);
     }
+    public static fromScreenCoords2(canvas: HTMLCanvasElement, _x: number, _y: number, _z: number) {
+        const factor = 2000 / 200;
+        const x = (_x - canvas.width / 2) / factor;
+        const y = (_y - canvas.height / 2) / factor;
+        const z = _z !== undefined ? _z : 0;
+        return {
+            x,
+            y,
+            z,
+        };
+    }
     public rotateX(angle: number) {
         const z = this.z * Math.cos(angle) - this.x * Math.sin(angle);
         const x = this.z * Math.sin(angle) + this.x * Math.cos(angle);

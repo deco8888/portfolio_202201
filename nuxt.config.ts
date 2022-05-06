@@ -46,6 +46,10 @@ const nuxtConfig: NuxtConfig = {
                 rel: 'stylesheet',
                 href: 'https://fonts.googleapis.com/css?family=M+PLUS+1p',
             },
+            {
+                rel: 'stylesheet',
+                href: 'https://api.fontshare.com/css?f[]=nippo@700&f[]=kola@400&display=swap',
+            },
         ],
     },
 
@@ -53,10 +57,7 @@ const nuxtConfig: NuxtConfig = {
     css: ['ress', '~/assets/styles/app.scss'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-    plugins: [
-        { src: '~/plugins/routerOption', mode: 'client' },
-        { src: '~/plugins/scroll', mode: 'client' },
-    ],
+    plugins: [{ src: '~/plugins/scroll', mode: 'client' }],
 
     router: {
         scrollBehavior: function (_to, _from, _savedPosition) {
@@ -80,6 +81,7 @@ const nuxtConfig: NuxtConfig = {
         '@nuxt/typescript-build',
         // https://go.nuxtjs.dev/stylelint
         '@nuxtjs/stylelint-module',
+        '@nuxt/postcss8',
     ],
 
     // Modules: https://go.nuxtjs.dev/config-modules

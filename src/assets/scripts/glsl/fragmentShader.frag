@@ -1,21 +1,17 @@
 // どのくらいの精度でデータを扱うかと指定する文でprecision修飾子で宣言
 precision mediump float;
-uniform vec2 uResolution;
-uniform vec2 uShape;
-varying vec2 vUv;
-// uniform sampler2D u_texture;
-
-// vec4 _texture = texture2D(u_texture, vUv);
-// gl_FragColor = _texture;
+varying vec3 v_color;
+varying float v_alpha;
 
 void main() {
-    vec2 center = vec2(.03, .03);
-    // 半径を、中心から現在のピクセルへの距離で割る
-    float lightness = 0.05 / length(vUv - center);
-
-    vec4 color = vec4(vec3(lightness), 1.0);
-    // vec4 color = vec4(1.0, 0.0, 1.0, 1.0);
-    // color *= vec4(0.2, 1.0, 0.5, 1.0);
-    // gl_FragColor に vec4 型（rgba）の色を入れることでピクセル色を決定する。
-    gl_FragColor = color;
+    // gl_PointCoord: 描画される点上のテクスチャ座標
+    vec2 temp = gl_PointCoord - vec2(0.5);
+    // dot: ドット積・点乗積➡ベクトル演算の一種で、2つの同じ長さの数列から1つの数値を返す演算
+    float f = dot(temp, temp);
+    if(f > 0.25) {
+      // 何も出力しない
+      discard;
+    }
+    
+    gl_FragColor = vec4(v_color, v_alpha);
 }

@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "ES2018",
     "module": "ESNext",
-    // モジュールをどのように解決するのかを指定
     "moduleResolution": "Node",
     "lib": [
       "ESNext",
@@ -14,20 +13,11 @@
     "sourceMap": true,
     "strict": false,
     "noEmit": true,
-    // 暗黙的にanyになる値をエラーにする
     "noImplicitAny": true,
-    // 使われているthisの型が暗黙的にanyになる場合にエラーにする
     "noImplicitThis": true,
-    // デコレータの実験的なサポートを有効にする
     "experimentalDecorators": true,
-    // TypeScriptの型を実行時に保持する
-    "emitDecoratorMetadata": true,
-    // *.d.ts に対して型チェックしない
-    "skipLibCheck": true,
-    // jsonファイルをimportして型解決した状態で値を取得できる
     "resolveJsonModule": true,
-    // import時にファイルパスの文字列で大文字小文字を区別するかどうかを指定
-    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "~/*": [
@@ -38,9 +28,8 @@
       ]
     },
     "types": [
-      "@nuxt/types",
       "@types/node",
-      "./src/types"
+      "@nuxt/types"
     ]
   },
   "exclude": [

@@ -4,6 +4,9 @@ import Webgl from './webgl';
 import { isMobile } from './isMobile';
 import expansionVertexShader from '../glsl/expansion/vertexshader.vert';
 import expansionFragmentShader from '../glsl/expansion/fragmentShader.frag';
+import Title from './section/index/title';
+import { addClass } from '../utils/classList';
+import { hasClass } from '../utils/hasClass';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -23,6 +26,9 @@ export default class Expansion extends Webgl {
     elms: {
         item: HTMLElement;
         canvas: HTMLCanvasElement;
+        expansion: HTMLElement;
+        title: HTMLCanvasElement;
+        study: HTMLCanvasElement;
     };
     isMobile: boolean;
     param: {
@@ -48,10 +54,13 @@ export default class Expansion extends Webgl {
         this.elms = {
             item: document.querySelector('[data-expansion="item"]'),
             canvas: document.querySelector('[data-expansion="canvas"]'),
+            expansion: document.querySelector('[data-expansion="expansion"]'),
+            title: document.querySelector('[data-canvas="title"]'),
+            study: document.querySelector('.p-index-study'),
         };
         this.isMobile = isMobile();
         this.param = {
-            color: '#2469a5',
+            color: '#f9f5ce', //#f8f3ba',
             speed: 1.35,
             ratio: this.isMobile ? 0.15 : 0.26,
             direction: 1,
@@ -164,21 +173,38 @@ export default class Expansion extends Webgl {
     displayInFull(): void {
         if (this.state === 'full' || this.flg.isAnimating) return;
         this.flg.isAnimating = true;
-        this.elms.canvas.style.zIndex = '1010';
         const tl = gsap.timeline({
             paused: true,
             defaults: {
                 duration: 1.5,
                 ease: Power2.easeInOut,
+                onStart: () => {
+                    // new Title().setBorderStyle('37 105 165');
+                    // tl.set(this.elms.title, {
+                    //     zIndex: 1000,
+                    //     // display: 'none',
+                    // });
+                    // tl.set(this.elms.study, {
+                    //     // zIndex: 2000,
+                    //     display: 'none',
+                    // });
+
+                    // this.elms.canvas.style.zIndex = '10000';
+                    addClass(this.elms.expansion, hasClass.active);
+                },
             },
         });
         const material = <THREE.ShaderMaterial>this.three.mesh.material;
+        tl.set(this.elms.canvas, {
+            zIndex: 1004,
+        });
         tl.to(
             material.uniforms.uProgress,
             {
                 value: 1,
                 onUpdate: () => this.render(),
                 onComplete: () => {
+                    this.elms.study.style.display = 'none';
                     this.flg.isAnimating = false;
                     this.state = 'full';
                     this.displayContent();
@@ -197,7 +223,6 @@ export default class Expansion extends Webgl {
             },
         });
         const content = document.querySelector<HTMLElement>('.p-index-study__content');
-        console.log(content);
         tl.set(content, { visibility: 'visible' });
         tl.to(
             content,

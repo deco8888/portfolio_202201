@@ -4,11 +4,12 @@
             <!-- <TheCanvas :sectionName="'study'" /> -->
             <div class="p-index-study__canvas" data-study="canvas"></div>
             <div class="p-index-study__wrap" data-horizontal="wrapper">
-                <div class="p-index-study__expansion" data-expansion="canvas">
+                <!-- <div class="p-index-study__expansion" data-expansion="canvas">
+                    <div class="p-index-study__expansion-canvas" data-expansion="expansion"></div>
                     <div class="p-index-study__content">
                         <p>TEST</p>
                     </div>
-                </div>
+                </div> -->
                 <div class="p-index-study__list" data-horizontal="list">
                     <div class="p-index-study__image-wrap p-index-study__image-wrap--image1">
                         <div

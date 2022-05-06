@@ -12,6 +12,8 @@ import { Vector2, Vector3 } from 'three';
 import { debounce } from '../utils/debounce';
 import { Cursor } from './cursor';
 import Webgl from './webgl';
+import { hasClass } from '../utils/hasClass';
+import { isContains } from '../utils/classList';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -45,6 +47,7 @@ export default class Photo extends Webgl {
         canvas: HTMLCanvasElement;
         images: NodeListOf<HTMLImageElement>;
         mv: HTMLCanvasElement;
+        expansion: HTMLCanvasElement;
     };
     mouse: {
         x: number;
@@ -55,8 +58,7 @@ export default class Photo extends Webgl {
     viewport!: ThreeNumber;
     rectList: DOMRect[];
     flg: {
-        isScroll: boolean;
-        isMove: boolean;
+        [key: string]: boolean;
     };
     scrollList: ScrollOptions[];
     meshList: THREE.Mesh[];
@@ -86,6 +88,7 @@ export default class Photo extends Webgl {
             canvas: document.querySelector('[data-study="canvas"]'),
             images: document.querySelectorAll('[data-study="image"]'),
             mv: document.querySelector('.p-index-mv'),
+            expansion: document.querySelector('[data-expansion="canvas"]'),
         };
         this.winSize = {
             width: 0,
@@ -102,6 +105,8 @@ export default class Photo extends Webgl {
         this.flg = {
             isScroll: false,
             isMove: false,
+            display: false,
+            isContact: false,
         };
         this.scrollList = [];
         this.meshList = [];
@@ -165,20 +170,6 @@ export default class Photo extends Webgl {
         this.update(index);
         this.scrollList[index].previous = this.meshList[index].position.x;
     }
-    // initCamera(): THREE.PerspectiveCamera {
-    //     // PerspectiveCamera: 遠近感が適用されるカメラ
-    //     const camera = new THREE.PerspectiveCamera(
-    //         45, // 画角
-    //         this.winSize.width / this.winSize.height, // 縦横比
-    //         0.1, // 視点から最も近い面までの距離
-    //         2000 // 視点から最も遠い面までの距離
-    //     );
-    //     // カメラ位置を設定
-    //     camera.position.set(0, 0, 1000);
-    //     // どの位置からでも指定した座標に強制的に向かせることができる命令
-    //     camera.lookAt(this.three.scene.position);
-    //     return camera;
-    // }
     initViewport(): ThreeNumber {
         if (this.three.camera) {
             // fov : Field OF View (カメラの位置から見えるシーンの範囲)
@@ -344,12 +335,6 @@ export default class Photo extends Webgl {
             bgMaterial.uniforms.uResolution.value = new Vector2(rect.width, rect.height);
         }
     }
-    // setSize(): void {
-    //     this.winSize = {
-    //         width: window.innerWidth,
-    //         height: window.innerHeight,
-    //     };
-    // }
     handleEvent(): void {
         window.addEventListener(
             'resize',
@@ -539,10 +524,6 @@ export default class Photo extends Webgl {
                         : targetY > this.targetY
                         ? Math.min(imagePos, scroll.previous)
                         : Math.max(imagePos, scroll.previous);
-                // if (i === 0) {
-                //     console.log(this.meshList[i].position.x);
-                //     console.log(imagePos);
-                // }
             }
         }
         this.targetY = targetY;
@@ -553,14 +534,13 @@ export default class Photo extends Webgl {
             x: (e.clientX / window.innerWidth) * 2 - 1,
             y: -(e.clientY / window.innerHeight) * 2 + 1,
         };
-        this.setRaycaster();
+        if (!isContains(this.elms.expansion, hasClass.active)) this.setRaycaster();
     }
     handleClick(e: MouseEvent): void {
         this.mouse = {
             x: (e.clientX / window.innerWidth) * 2 - 1,
             y: -(e.clientY / window.innerHeight) * 2 + 1,
         };
-        // this.setRaycaster();
     }
     getMaterial(mesh: THREE.Mesh): THREE.ShaderMaterial {
         return <THREE.ShaderMaterial>mesh.material;
