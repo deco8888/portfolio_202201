@@ -32,7 +32,7 @@ export default Vue.extend({
             this.handleEvent();
         }, 1000);
         this.$router.beforeEach(async (_to, _from, next) => {
-            await this.title.cancelAnimFrame(true);
+            await this.title.cancelAnimFrame();
             next();
         });
     },

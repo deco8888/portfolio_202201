@@ -1,9 +1,24 @@
+import {
+    PerspectiveCamera,
+    Scene,
+    BufferGeometry,
+    Mesh,
+    Points,
+    Object3D,
+    WebGLRenderer,
+    Clock,
+    Color,
+    PointLight,
+    PlaneGeometry,
+    ShadowMaterial,
+} from 'three';
 import gsap from 'gsap';
 import { addClass, isContains, removeClass } from '../utils/classList';
 import { debounce } from '../utils/debounce';
 import { hasClass } from '../utils/hasClass';
 import { lerp } from '../utils/math';
 import { throttle } from '../utils/throttle';
+import Webgl from './webgl';
 
 interface CursorOption {
     cursorSelector: string;
@@ -19,8 +34,20 @@ const defaults: CursorOption = {
     pankuzuSelector: '#pankuzu',
 };
 
-export class Cursor {
+export class Cursor extends Webgl {
     params: CursorOption;
+    three: {
+        camera: PerspectiveCamera | null;
+        scene: Scene;
+        geometry: BufferGeometry | null;
+        mesh: Mesh | Mesh[] | null;
+        floor: THREE.Mesh | null;
+        points: Points | null;
+        object: Object3D | null;
+        renderer: WebGLRenderer | null;
+        clock: Clock | null;
+        pointLight: PointLight | null;
+    };
     elms: {
         cursor: HTMLElement;
         targets: NodeListOf<HTMLElement>;
@@ -44,6 +71,19 @@ export class Cursor {
     };
     animFrame: number;
     constructor(props: Partial<CursorOption> = {}) {
+        super();
+        this.three = {
+            camera: null,
+            scene: new Scene(),
+            geometry: null,
+            mesh: null,
+            floor: null,
+            points: null,
+            object: null,
+            renderer: null,
+            clock: null,
+            pointLight: null,
+        };
         this.params = { ...defaults, ...props };
         this.elms = {
             cursor: document.querySelector(this.params.cursorSelector),
@@ -88,6 +128,7 @@ export class Cursor {
             // this.handleResize();
             this.getRect();
             this.event();
+            this.initFloor();
             this.render();
             window.addEventListener(
                 'resize',
@@ -126,11 +167,11 @@ export class Cursor {
                     duration: 0,
                     left: this.styles.transX.previous,
                     top: this.styles.transY.previous,
-                    scaleX: 3,
-                    scaleY: 3,
+                    scaleX: 1,
+                    scaleY: 1,
                 });
             } else {
-                this.styles.scale.current = this.flg.isScaleUp ? 3 : 1;
+                this.styles.scale.current = this.flg.isScaleUp ? 1 : 0.3;
                 gsap.to(this.elms.cursor, {
                     left: this.styles.transX.previous,
                     top: this.styles.transY.previous,
@@ -151,18 +192,14 @@ export class Cursor {
             target.addEventListener('mouseleave', () => this.leave());
         });
     }
-    // handelScroll(): void {
-    //     this.mouse.x = this.mouse.x;
-    //     this.mouse.y = this.mouse.y;
-    // }
     mouseover(flg: boolean): void {
         if (flg) {
             // addClass(this.elms.cursor, hasClass.active);
-            this.styles.scale.current = 3;
+            this.styles.scale.current = 1;
             this.flg.isRaycaster = true;
         } else {
             // removeClass(this.elms.cursor, hasClass.active);
-            this.styles.scale.current = 1;
+            this.styles.scale.current = 0.3;
             this.flg.isRaycaster = false;
         }
     }
@@ -183,5 +220,28 @@ export class Cursor {
     leave(): void {
         removeClass(this.elms.cursor, hasClass.active);
         this.flg.isScaleUp = false;
+    }
+    initFloor(): void {
+        const geometry = new PlaneGeometry(window.innerWidth, window.innerHeight);
+        const material = new ShadowMaterial({
+            opacity: 0.3,
+            color: new Color('#ffffff'),
+        });
+        const floor = new Mesh(geometry, material);
+        floor.position.z = 0;
+        // floor.rotateY(radians(-180));
+        // 影を受け付ける
+        // https://ics.media/tutorial-three/light_shadowmap/
+        // floor.receiveShadow = true;
+        // Math.PI / 2 = 1/2π = 90度
+        // floor.rotateY(radians(-90));
+        this.three.floor = floor;
+        this.three.scene.add(this.three.floor);
+    }
+    setText(text: string): void {
+        this.elms.cursor.querySelector('span').innerHTML = text;
+    }
+    deleteText(): void {
+        this.elms.cursor.querySelector('span').innerHTML = '';
     }
 }

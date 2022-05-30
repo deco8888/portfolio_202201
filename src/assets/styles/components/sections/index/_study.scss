@@ -49,10 +49,11 @@
             position: relative;
             padding-top: 22%;
             width: g.get_vw(400);
+            max-width: 400px;
             transform: translate(0, -50%);
             overflow: hidden;
             &--image1 {
-                top: 42vh;
+                top: 45vh;
                 margin: 0 g.get_vw(70) 0 0;
             }
             &--image2 {
@@ -60,7 +61,7 @@
                 margin: 0 g.get_vw(70) 0 0;
             }
             &--image3 {
-                top: 42vh;
+                top: 45vh;
             }
         }
     }
@@ -79,5 +80,57 @@
         width: 100%;
         height: 100%;
     }
-    
+    &-expansion {
+        position: fixed;
+        top: 50%;
+        right: 0;
+        width: 400px;
+        height: 400px;
+        z-index: -1;
+        @include g.scroll-fadein-before(20px, -50%);
+        &.is-active {
+            @include g.scroll-fadein-after(0, -50%, 0s);
+            z-index: 1002;
+        }
+        @include g.media('>phone') {
+            margin: 0 g.get_per(100) 0 0;
+        }
+        @include g.media('<=phone') {
+            margin: 0 g.get_per(100) 0 0;
+        }
+        &__inner {
+            display: grid;
+            width: 100%;
+            height: 100%;
+        }
+        &__item {
+            display: flex;
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background-color: #ebab40;
+            cursor: pointer;
+        }
+        // &__content {
+        //     position: absolute;
+        //     top: 0;
+        //     left: 0;
+        //     width: 100%;
+        //     height: 100%;
+        //     visibility: hidden;
+        //     opacity: 0;
+        //     // display: none;
+        // }
+        &__canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: solid 10px;
+            // border-image: linear-gradient(180deg, #043e6b, #578bb3);
+            // border-image-slice: 1;
+            transition: border-color 1s g.ease(OutSine);
+        }
+    }
 }

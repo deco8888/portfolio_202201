@@ -10,12 +10,14 @@
                         <p>TEST</p>
                     </div>
                 </div> -->
+                <!-- <TheContact /> -->
                 <div class="p-index-study__list" data-horizontal="list">
                     <div class="p-index-study__image-wrap p-index-study__image-wrap--image1">
                         <div
                             class="p-index-study__image"
                             data-study="image"
                             data-study-image="sakura.jpg"
+                            data-study-title="No.1"
                             data-study-link="https://hatarakigai.info/project/"
                         ></div>
                     </div>
@@ -24,6 +26,7 @@
                             class="p-index-study__image"
                             data-study="image"
                             data-study-image="sakura.jpg"
+                            data-study-title="No.2"
                             data-study-link="https://works.yuta-takahashi.dev/"
                         ></div>
                     </div>
@@ -32,11 +35,21 @@
                             class="p-index-study__image"
                             data-study="image"
                             data-study-image="sakura.jpg"
+                            data-study-title="No.3"
                             data-study-link="https://nuxtjs.org/ja/docs/concepts/views/#layouts"
                         ></div>
                     </div>
                 </div>
-                <TheContact />
+                <div class="p-index-study-expansion" data-expansion="wrapper">
+                    <div class="p-index-study-expansion__inner">
+                        <div
+                            class="p-index-study-expansion__item"
+                            data-expansion="item"
+                            data-cursor-target
+                            @click="clickItem"
+                        ></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -45,6 +58,8 @@
 <script lang="ts">
 import Vue from 'vue';
 // import TheCanvas from '../common/TheCanvas.vue';
+import Expansion from '~/assets/scripts/components/expansion';
+import Title from '~/assets/scripts/components/parts/contact/title';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import BaseImage from '~/components/common/TheBaseImage.vue';
@@ -58,6 +73,8 @@ interface StudyOptions {
     studyAnim: {
         [key: string]: number;
     };
+    expansion: Expansion;
+    title: Title;
 }
 
 export default Vue.extend({
@@ -73,6 +90,8 @@ export default Vue.extend({
                 current: 0,
                 ease: 0.1,
             },
+            expansion: null,
+            title: null,
         };
     },
     mounted() {
@@ -84,13 +103,13 @@ export default Vue.extend({
         test() {
             const horizontalWrapper = document.querySelector("[data-horizontal='wrapper']");
             const horizontalList = document.querySelector("[data-horizontal='list']");
-            const box = document.querySelector('.p-contact');
+            const box = document.querySelector('[data-expansion="wrapper"]');
             gsap.to(horizontalList, {
                 x: () => -(horizontalList.clientWidth - horizontalWrapper.clientWidth),
                 ease: 'none',
                 scrollTrigger: {
                     trigger: '.js-study-trigger',
-                    // markers: true,
+                    markers: true,
                     start: 'top top',
                     end: () => '+=' + (horizontalList.clientWidth - horizontalWrapper.clientWidth),
                     onLeave: () => {
@@ -105,6 +124,24 @@ export default Vue.extend({
                     scrub: true, // アニメーションをスクロール位置にリンクさせる
                 },
             });
+        },
+        async clickItem(): Promise<void> {
+            this.expansion = new Expansion();
+            this.expansion.init();
+            await this.expansion.start();
+            this.title = new Title();
+            this.title.init();
+            this.handleEvent();
+            this.$emit("is-show", true);
+        },
+        handleEvent(): void {
+            window.addEventListener(
+                'mousemove',
+                (e: MouseEvent) => {
+                    this.title.handleMove(e);
+                },
+                false
+            );
         },
     },
 });

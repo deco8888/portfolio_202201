@@ -86,9 +86,9 @@ export default class Title extends Letter {
             back: '#7caed4', //#5174b3',
         };
         this.font = {
-            wight: 700,
+            wight: 900,
             size: window.innerWidth * 0.1,
-            family: 'Nippo',
+            family: "'Red Hat Display', sans-serif" //"Arial", //"'Nippo', sans-serif",
         };
         this.text = 'CONTACT';
     }
@@ -97,7 +97,6 @@ export default class Title extends Letter {
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
         // 描写する
-        this.setBorderStyle('124 174 212');
         this.render();
         this.three.clock = new THREE.Clock();
         this.three.clock.start();
@@ -109,7 +108,7 @@ export default class Title extends Letter {
             this.time.delta = this.three.clock.getDelta();
             this.time.total += this.time.delta;
         }
-        if (this.three.object) this.three.object.rotation.y += 0.005;
+        // if (this.three.object) this.three.object.rotation.y += 0.005;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
         if (this.three.points) this.update();

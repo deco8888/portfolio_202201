@@ -1,9 +1,12 @@
-import * as THREE from 'three';
-import { Vector3 } from 'three';
+import { BufferGeometry, Clock, ShaderMaterial, Vector3 } from 'three';
 import { addClass, isContains, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { lerp } from '../../../utils/math';
 import Letter from '../../letter';
+
+interface PointsListType {
+    [key: number]: Vector3[];
+}
 
 export default class Title extends Letter {
     layers: number;
@@ -57,9 +60,17 @@ export default class Title extends Letter {
             [key: string]: number;
         };
     };
-    test: {
-        [key: string]: number;
+    test: {};
+    pointsList: PointsListType;
+    pointsInfo: {
+        previous: {
+            [key: string]: number;
+        };
+        current: {
+            [key: string]: number;
+        };
     };
+    pointsIndex: number;
     constructor() {
         super();
         this.borderColor = 'rgb(152 120 210)';
@@ -94,12 +105,12 @@ export default class Title extends Letter {
         };
         this.color = {
             front: '#906cd1',
-            back: '#f9b97c', //'#ff9800',
+            back: '#f9b97c', //'#f9b97c', //'#ff9800',
         };
         this.font = {
-            wight: 800,
-            size: 150,
-            family: 'Nippo',
+            wight: 900,
+            size: window.innerWidth * 0.1,
+            family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
         };
         this.vertical = 0;
         this.horizontal = 0;
@@ -122,18 +133,34 @@ export default class Title extends Letter {
             },
         };
         this.test = null;
+        this.pointsList = {};
+        this.pointsInfo = {
+            previous: {
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+            current: {
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+        };
+        this.pointsIndex = 0;
     }
-    init(): void {
+    async init(): Promise<void> {
+        this.handleMove({ clientX: 0, clientY: 0 });
         this.canvas = document.querySelector('[data-canvas="title"]');
         // カメラ・シーン・レンダラー等の準備
-        this.prepare();
-        this.setBorderStyle('152 120 210');
+        await this.prepare();
         // 描写する
         this.render();
-        this.three.clock = new THREE.Clock();
+        this.three.clock = new Clock();
         this.three.clock.start();
+        // this.createPointsList();
+        // this.update();
     }
-    render(): void {
+    async render(): Promise<void> {
         this.animFrame = requestAnimationFrame(this.render.bind(this));
         if (this.three.clock) {
             // delta: 変化量
@@ -143,41 +170,19 @@ export default class Title extends Letter {
         // if (this.three.object) this.three.object.rotation.y += 0.005;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
-        if (this.three.points) this.update();
         if (this.three.object) {
             this.rotate();
+            this.moveInStudyArea();
         }
-        if (this.three.object) {
-            if (this.isStudyArea) {
-                let current = lerp(this.object.previous.x, this.object.current.x, 0.08);
-                current = Math.min(0, current);
-                current = Math.max(-window.innerWidth * 0.25, current);
-                this.three.object.position.setX(current);
-                if (current >= -window.innerWidth * 0.25) {
-                    let currentY = lerp(this.object.previous.y, this.object.current.y, 0.08);
-                    currentY = Math.max(0, currentY);
-                    currentY = Math.min(window.innerHeight * 0.35, currentY);
-                    this.three.object.position.setY(currentY);
-                }
-            }
-            if (this.horizontal === 0 && this.object.current.x > 0) {
-                let current = lerp(this.object.previous.x, this.object.current.x, 1);
-                current = Math.min(0, current);
-                current = Math.max(-window.innerWidth, current);
-                this.three.object.position.setX(current);
-            }
-            if (this.vertical === 0 && this.object.current.y < 0) {
-                let currentY = lerp(this.object.previous.y, this.object.current.y, 1);
-                currentY = Math.max(0, currentY);
-                currentY = Math.min(window.innerHeight * 0.35, currentY);
-                this.three.object.position.setY(currentY);
-            }
-            this.object.previous.x = this.three.object.position.x;
-            this.object.previous.y = this.three.object.position.y;
+        if (this.three.points) {
+            // this.draw();
+            this.update();
+            this.addTime();
+            if (this.raycaster) this.raycast();
         }
     }
     update(): void {
-        const geometry = <THREE.BufferGeometry>this.three.points.geometry;
+        const geometry = <BufferGeometry>this.three.points.geometry;
         const geometryPosition = geometry.attributes.position;
         const positionList = geometryPosition.array;
         const promiseList = this.title.secondList.position;
@@ -193,14 +198,36 @@ export default class Title extends Letter {
             geometryPosition.needsUpdate = true;
         }
     }
-    handleResize(): void {
-        this.setSize();
-        if (this.three.camera) {
-            // カメラのアスペクト比を正す
-            this.three.camera.aspect = this.winSize.width / this.winSize.height;
-            this.three.camera.updateProjectionMatrix();
-            if (this.three.renderer) this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+    moveInStudyArea(): void {
+        if (this.isStudyArea) {
+            let current = lerp(this.object.previous.x, this.object.current.x, 0.08);
+            current = Math.min(0, current);
+            current = Math.max(-window.innerWidth * 0.25, current);
+            this.three.object.position.setX(current);
+            if (current >= -window.innerWidth * 0.25) {
+                let currentY = lerp(this.object.previous.y, this.object.current.y, 0.08);
+                currentY = Math.max(0, currentY);
+                currentY = Math.min(window.innerHeight * 0.35, currentY);
+                this.three.object.position.setY(currentY);
+            }
         }
+        if (this.horizontal === 0 && this.object.current.x > 0) {
+            let current = lerp(this.object.previous.x, this.object.current.x, 1);
+            current = Math.min(0, current);
+            current = Math.max(-window.innerWidth, current);
+            this.three.object.position.setX(current);
+        }
+        if (this.vertical === 0 && this.object.current.y < 0) {
+            let currentY = lerp(this.object.previous.y, this.object.current.y, 1);
+            currentY = Math.max(0, currentY);
+            currentY = Math.min(window.innerHeight * 0.35, currentY);
+            this.three.object.position.setY(currentY);
+        }
+        this.object.previous.x = this.three.object.position.x;
+        this.object.previous.y = this.three.object.position.y;
+    }
+    handleResize(): void {
+        this.onResize();
     }
     rotate() {
         this.three.object.rotation.y =
@@ -213,12 +240,14 @@ export default class Title extends Letter {
         const study = document.querySelector('.p-index-study').getBoundingClientRect().top + scrollY;
         if (!isContains(this.elms.study, hasClass.active)) {
             if (scrollY < study * 0.85) {
+                console.log(scrollY < this.scroll.y);
+                console.log(lerp(this.three.object.rotation.y, this.rotation.y, 0.1));
                 if (scrollY === 0) {
                     this.rotation.y = 0;
                 } else if (scrollY > this.scroll.y) {
-                    this.rotation.y = Math.max(this.three.object.rotation.y + 0.3, 0);
+                    this.rotation.y = this.three.object.rotation.y + 0.3;
                 } else if (scrollY < this.scroll.y) {
-                    this.rotation.y = Math.max(this.three.object.rotation.y - 0.3, 0);
+                    this.rotation.y = this.three.object.rotation.y - 0.3;
                 }
             } else if (scrollY >= study * 0.85) {
                 addClass(this.elms.study, hasClass.active);
@@ -226,11 +255,19 @@ export default class Title extends Letter {
                 this.horizontal = 0;
                 await this.initValue();
                 this.text = 'STUDY';
+                this.font = {
+                    wight: 900,
+                    size: window.innerWidth * 0.1,
+                    family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+                };
                 this.color = {
                     front: '#00be08',
-                    back: '#ff87e8',
+                    back: '#e0bdd7',
                 };
-                this.setBorderStyle('112 216 114');
+                this.setBorderStyle('study');
+                // テキスト画像をセット
+                this.setTextImage();
+                this.textImage.data = await this.getImageData();
                 await this.getTitleInfo();
                 this.change();
             }
@@ -257,11 +294,19 @@ export default class Title extends Letter {
                 this.horizontal = 0;
                 await this.initValue();
                 this.text = 'PORTFOLIO';
+                this.font = {
+                    wight: 900,
+                    size: window.innerWidth * 0.1,
+                    family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+                };
                 this.color = {
                     front: '#906cd1',
                     back: '#f9b97c',
                 };
                 this.setBorderStyle('152 120 210');
+                // テキスト画像をセット
+                this.setTextImage();
+                this.textImage.data = await this.getImageData();
                 await this.getTitleInfo();
                 this.change();
             }
@@ -269,24 +314,36 @@ export default class Title extends Letter {
         this.scroll.y = scrollY;
     }
     change(): void {
-        const geometry = <THREE.BufferGeometry>this.three.points.geometry;
+        const pointsMaterial = <ShaderMaterial>this.three.points.material;
+        const geometry = <BufferGeometry>this.three.points.geometry;
+        const geometryPosition = geometry.attributes.position;
+        // const promiseList = this.title.secondList.position;
+        console.log(geometryPosition.array.length);
         for (const [attribute, list] of Object.entries(this.title.firstList)) {
-            geometry.deleteAttribute(attribute);
-            const size = attribute === 'alpha' ? 1 : 3;
+            const size = attribute === 'alpha' || attribute === 'size' ? 1 : 3;
             this.setAttribute(attribute, list, size);
         }
-        const geometryPosition = geometry.attributes.position;
+        // this.setAttribute("position", this.title.firstList.position, 3);
+        // this.setAttribute("color", this.title.firstList.color, 3);
         geometryPosition.needsUpdate = true;
+        const geometryColor = geometry.attributes.color;
+        geometryColor.needsUpdate = true;
     }
-    handleMove(e: MouseEvent): void {
+    handleMove(e: Partial<MouseEvent>): void {
+        // console.log(this.textImage.canvas.width);
         if (this.three.object) this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+        if (this.textImage.canvas) {
+            // this.mouse.x = (clientX / this.winSize.width) * 2 - 1;
+            // this.mouse.y = -(clientY / this.winSize.height) * 2 + 1;
+            this.mouse.x = e.clientX - this.winSize.width * 0.5;
+            this.mouse.y = -(e.clientY - this.winSize.height * 0.5);
+        }
+        if (this.three.points) {
+            const geometryPosition = this.three.points.geometry.attributes.position;
+            geometryPosition.needsUpdate = true;
+        }
     }
     async initValue(): Promise<void> {
         await this.initCommonValue();
-        this.font = {
-            wight: 800,
-            size: 150,
-            family: 'Nippo',
-        };
     }
 }

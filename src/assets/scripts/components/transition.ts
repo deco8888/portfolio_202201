@@ -1,10 +1,25 @@
-import * as THREE from 'three';
+import {
+    PerspectiveCamera,
+    Scene,
+    PlaneBufferGeometry,
+    Mesh,
+    Points,
+    Vector3,
+    WebGLRenderer,
+    Clock,
+    ShaderMaterial,
+    DoubleSide,
+    Color,
+    Vector2,
+    PointLight,
+    Object3D,
+    OrthographicCamera,
+} from 'three';
 import gsap, { Power2 } from 'gsap';
 import Webgl from './webgl';
 import { isMobile } from './isMobile';
 import transitionVertexShader from '../glsl/transition/vertexshader.vert';
 import transitionFragmentShader from '../glsl/transition/fragmentShader.frag';
-import { ShaderMaterial, Vector3 } from 'three';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -12,12 +27,14 @@ interface ThreeNumber {
 
 export default class Transition extends Webgl {
     three: {
-        camera: THREE.PerspectiveCamera | null;
-        scene: THREE.Scene;
-        mesh: THREE.Mesh[] | null;
-        stars: THREE.Points | null;
-        renderer: THREE.WebGLRenderer | null;
-        clock: THREE.Clock | null;
+        camera: PerspectiveCamera | null;
+        scene: Scene;
+        mesh: Mesh[] | null;
+        object: Object3D | null;
+        stars: Points | null;
+        renderer: WebGLRenderer | null;
+        clock: Clock | null;
+        pointLight: PointLight | null;
     };
     elms: {
         wrapper: HTMLElement | null;
@@ -35,11 +52,13 @@ export default class Transition extends Webgl {
         super();
         this.three = {
             camera: null,
-            scene: new THREE.Scene(),
+            scene: new Scene(),
             mesh: [],
+            object: null,
             stars: null,
             renderer: null,
             clock: null,
+            pointLight: null,
         };
         this.elms = {
             wrapper: document.querySelector('[data-transition="wrapper"]'),
@@ -73,8 +92,8 @@ export default class Transition extends Webgl {
         this.render();
         if (this.elms.wrapper) this.elms.wrapper.style.backgroundColor = 'transparent';
     }
-    initMesh(): THREE.Mesh[] {
-        const meshList = [] as THREE.Mesh[];
+    initMesh(): Mesh[] {
+        const meshList = [] as Mesh[];
         for (let i = 0; i < 2; i++) {
             const mesh = this.createMesh();
             meshList.push(mesh);
@@ -82,19 +101,19 @@ export default class Transition extends Webgl {
 
         return meshList;
     }
-    createMesh(): THREE.Mesh {
+    createMesh(): Mesh {
         const uniforms = {
             uColor: {
-                value: new THREE.Color(this.param.color),
+                value: new Color(this.param.color),
             },
             uDirection: {
                 value: this.param.direction,
             },
             uScale: {
-                value: new THREE.Vector2(1, 1),
+                value: new Vector2(1, 1),
             },
             uPosition: {
-                value: new THREE.Vector2(0, 0),
+                value: new Vector2(0, 0),
             },
             uProgress: {
                 value: 1.0,
@@ -110,26 +129,26 @@ export default class Transition extends Webgl {
             },
             // 解像度
             uResolution: {
-                value: new THREE.Vector2(this.viewport.width, this.viewport.height),
+                value: new Vector2(this.viewport.width, this.viewport.height),
             },
         };
         // 分割数
         const segments = 128;
         // 形状データを作成
-        const geometry = new THREE.PlaneBufferGeometry(1, 1, segments, segments);
+        const geometry = new PlaneBufferGeometry(1, 1, segments, segments);
         // 質感を作成
-        const material = new THREE.ShaderMaterial({
+        const material = new ShaderMaterial({
             uniforms: uniforms,
             vertexShader: transitionVertexShader,
             fragmentShader: transitionFragmentShader,
-            side: THREE.DoubleSide,
+            side: DoubleSide,
             transparent: true,
             // 拡張機能
             // extensions: {
             //     derivatives: true,
             // },
         });
-        const mesh = new THREE.Mesh(geometry, material);
+        const mesh = new Mesh(geometry, material);
         // 視錐台カリングを有効にするかどうか
         // ↑カメラから見えているかどうかを判断する。カメラから外れていたら、描画対象（DrawMesh）から外す
         mesh.frustumCulled = false;
@@ -167,14 +186,14 @@ export default class Transition extends Webgl {
                     mesh.position.y = y;
                     mesh.position.z = i;
                     // Shaderパラメータ更新
-                    const material = <THREE.ShaderMaterial>mesh.material;
+                    const material = <ShaderMaterial>mesh.material;
                     material.uniforms.uScale.value.x = widthViewUnit;
                     material.uniforms.uScale.value.y = heightViewUnit;
                     material.uniforms.uPosition.value.x = x / widthViewUnit;
                     material.uniforms.uPosition.value.y = y / heightViewUnit;
 
                     if (i > 1) {
-                        const color = new THREE.Color('#51a2f6');
+                        const color = new Color('#51a2f6');
                         material.uniforms.uColor.value = new Vector3(color.r, color.g, color.b);
                     }
                 }
@@ -226,7 +245,7 @@ export default class Transition extends Webgl {
             tl.play();
         }
     }
-    last(material: THREE.ShaderMaterial): void {
+    last(material: ShaderMaterial): void {
         const tl = gsap.timeline({
             paused: true,
             defaults: {
@@ -262,7 +281,7 @@ export default class Transition extends Webgl {
         });
         tl.play();
     }
-    calc(material: THREE.ShaderMaterial): gsap.core.Timeline {
+    calc(material: ShaderMaterial): gsap.core.Timeline {
         const tl = gsap.timeline({
             paused: true,
             defaults: {
@@ -278,7 +297,7 @@ export default class Transition extends Webgl {
         });
         return tl;
     }
-    getMaterial(mesh: THREE.Mesh): THREE.ShaderMaterial {
-        return <THREE.ShaderMaterial>mesh.material;
+    getMaterial(mesh: Mesh): ShaderMaterial {
+        return <ShaderMaterial>mesh.material;
     }
 }

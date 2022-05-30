@@ -86,9 +86,9 @@ export default class Title extends Letter {
             back: '#e9451d',
         };
         this.font = {
-            wight: 700,
+            wight: 900,
             size: window.innerWidth * 0.1,
-            family: 'Nippo',
+            family: "'Red Hat Display', sans-serif" //"Arial", //"'Nippo', sans-serif",
         };
         this.text = 'ABOUT';
     }

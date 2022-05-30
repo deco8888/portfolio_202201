@@ -3,9 +3,9 @@
 .c-cursor {
     @include g.media('>phone') {
         position: fixed;
-        width: g.get_vw(30);
-        height: g.get_vw(30);
-        transform: scale(1);
+        width: g.get_vw(100);
+        height: g.get_vw(100);
+        transform: scale(0.3);
         transition: transform 0.2s g.ease(OutSine);
         will-change: transform;
         z-index: 1004;
@@ -24,7 +24,7 @@
             background-color: g.$color-greyish-brown;
             border: solid 2px g.$color-black;
             // border-radius: 50%;
-            color: g.$color-greyish-brown;
+            color: g.$color-white;
             font-size: 13px;
             font-weight: g.$font-weight-bold;
             text-align: center;

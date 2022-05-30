@@ -1,16 +1,14 @@
 <template>
     <div class="p-page">
         <!-- <TheIndex /> -->
-        <div class="p-index-mv__canvas" data-canvas="title"></div>
+        <div class="p-index-mv__canvas" data-canvas="title" data-title="mv"></div>
         <div class="p-index-study__expansion" data-expansion="canvas">
             <div class="p-index-study__expansion-canvas expansion" data-expansion="expansion"></div>
-            <div class="p-index-study__content">
-                <p>TEST</p>
-            </div>
+            <TheContact :isShow="this.showFlg" />
         </div>
         <TheMv />
         <TheBox />
-        <TheStudy />
+        <TheStudy @is-show="show" />
         <TheCursor />
     </div>
 </template>
@@ -20,6 +18,7 @@ import Vue from 'vue';
 import TheBox from '~/components/parts/TheBox.vue';
 import TheMv from '~/components/section/index/_TheIndexMv.vue';
 import TheStudy from '~/components/section/index/_TheIndexStudy.vue';
+import TheContact from '~/components/parts/TheContact.vue';
 import TheCursor from '../components/parts/TheCursor.vue';
 import BaseImage from '~/components/common/TheBaseImage.vue';
 import Title from '~/assets/scripts/components/section/index/title';
@@ -32,28 +31,29 @@ export default Vue.extend({
     data(): {
         title: Title;
         scrollFlg: boolean;
+        showFlg: boolean;
     } {
         return {
             title: null,
             scrollFlg: true,
+            showFlg: false,
         };
     },
     components: {
         TheBox,
         TheMv,
         TheStudy,
+        TheContact,
         TheCursor,
         BaseImage,
     },
     mounted() {
-        setTimeout(() => {
-            this.title = new Title();
-            this.title.init();
-            this.handleEvent();
-        }, 100);
+        this.title = new Title();
+        this.title.init();
+        this.handleEvent();
         this.$router.beforeEach(async (_to, _from, next) => {
             this.scrollFlg = false;
-            await this.title.cancelAnimFrame(true);
+            await this.title.cancelAnimFrame();
             next();
         });
     },
@@ -86,6 +86,9 @@ export default Vue.extend({
                 },
                 false
             );
+        },
+        show(isShow: boolean) {
+            this.showFlg = isShow;
         },
     },
 });

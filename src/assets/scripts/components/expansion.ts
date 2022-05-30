@@ -7,6 +7,7 @@ import expansionFragmentShader from '../glsl/expansion/fragmentShader.frag';
 import Title from './section/index/title';
 import { addClass } from '../utils/classList';
 import { hasClass } from '../utils/hasClass';
+import { throttle } from '../utils/throttle';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -21,13 +22,16 @@ export default class Expansion extends Webgl {
         camera: THREE.PerspectiveCamera | null;
         scene: THREE.Scene;
         mesh: THREE.Mesh | null;
+        object: THREE.Object3D | null;
         renderer: THREE.WebGLRenderer | null;
+        pointLight: THREE.PointLight | null;
     };
     elms: {
         item: HTMLElement;
         canvas: HTMLCanvasElement;
         expansion: HTMLElement;
         title: HTMLCanvasElement;
+        contact: HTMLCanvasElement;
         study: HTMLCanvasElement;
     };
     isMobile: boolean;
@@ -48,14 +52,17 @@ export default class Expansion extends Webgl {
         this.three = {
             camera: null,
             scene: new THREE.Scene(),
+            object: null,
             mesh: null,
             renderer: null,
+            pointLight: null,
         };
         this.elms = {
             item: document.querySelector('[data-expansion="item"]'),
             canvas: document.querySelector('[data-expansion="canvas"]'),
             expansion: document.querySelector('[data-expansion="expansion"]'),
             title: document.querySelector('[data-canvas="title"]'),
+            contact: document.querySelector('[data-canvas="contact"]'),
             study: document.querySelector('.p-index-study'),
         };
         this.isMobile = isMobile();
@@ -88,6 +95,8 @@ export default class Expansion extends Webgl {
         this.three.scene.add(this.three.mesh);
         // メッシュを更新
         this.update();
+        // ハンドルイベント
+        this.handleEvent();
     }
     initMesh(): THREE.Mesh {
         this.uniforms = {
@@ -207,6 +216,7 @@ export default class Expansion extends Webgl {
                     this.elms.study.style.display = 'none';
                     this.flg.isAnimating = false;
                     this.state = 'full';
+                    this.elms.contact.setAttribute('data-title', 'contact');
                     this.displayContent();
                 },
             },
@@ -232,5 +242,26 @@ export default class Expansion extends Webgl {
             0
         );
         tl.play();
+    }
+    handleEvent(): void {
+        window.addEventListener(
+            'resize',
+            throttle(() => {
+                this.handleResize();
+            }, 100),
+            false
+        );
+    }
+    handleResize(): void {
+        this.setSize();
+        if (this.three.camera) {
+            // カメラのアスペクト比を正す
+            this.three.camera.aspect = this.winSize.width / this.winSize.height;
+            this.three.camera.updateProjectionMatrix();
+            if (this.three.renderer) {
+                this.three.renderer.setPixelRatio(Math.min(2));
+                this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+            }
+        }
     }
 }

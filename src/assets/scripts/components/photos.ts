@@ -32,7 +32,7 @@ interface UniformOptions {
 export default class Photo extends Webgl {
     [x: string]: any;
     three: {
-        camera: THREE.PerspectiveCamera;
+        camera: THREE.PerspectiveCamera | null;
         scene: THREE.Scene;
         mesh: THREE.Mesh;
         bgMesh: THREE.Mesh[];
@@ -42,6 +42,7 @@ export default class Photo extends Webgl {
         // control: OrbitControls | null;
         clock: THREE.Clock;
         raycaster: THREE.Raycaster;
+        pointLight: THREE.PointLight | null;
     };
     elms: {
         canvas: HTMLCanvasElement;
@@ -64,7 +65,10 @@ export default class Photo extends Webgl {
     meshList: THREE.Mesh[];
     bgMeshList: THREE.Mesh[][];
     srcList: string[];
-    url: string;
+    studyData: {
+        url: string;
+        title: string;
+    };
     imagePath: string;
     targetY: number;
     cursor: Cursor;
@@ -82,6 +86,7 @@ export default class Photo extends Webgl {
             // control: null,
             clock: new THREE.Clock(),
             raycaster: new THREE.Raycaster(),
+            pointLight: null,
         };
         this.rectList = [];
         this.elms = {
@@ -112,7 +117,11 @@ export default class Photo extends Webgl {
         this.meshList = [];
         this.bgMeshList = [];
         this.srcList = [];
-        this.url = '';
+
+        this.studyData = {
+            url: '',
+            title: '',
+        };
         this.targetY = 0;
         this.cursor = new Cursor();
     }
@@ -131,7 +140,7 @@ export default class Photo extends Webgl {
         this.elms.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
-        // 画像を読み込む
+        // 画像を読み込むs
         this.load();
         // 描写する
         this.render();
@@ -146,7 +155,7 @@ export default class Photo extends Webgl {
     }
     async texture(index: string, imageName: string): Promise<THREE.Texture> {
         return new Promise((resolve) => {
-            const imageSrc = `/_nuxt/src/assets/images/pc/${imageName}`;
+            const imageSrc = `/textures/${imageName}`;
             const textureLoader = new THREE.TextureLoader();
             textureLoader.load(imageSrc, async (texture) => {
                 this.three.textureList.push(texture);
@@ -165,27 +174,28 @@ export default class Photo extends Webgl {
         // メッシュをシーンに追加
         this.three.scene.add(this.three.mesh, this.three.bgMesh[0], this.three.bgMesh[1]);
         // リンクを取得
-        this.three.mesh.userData.url = this.setLink(index);
+        this.three.mesh.userData.url = this.getLink(index);
+        this.three.mesh.userData.title = this.getTitle(index);
         // HTML要素の情報を取得、3Dモデルの更新
         this.update(index);
         this.scrollList[index].previous = this.meshList[index].position.x;
     }
-    initViewport(): ThreeNumber {
-        if (this.three.camera) {
-            // fov : Field OF View (カメラの位置から見えるシーンの範囲)
-            // 角度をラジアンに変更
-            const fov = (this.three.camera.fov * Math.PI) / 180;
-            // https://kou.benesse.co.jp/nigate/math/a14m0313.html
-            // 高さの半分 / 奥行(= Math.tan(ラジアン)) * 奥行 * 2
-            const height = Math.tan(fov / 2) * this.three.camera.position.z * 2;
-            const width = height * this.three.camera.aspect;
-            const viewport = {
-                width: width,
-                height: height,
-            };
-            return viewport;
-        }
-    }
+    // initViewport(): ThreeNumber {
+    //     if (this.three.camera) {
+    //         // fov : Field OF View (カメラの位置から見えるシーンの範囲)
+    //         // 角度をラジアンに変更
+    //         const fov = (this.three.camera.fov * Math.PI) / 180;
+    //         // https://kou.benesse.co.jp/nigate/math/a14m0313.html
+    //         // 高さの半分 / 奥行(= Math.tan(ラジアン)) * 奥行 * 2
+    //         const height = Math.tan(fov / 2) * this.three.camera.position.z * 2;
+    //         const width = height * this.three.camera.aspect;
+    //         const viewport = {
+    //             width: width,
+    //             height: height,
+    //         };
+    //         return viewport;
+    //     }
+    // }
     initMesh(index: number): THREE.Mesh {
         const uniforms = {
             uResolution: {
@@ -228,8 +238,12 @@ export default class Photo extends Webgl {
         return mesh;
     }
     // 遷移先リンクを取得
-    setLink(index: number): string {
+    getLink(index: number): string {
         return this.elms.images[index].getAttribute('data-study-link');
+    }
+    // 遷移先タイトルを取得
+    getTitle(index: number): string {
+        return this.elms.images[index].getAttribute('data-study-title');
     }
     initBgMesh(): THREE.Mesh[] {
         const bgMeshList = [] as THREE.Mesh[];
@@ -376,7 +390,7 @@ export default class Photo extends Webgl {
         this.setSize();
         // カメラのアスペクト比を正す
         if (this.three.camera) {
-            this.three.camera.aspect = this.winSize.width / this.winSize.height;
+            // this.three.camera.aspect = this.winSize.width / this.winSize.height;
             this.three.camera.updateProjectionMatrix();
             this.viewport = this.initViewport();
         }
@@ -478,14 +492,18 @@ export default class Photo extends Webgl {
             for (const mesh of Object.values(this.meshList)) {
                 const material = this.getMaterial(mesh);
                 if (intersectMaterial.id === material.id) {
-                    this.url = mesh.userData.url;
+                    this.studyData.url = mesh.userData.url;
+                    this.studyData.title = mesh.userData.title;
+                    this.cursor.setText(this.studyData.title);
                     material.uniforms.uMoz.value = lerp(material.uniforms.uMoz.value, 0.0, 0.08);
                     !this.flg.isScroll && this.flg.isMove ? this.cursor.mouseover(true) : this.cursor.mouseover(false);
                 }
             }
         }
         if (intersectObjects.length === 0) {
-            this.url = '';
+            this.studyData.url = '';
+            this.studyData.title = '';
+            this.cursor.deleteText();
             for (const mesh of Object.values(this.meshList)) {
                 const material = this.getMaterial(mesh);
                 material.uniforms.uMoz.value = lerp(material.uniforms.uMoz.value, 0.02, 0.2);
@@ -494,8 +512,8 @@ export default class Photo extends Webgl {
         }
     }
     async openPage(): Promise<void> {
-        if (this.url) window.location.href = this.url;
-        this.url = '';
+        if (this.studyData.url) window.open(this.studyData.url, '_blank', 'noreferrer');
+        this.studyData.url = '';
     }
     // スクロール
     handleScroll(): void {
