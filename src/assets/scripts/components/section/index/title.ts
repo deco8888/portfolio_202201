@@ -159,6 +159,8 @@ export default class Title extends Letter {
         this.three.clock.start();
         // this.createPointsList();
         // this.update();
+        const geometry = <BufferGeometry>this.three.points.geometry;
+        const geometryPosition = geometry.attributes.position;
     }
     async render(): Promise<void> {
         this.animFrame = requestAnimationFrame(this.render.bind(this));
@@ -200,14 +202,15 @@ export default class Title extends Letter {
     }
     moveInStudyArea(): void {
         if (this.isStudyArea) {
-            let current = lerp(this.object.previous.x, this.object.current.x, 0.08);
+            let current = lerp(this.object.previous.x, this.object.current.x, 0.1);
             current = Math.min(0, current);
-            current = Math.max(-window.innerWidth * 0.25, current);
+            current = Math.max(-window.innerWidth * 0.25 * window.devicePixelRatio, current);
             this.three.object.position.setX(current);
-            if (current >= -window.innerWidth * 0.25) {
-                let currentY = lerp(this.object.previous.y, this.object.current.y, 0.08);
+
+            if (current <= -window.innerWidth * 0.25) {
+                let currentY = lerp(this.object.previous.y, this.object.current.y, 0.1);
                 currentY = Math.max(0, currentY);
-                currentY = Math.min(window.innerHeight * 0.35, currentY);
+                currentY = Math.min(window.innerHeight * 0.35 * window.devicePixelRatio, currentY);
                 this.three.object.position.setY(currentY);
             }
         }
@@ -240,8 +243,6 @@ export default class Title extends Letter {
         const study = document.querySelector('.p-index-study').getBoundingClientRect().top + scrollY;
         if (!isContains(this.elms.study, hasClass.active)) {
             if (scrollY < study * 0.85) {
-                console.log(scrollY < this.scroll.y);
-                console.log(lerp(this.three.object.rotation.y, this.rotation.y, 0.1));
                 if (scrollY === 0) {
                     this.rotation.y = 0;
                 } else if (scrollY > this.scroll.y) {
@@ -276,14 +277,17 @@ export default class Title extends Letter {
         if (isContains(this.elms.study, hasClass.active)) {
             if (scrollY > study * 0.85) {
                 if (scrollY > this.scroll.y) {
-                    this.horizontal = current > window.innerHeight / 2 ? window.innerWidth * window.devicePixelRatio * -0.2 : 0;
-                    this.vertical = current > window.innerHeight ? window.innerHeight * 0.2 : 0;
+                    this.horizontal = current > 0 ? window.innerWidth * -0.3 : -0;
+                    this.vertical =
+                        current > window.innerHeight ? window.innerHeight * 0.3 * window.devicePixelRatio : 0;
                 } else if (scrollY < this.scroll.y) {
-                    this.horizontal = current < window.innerHeight / 2 ? window.innerWidth * 0.2 : 0;
-                    this.vertical = current < window.innerHeight ? window.innerHeight * -0.2 : 0;
+                    this.horizontal = current < window.innerHeight * 1.1 ? window.innerWidth * 0.3 : 0;
+                    this.vertical =
+                        current < window.innerWidth * 1.1 ? window.innerHeight * -0.3 * window.devicePixelRatio : 0;
                 }
                 this.object.current.x = this.three.object.position.x + this.horizontal;
                 this.object.current.y = this.three.object.position.y + this.vertical;
+
                 this.isStudyArea = true;
             }
             if (scrollY < study * 0.85) {
@@ -296,7 +300,7 @@ export default class Title extends Letter {
                 this.text = 'PORTFOLIO';
                 this.font = {
                     wight: 900,
-                    size: window.innerWidth * 0.1,
+                    size: window.innerWidth * 0.12,
                     family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
                 };
                 this.color = {
@@ -318,7 +322,6 @@ export default class Title extends Letter {
         const geometry = <BufferGeometry>this.three.points.geometry;
         const geometryPosition = geometry.attributes.position;
         // const promiseList = this.title.secondList.position;
-        console.log(geometryPosition.array.length);
         for (const [attribute, list] of Object.entries(this.title.firstList)) {
             const size = attribute === 'alpha' || attribute === 'size' ? 1 : 3;
             this.setAttribute(attribute, list, size);
@@ -330,7 +333,6 @@ export default class Title extends Letter {
         geometryColor.needsUpdate = true;
     }
     handleMove(e: Partial<MouseEvent>): void {
-        // console.log(this.textImage.canvas.width);
         if (this.three.object) this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
         if (this.textImage.canvas) {
             // this.mouse.x = (clientX / this.winSize.width) * 2 - 1;

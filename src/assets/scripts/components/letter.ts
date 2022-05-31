@@ -121,6 +121,7 @@ export default class Letter extends Webgl {
     isFlg: boolean;
     mouse: THREE.Vector2;
     portfolio: number[];
+    particleSize: number;
     constructor() {
         super();
         this.three = {
@@ -218,6 +219,8 @@ export default class Letter extends Webgl {
         this.isFlg = true;
         this.mouse = new Vector2();
         this.portfolio = [];
+        console.log(window.devicePixelRatio);
+        this.particleSize = 8.0 / 2;
     }
     async prepare(): Promise<void> {
         this.setSize();
@@ -225,7 +228,7 @@ export default class Letter extends Webgl {
         this.three.camera = this.initCamera();
         const cameraHelper = new CameraHelper(this.three.camera);
         // カメラをシーンに追加
-        this.three.scene.add(this.three.camera);
+        this.three.scene.add(cameraHelper);
         // レンダラーを作成
         this.three.renderer = this.initRenderer();
         // HTMLに追加
@@ -239,7 +242,7 @@ export default class Letter extends Webgl {
         await this.getTitleInfo();
         // メッシュを作成
         this.three.object = this.initMesh();
-        // this.three.object.position.z = 0;
+        this.three.object.position.z = 0;
         // メッシュをシーンに追加
         this.three.scene.add(this.three.object);
         // if (this.three.object) this.three.object.position.setZ(-1);
@@ -367,7 +370,7 @@ export default class Letter extends Webgl {
                         position.first.push(this.coord.first.x, this.coord.first.y, j * 10);
                         position.second.push(this.coord.second.x, this.coord.second.y);
                         alpha.push(a);
-                        size.push(8.0);
+                        size.push(this.particleSize);
                     }
                 }
             }
@@ -445,12 +448,13 @@ export default class Letter extends Webgl {
     async getImageData(): Promise<ImageData> {
         const c = this.textImage.canvas;
         const ctx = this.textImage.ctx;
+        const ratio = window.devicePixelRatio;
         // フォントを設定・取得
         this.textImage.ctx.font = this.getFont();
         // テキストの描画幅をを測定する
         let w = this.measureTextWidth();
-        let h = this.font.size * 1;
-        this.gap = 7;
+        let h = this.font.size * ratio;
+        this.gap = 5;
         // Adjust font and particle size to git text on screen
         w = this.adjustSize(w, ctx);
         // テキスト用のcanvasサイズを設定
@@ -552,14 +556,15 @@ export default class Letter extends Webgl {
                 const y2 = position.array[i * 3 + 1] + this.three.object.position.y;
                 const z2 = position.array[i * 3 + 2] + this.three.object.position.z;
                 const mouseDistance = distance3d(mouseX, mouseY, 0, x2, y2, z2);
-                if (mouseDistance < 100 && size.array[i] !== 15.0) {
-                    size.array[i] = lerp(size.array[i], 15.0, 0.1);
+                const upSize = 15.0  / window.devicePixelRatio;
+                if (mouseDistance < 100 && size.array[i] !== upSize) {
+                    size.array[i] = lerp(size.array[i], upSize, 0.1);
                 }
             }
         }
         for (let i = 0; i < position.array.length / 3; i++) {
-            if (size.array[i] !== 8.0) {
-                size.array[i] = lerp(size.array[i], 8.0, 0.1);
+            if (size.array[i] !== this.particleSize) {
+                size.array[i] = lerp(size.array[i], this.particleSize, 0.1);
             }
         }
         position.needsUpdate = true;

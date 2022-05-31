@@ -180,29 +180,13 @@ export default class Photo extends Webgl {
         this.update(index);
         this.scrollList[index].previous = this.meshList[index].position.x;
     }
-    // initViewport(): ThreeNumber {
-    //     if (this.three.camera) {
-    //         // fov : Field OF View (カメラの位置から見えるシーンの範囲)
-    //         // 角度をラジアンに変更
-    //         const fov = (this.three.camera.fov * Math.PI) / 180;
-    //         // https://kou.benesse.co.jp/nigate/math/a14m0313.html
-    //         // 高さの半分 / 奥行(= Math.tan(ラジアン)) * 奥行 * 2
-    //         const height = Math.tan(fov / 2) * this.three.camera.position.z * 2;
-    //         const width = height * this.three.camera.aspect;
-    //         const viewport = {
-    //             width: width,
-    //             height: height,
-    //         };
-    //         return viewport;
-    //     }
-    // }
     initMesh(index: number): THREE.Mesh {
         const uniforms = {
             uResolution: {
                 value: new THREE.Vector2(0.0, 0.0), // 画面サイズ
             },
             uImageResolution: {
-                value: new THREE.Vector2(1280, 853), // 画像サイズ
+                value: new THREE.Vector2(400, 300), // 画像サイズ
             },
             uTexture: {
                 value: this.three.textureList[index], // 読み込んだ画像
@@ -259,7 +243,7 @@ export default class Photo extends Webgl {
                 value: new THREE.Vector2(0.0, 0.0), // 画面サイズ
             },
             uImageResolution: {
-                value: new THREE.Vector2(1280, 853), // 画像サイズ
+                value: new THREE.Vector2(400, 300), // 画像サイズ
             },
             uProgress: {
                 value: 1.0,
@@ -324,8 +308,8 @@ export default class Photo extends Webgl {
         mesh.scale.x = (this.viewport.width * rect.width) / winSizeW;
         mesh.scale.y = (this.viewport.height * rect.height) / winSizeH;
         // meshの位置更新
-        mesh.position.x = rect.left - rect.width / 2 - winSizeW / 2;
-        mesh.position.y = winSizeH / 2 - rect.top - rect.height / 2;
+        mesh.position.x = 0; //rect.left - rect.width / 2 - winSizeW / 2;
+        mesh.position.y = 0; //winSizeH / 2 - rect.top - rect.height / 2;
         const material = this.getMaterial(this.meshList[index]);
         material.uniforms.uResolution.value = new Vector2(rect.width, rect.height);
     }

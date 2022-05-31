@@ -53,7 +53,7 @@ export default class Webgl {
         // );
         camera.position.set(0, 0, 1000);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
-        camera.lookAt(this.three.scene.position);
+        // camera.lookAt(this.three.scene.position);
         return camera;
     }
     // initPointLight(): PointLight {
@@ -72,8 +72,6 @@ export default class Webgl {
          * https://ics.media/tutorial-three/renderer_resize/
          */
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        // console.log(window.devicePixelRatio);
-        // renderer.setPixelRatio(2);
         renderer.setClearColor(0xeaf2f5, 0);
         renderer.setSize(this.winSize.width, this.winSize.height);
         renderer.physicallyCorrectLights = true;
@@ -95,6 +93,7 @@ export default class Webgl {
                 width,
                 height,
             };
+            console.log( this.viewport);
         }
         return this.viewport;
     }
