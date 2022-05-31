@@ -202,15 +202,16 @@ export default class Title extends Letter {
     }
     moveInStudyArea(): void {
         if (this.isStudyArea) {
-            let current = lerp(this.object.previous.x, this.object.current.x, 0.1);
-            current = Math.min(0, current);
-            current = Math.max(-window.innerWidth * 0.25 * window.devicePixelRatio, current);
-            this.three.object.position.setX(current);
-
-            if (current <= -window.innerWidth * 0.25) {
-                let currentY = lerp(this.object.previous.y, this.object.current.y, 0.1);
+          let currentX = lerp(this.object.previous.x, this.object.current.x, 0.08);
+          let currentY = lerp(this.object.previous.y, this.object.current.y, 0.08);
+            if(currentX > -window.innerWidth * 0.25 || currentY <= 0) {
+              currentX = Math.min(0, currentX);
+              currentX = Math.max(-window.innerWidth * 0.25, currentX);
+              this.three.object.position.setX(currentX);
+            }
+            if (currentX <= -window.innerWidth * 0.25 || currentY > 0) {
                 currentY = Math.max(0, currentY);
-                currentY = Math.min(window.innerHeight * 0.35 * window.devicePixelRatio, currentY);
+                currentY = Math.min(window.innerHeight * 0.35, currentY);
                 this.three.object.position.setY(currentY);
             }
         }
@@ -279,11 +280,11 @@ export default class Title extends Letter {
                 if (scrollY > this.scroll.y) {
                     this.horizontal = current > 0 ? window.innerWidth * -0.3 : -0;
                     this.vertical =
-                        current > window.innerHeight ? window.innerHeight * 0.3 * window.devicePixelRatio : 0;
+                        current > window.innerHeight ? window.innerHeight * 0.3 : 0;
                 } else if (scrollY < this.scroll.y) {
-                    this.horizontal = current < window.innerHeight * 1.1 ? window.innerWidth * 0.3 : 0;
+                    this.horizontal = current < window.innerHeight * 1.5 ? window.innerWidth * 0.3 : 0;
                     this.vertical =
-                        current < window.innerWidth * 1.1 ? window.innerHeight * -0.3 * window.devicePixelRatio : 0;
+                        current < window.innerWidth * 1.5 ? window.innerHeight * -0.3 : 0;
                 }
                 this.object.current.x = this.three.object.position.x + this.horizontal;
                 this.object.current.y = this.three.object.position.y + this.vertical;

@@ -220,7 +220,7 @@ export default class Letter extends Webgl {
         this.mouse = new Vector2();
         this.portfolio = [];
         console.log(window.devicePixelRatio);
-        this.particleSize = 8.0 / 2;
+        this.particleSize = 8.0;
     }
     async prepare(): Promise<void> {
         this.setSize();
@@ -448,12 +448,11 @@ export default class Letter extends Webgl {
     async getImageData(): Promise<ImageData> {
         const c = this.textImage.canvas;
         const ctx = this.textImage.ctx;
-        const ratio = window.devicePixelRatio;
         // フォントを設定・取得
         this.textImage.ctx.font = this.getFont();
         // テキストの描画幅をを測定する
         let w = this.measureTextWidth();
-        let h = this.font.size * ratio;
+        let h = this.font.size;
         this.gap = 5;
         // Adjust font and particle size to git text on screen
         w = this.adjustSize(w, ctx);
