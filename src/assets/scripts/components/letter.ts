@@ -220,7 +220,7 @@ export default class Letter extends Webgl {
         this.mouse = new Vector2();
         this.portfolio = [];
         console.log(window.devicePixelRatio);
-        this.particleSize = 8.0;
+        this.particleSize = 4.0;
     }
     async prepare(): Promise<void> {
         this.setSize();
@@ -461,7 +461,8 @@ export default class Letter extends Webgl {
         c.height = h;
         // 差分の再計算(文字を構成する1マスの大きさが変わる)
         this.gap = this.setGap();
-        this.size = Math.max(this.gap / 2, 1);
+        console.log(this.gap / 2);
+        this.size = Math.max(this.gap / 1.5, 1);
         // フォントを設定・取得
         ctx.font = this.getFont();
         // 指定した座標にテキスト文字列を描画し、その文字を現在のfillStyleで塗りつぶす
@@ -494,7 +495,7 @@ export default class Letter extends Webgl {
     setGap(): number {
         switch (true) {
             case this.font.size >= 70:
-                return 8;
+                return 10;
             case this.font.size >= 40 && this.font.size < 70:
                 return 6;
             case this.font.size < 40:
