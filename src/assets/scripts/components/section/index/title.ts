@@ -109,7 +109,7 @@ export default class Title extends Letter {
         };
         this.font = {
             wight: 900,
-            size: window.innerWidth * 0.1,
+            size: window.innerWidth * 0.12,
             family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
         };
         this.vertical = 0;
@@ -276,7 +276,7 @@ export default class Title extends Letter {
         if (isContains(this.elms.study, hasClass.active)) {
             if (scrollY > study * 0.85) {
                 if (scrollY > this.scroll.y) {
-                    this.horizontal = current > window.innerHeight / 2 ? window.innerWidth * -0.2 : 0;
+                    this.horizontal = current > window.innerHeight / 2 ? window.innerWidth * window.devicePixelRatio * -0.2 : 0;
                     this.vertical = current > window.innerHeight ? window.innerHeight * 0.2 : 0;
                 } else if (scrollY < this.scroll.y) {
                     this.horizontal = current < window.innerHeight / 2 ? window.innerWidth * 0.2 : 0;

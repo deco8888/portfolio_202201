@@ -36,8 +36,16 @@ const nuxtConfig: NuxtConfig = {
         ],
         link: [
             { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+            { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
             { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
-            { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Red+Hat+Display&display=swap' },
+            {
+                rel: 'stylesheet',
+                href: 'https://api.fontshare.com/css?f[]=nippo@700&f[]=kola@400&display=swap',
+            },
+            {
+                rel: 'stylesheet',
+                href: 'https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@900&display=swap',
+            },
             {
                 rel: 'stylesheet',
                 href: 'https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@700&family=Red+Hat+Display&display=swap',
@@ -45,10 +53,6 @@ const nuxtConfig: NuxtConfig = {
             {
                 rel: 'stylesheet',
                 href: 'https://fonts.googleapis.com/css?family=M+PLUS+1p',
-            },
-            {
-                rel: 'stylesheet',
-                href: 'https://api.fontshare.com/css?f[]=nippo@700&f[]=kola@400&display=swap',
             },
         ],
     },
@@ -60,6 +64,7 @@ const nuxtConfig: NuxtConfig = {
     plugins: [{ src: '~/plugins/scroll', mode: 'client' }],
 
     router: {
+        base: process.env.BASE_URL || '',
         scrollBehavior: function (_to, _from, _savedPosition) {
             return { x: 0, y: 0 };
         },
@@ -89,6 +94,7 @@ const nuxtConfig: NuxtConfig = {
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
+        transpile: ['three'],
         babel: {
             // コンパイルに必要なプラグインのリストをBabel本体に渡す役割
             presets({ isServer }: any) {
@@ -112,6 +118,7 @@ const nuxtConfig: NuxtConfig = {
                     ],
                 ];
             },
+            compact: true,
         },
         // webpackの設定を拡張
         extend(config: Configuration, { isClient }: any) {
@@ -121,8 +128,8 @@ const nuxtConfig: NuxtConfig = {
             // eslint-disable-next-line no-extra-boolean-cast
             if (!!config.module) {
                 config.module.rules.push({
-                    test: /\.(vert|frag)$/i,
-                    use: ['raw-loader'],
+                    test: /\.(vert|frag|glsl)$/i,
+                    use: ['raw-loader', 'glslify-loader'],
                 });
             }
         },

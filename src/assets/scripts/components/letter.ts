@@ -429,7 +429,7 @@ export default class Letter extends Webgl {
             this.three.camera.aspect = this.winSize.width / this.winSize.height;
             this.three.camera.updateProjectionMatrix();
             if (this.three.renderer) {
-                this.three.renderer.setPixelRatio(Math.min(2));
+                this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.three.renderer.setSize(this.winSize.width, this.winSize.height);
             }
         }
