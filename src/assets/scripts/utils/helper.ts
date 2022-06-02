@@ -11,7 +11,7 @@ export const distance2d = (x1: number, y1: number, x2: number, y2: number): numb
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 };
 
-export const distance3d = (x1: number, y1: number, z1: number, x2: number, y2: number, z2: number,): number => {
+export const distance3d = (x1: number, y1: number, z1: number, x2: number, y2: number, z2: number): number => {
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) + Math.pow(z1 - z2, 2));
 };
 

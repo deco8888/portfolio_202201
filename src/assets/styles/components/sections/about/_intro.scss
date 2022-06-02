@@ -18,10 +18,12 @@
     &__inner {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         width: 50%;
         height: 100%;
+        overflow-y: auto;
         @include g.media('>phone') {
-            padding: g.get_per(100) g.get_per(100) g.get_per(100) 0;
+            padding: g.get_per(50) g.get_per(100) g.get_per(50) 0;
         }
         @include g.media('<=phone') {
             padding: g.get_per(20);
@@ -32,13 +34,18 @@
         color: #51a2f6;
         font-family: 'BIZ UDPGothic', sans-serif;
         font-family: 'Red Hat Display', sans-serif;
-        font-size: 5rem;
         font-weight: bold;
         letter-spacing: 0.2rem;
         // filter: drop-shadow(0.2rem 0.2rem 0rem #f87a5b);
         // background: linear-gradient(20deg, rgb(81, 161, 246), rgb(248, 122, 91));
         // -webkit-background-clip: text;
         // -webkit-text-fill-color: transparent;
+        @include g.media('>phone') {
+            @include g.fluid-type(font-size, 24px, 50px);
+        }
+        @include g.media('<=phone') {
+            font-size: 5rem;
+        }
     }
     &__desc {
         display: inline-block;
@@ -47,7 +54,6 @@
         letter-spacing: 0.1rem;
         font-family: 'BIZ UDPGothic', sans-serif;
         font-family: 'Red Hat Display', sans-serif;
-        font-size: 2.2rem;
         font-weight: bold;
         text-decoration: underline;
         text-decoration-color: rgb(235 88 52);
@@ -59,19 +65,21 @@
         // -webkit-text-fill-color: transparent;
         @include g.media('>phone') {
             margin: 1rem 0 0;
+            @include g.fluid-type(font-size, 12px, 25px);
         }
         @include g.media('<=phone') {
             margin: 1rem 0 0;
+            font-size: 2.2rem;
         }
     }
     &__block {
         position: relative;
         &:not(:first-child) {
             @include g.media('>phone') {
-                margin: 5rem 0 0;
+                margin: g.get-per(30) 0 0;
             }
             @include g.media('<=phone') {
-                margin: 5rem 0 0;
+                margin: g.get-per(30) 0 0;
             }
         }
     }
@@ -97,12 +105,13 @@
         letter-spacing: 0.1rem;
         font-family: 'BIZ UDPGothic', sans-serif;
         font-family: 'Red Hat Display', sans-serif;
-        font-size: 2rem;
         font-weight: bold;
         text-align: center;
+        white-space: nowrap;
         filter: drop-shadow(0.4rem 0.4rem 0px rgba(235, 89, 52, 0.9));
         @include g.media('>phone') {
-            width: 22%;
+            width: 20%;
+            @include g.fluid-type(font-size, 10px, 20px);
             &:not(:nth-of-type(4n)) {
                 margin: 0 3% 0 0;
             }
@@ -115,6 +124,7 @@
         }
         @include g.media('<=phone') {
             width: 22%;
+            font-size: 2rem;
         }
     }
 }

@@ -1,4 +1,15 @@
-import { PerspectiveCamera, Scene, Mesh, WebGLRenderer, PointLight, Light, Object3D, OrthographicCamera, sRGBEncoding, ACESFilmicToneMapping } from 'three';
+import {
+    PerspectiveCamera,
+    Scene,
+    Mesh,
+    WebGLRenderer,
+    PointLight,
+    Light,
+    Object3D,
+    OrthographicCamera,
+    sRGBEncoding,
+    ACESFilmicToneMapping,
+} from 'three';
 // import { GUI } from 'dat.gui';
 
 interface ThreeNumber {
@@ -53,7 +64,8 @@ export default class Webgl {
         // );
         camera.position.set(0, 0, 1000);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
-        // camera.lookAt(this.three.scene.position);
+        camera.lookAt(this.three.scene.position);
+        camera.updateProjectionMatrix();
         return camera;
     }
     // initPointLight(): PointLight {
@@ -93,7 +105,6 @@ export default class Webgl {
                 width,
                 height,
             };
-            console.log( this.viewport);
         }
         return this.viewport;
     }

@@ -35,7 +35,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        padding: 0 g.get_vw(400) 0 200vw;
+        padding: 0 g.get_vw(600) 0 150vw;
         user-select: none;
     }
     &__image {
@@ -84,8 +84,8 @@
         position: fixed;
         top: 50%;
         right: 0;
-        width: 400px;
-        height: 400px;
+        width: g.get-vw(300);
+        height: g.get-vw(300);
         z-index: -1;
         @include g.scroll-fadein-before(20px, -50%);
         &.is-active {
@@ -106,8 +106,8 @@
         &__item {
             display: flex;
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: g.get-vw(300);
+            height: g.get-vw(300);
             background-color: #ebab40;
             cursor: pointer;
         }

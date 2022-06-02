@@ -1,6 +1,6 @@
 <template>
     <div class="p-about">
-        <div class="p-index-mv__canvas" data-canvas="title"> </div>
+        <div class="p-about__canvas" data-canvas="title"> </div>
         <TheAboutTransition />
         <TheAboutIntro />
     </div>
@@ -57,3 +57,7 @@ export default Vue.extend({
     },
 });
 </script>
+
+<style lang="scss" scoped>
+@import '~/assets/styles/pages/about.scss';
+</style>

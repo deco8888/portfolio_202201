@@ -1,5 +1,3 @@
 <template>
-    <section class="p-loading">
-
-    </section>
+    <section class="p-loading"></section>
 </template>

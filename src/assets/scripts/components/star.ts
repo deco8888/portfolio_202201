@@ -78,7 +78,7 @@ export default class Webgl {
         this.step = 0;
     }
     init(canvas: HTMLCanvasElement): void {
-        if(!canvas) canvas = document.querySelector(".p-index__canvas");
+        if (!canvas) canvas = document.querySelector('.p-index__canvas');
         this.setSize();
         // カメラを作成
         this.three.camera = this.initCamera();
@@ -149,17 +149,17 @@ export default class Webgl {
         const geometry = new BufferGeometry();
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         geometry.setAttribute('size', new THREE.Float32BufferAttribute(this.sizeList, 1));
-        const stars = require("~/assets/images/pc/star.png");
+        const stars = require('~/assets/images/pc/star.png');
         const uniforms = {
             uTex: {
-                type: "t",
-                value: new THREE.TextureLoader().load(stars)
+                type: 't',
+                value: new THREE.TextureLoader().load(stars),
             },
             // uPointSize: {
             //     type: "f",
             //     value: 2.0
             // }
-        }
+        };
         const material = new THREE.ShaderMaterial({
             uniforms,
             vertexShader: starVertexShader,
@@ -169,7 +169,7 @@ export default class Webgl {
             // ブレンドモード: AdditiveBlending➡加算合成
             blending: THREE.AdditiveBlending,
             // 陰面処理を有効化するかのフラグ。陰面処理とは "ある視点から見えない部分の面を消去する" という処理のこと。
-            depthTest: true
+            depthTest: true,
         });
         // const mesh = new THREE.Mesh(geometry, material);
         this.three.stars = new Points(geometry, material);
@@ -286,7 +286,7 @@ export default class Webgl {
         };
         return object;
     }
-    update(): void { }
+    update(): void {}
     scroll(): void {
         window.addEventListener('wheel', (e) => {
             this.setWheel(e);

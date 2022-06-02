@@ -14,7 +14,7 @@ const nuxtConfig: NuxtConfig = {
     },
 
     // Target: https://go.nuxtjs.dev/config-target
-    target: 'static',
+    // target: 'static',
     srcDir: 'src/',
 
     generate: {

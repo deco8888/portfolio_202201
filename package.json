@@ -12,9 +12,10 @@
     "generate:stg": "cross-env NODE_ENV=staging nuxt generate --modern=client --dotenv env/.env.staging",
     "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
     "lint:style": "stylelint \"**/*.{css,scss,sass,html,vue}\" --ignore-path .prettierignore",
-    "lint:prettier": "prettier --check .",
+    "lint:prettier": "prettier --check --ignore-path .prettierignore .",
     "lint": "npm run lint:js && npm run lint:style && npm run lint:prettier",
-    "lintfix": "prettier --write --list-different . && npm run lint:js -- --fix && npm run lint:style -- --fix"
+    "lintfix": "prettier --write --list-different . && npm run lint:js -- --fix && npm run lint:style -- --fix",
+    "fix:prettier": "yarn lint:prettier --write"
   },
   "dependencies": {
     "@types/webpack": "^5.28.0",

@@ -15,7 +15,7 @@ void main() {
         min((uResolution.x / uResolution.y) / (uImageResolution.x / uImageResolution.y), 1.0),
         min((uResolution.y / uResolution.x) / (uImageResolution.y / uImageResolution.x), 1.0)
     );
-    // UV座標: テクスチャ上の座標（1. ０〜１の値で正規化 / 2. 左下が原点）
+    // UV座標: テクスチャ上の座標（1. 0~1の値で正規化 / 2. 左下が原点）
     vec2 uv = vec2(
         vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
         vUv.y * ratio.y + (1.0 - ratio.y) * 0.5

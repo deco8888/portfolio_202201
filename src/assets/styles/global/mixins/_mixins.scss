@@ -1,4 +1,4 @@
-@use "../settings/size";
+@use '../settings/size';
 
 @mixin font-size($pc: 1.6rem, $sp: 1.4rem) {
     @include size.media('>phone') {

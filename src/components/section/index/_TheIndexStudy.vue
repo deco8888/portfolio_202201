@@ -132,7 +132,7 @@ export default Vue.extend({
             this.title = new Title();
             this.title.init();
             this.handleEvent();
-            this.$emit("is-show", true);
+            this.$emit('is-show', true);
         },
         handleEvent(): void {
             window.addEventListener(

@@ -1,8 +1,9 @@
 {
-    "cSpell.words": [
-        "gsap",
-        "interpolant",
-        "raycaster",
-        "vertexshader"
-    ]
+  "cSpell.words": [
+    "gsap",
+    "interpolant",
+    "raycaster",
+    "vertexshader"
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

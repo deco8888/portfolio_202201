@@ -149,7 +149,10 @@ export default class Title extends Letter {
         this.pointsIndex = 0;
     }
     getFontSize(): number {
-        return window.innerWidth * (window.devicePixelRatio === 2 ? 0.12 : 0.15);
+        // return window.innerWidth * (window.devicePixelRatio === 1 ? 0.1 : window.devicePixelRatio === 2 ? 0.12 : 0.15
+        //     );
+        console.log(this.viewport.width * 0.1);
+        return this.viewport.width * 0.1;
     }
     async init(): Promise<void> {
         this.handleMove({ clientX: 0, clientY: 0 });
@@ -204,34 +207,34 @@ export default class Title extends Letter {
         }
     }
     moveInStudyArea(): void {
+        const ratio = window.devicePixelRatio;
+        const horizontal = -window.innerWidth * 0.25 * ratio;
+        const previous = this.object.previous;
+        const current = this.object.current;
         if (this.isStudyArea) {
-            let currentX = lerp(this.object.previous.x, this.object.current.x, 0.08);
-            let currentY = lerp(this.object.previous.y, this.object.current.y, 0.08);
-            if (currentX > -window.innerWidth * 0.25 || currentY <= 0) {
-                currentX = Math.min(0, currentX);
-                currentX = Math.max(-window.innerWidth * 0.25, currentX);
-                this.three.object.position.setX(currentX);
-            }
-            if (currentX <= -window.innerWidth * 0.25 || currentY > 0) {
-                currentY = Math.max(0, currentY);
-                currentY = Math.min(window.innerHeight * 0.35, currentY);
-                this.three.object.position.setY(currentY);
-            }
+            let currentX = lerp(previous.x, current.x, 0.08);
+            let currentY = lerp(previous.y, current.y, 0.08);
+            if (currentX > horizontal || currentY <= 0) this.getCurrentX(0.08);
+            if (currentX <= horizontal || currentY > 0) this.getCurrentY(0.08);
         }
-        if (this.horizontal === 0 && this.object.current.x > 0) {
-            let current = lerp(this.object.previous.x, this.object.current.x, 1);
-            current = Math.min(0, current);
-            current = Math.max(-window.innerWidth, current);
-            this.three.object.position.setX(current);
-        }
-        if (this.vertical === 0 && this.object.current.y < 0) {
-            let currentY = lerp(this.object.previous.y, this.object.current.y, 1);
-            currentY = Math.max(0, currentY);
-            currentY = Math.min(window.innerHeight * 0.35, currentY);
-            this.three.object.position.setY(currentY);
-        }
-        this.object.previous.x = this.three.object.position.x;
-        this.object.previous.y = this.three.object.position.y;
+        if (this.horizontal === 0 && current.x > 0) this.getCurrentX(1);
+        if (this.vertical === 0 && current.y < 0) this.getCurrentY(1);
+        previous.x = this.three.object.position.x;
+        previous.y = this.three.object.position.y;
+    }
+    getCurrentX(amp: number) {
+        const horizontal = -window.innerWidth * 0.25 * window.devicePixelRatio;
+        let currentX = lerp(this.object.previous.x, this.object.current.x, amp);
+        currentX = Math.min(0, currentX);
+        currentX = Math.max(horizontal, currentX);
+        this.three.object.position.setX(currentX);
+    }
+    getCurrentY(amp: number) {
+        const vertical = window.innerHeight * 0.35 * window.devicePixelRatio;
+        let currentY = lerp(this.object.previous.y, this.object.current.y, amp);
+        currentY = Math.max(0, currentY);
+        currentY = Math.min(vertical, currentY);
+        this.three.object.position.setY(currentY);
     }
     handleResize(): void {
         this.onResize();

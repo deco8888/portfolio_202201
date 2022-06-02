@@ -8,7 +8,7 @@ html {
         font-size: 62.5%;
     }
     @include g.media('<=tablet', '>phone') {
-        font-size: calc(100vw / var(--base-size) * 10);
+        font-size: 62.5% * 0.9;
     }
     @include g.media('<=phone') {
         font-size: calc(100vw / var(--base-size) * 10);
@@ -38,6 +38,7 @@ body {
     -webkit-text-size-adjust: 100%;
     -webkit-print-color-adjust: exact;
     overflow-x: hidden;
+    margin: 0;
     width: 100%;
     height: 100%;
     &.is-hidden {

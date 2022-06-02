@@ -8,7 +8,7 @@ export default class Shape {
         this.init();
     }
     init(): void {
-        console.log(EventBus);
+
         EventBus.$on('TRANSITION', this.onTransition.bind(this));
     }
     onTransition(path: string) {
@@ -16,7 +16,7 @@ export default class Shape {
             case 'mv':
                 break;
             case 'index':
-                console.log(path);
+
                 break;
         }
     }

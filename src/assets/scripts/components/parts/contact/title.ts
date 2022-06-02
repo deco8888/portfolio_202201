@@ -88,7 +88,7 @@ export default class Title extends Letter {
         this.font = {
             wight: 900,
             size: window.innerWidth * 0.1,
-            family: "'Red Hat Display', sans-serif" //"Arial", //"'Nippo', sans-serif",
+            family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
         };
         this.text = 'CONTACT';
     }

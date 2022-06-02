@@ -19,10 +19,6 @@ export default class Caption {
     init(): void {
         this.handleEvent();
     }
-    handleEvent(): void {
-
-    }
-    hover(): void {
-
-    }
+    handleEvent(): void {}
+    hover(): void {}
 }

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { lerp } from '../../../utils/math';
 import Letter from '../../letter';
+import { radians } from '../../../utils/helper';
 
 export default class Title extends Letter {
     canvas: HTMLCanvasElement;
@@ -83,20 +84,23 @@ export default class Title extends Letter {
         };
         this.color = {
             front: '#51a2f7',
-            back: '#e9451d',
+            back: '#e96747',
         };
         this.font = {
             wight: 900,
-            size: window.innerWidth * 0.1,
-            family: "'Red Hat Display', sans-serif" //"Arial", //"'Nippo', sans-serif",
+            size: this.getFontSize(),
+            family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
         };
         this.text = 'ABOUT';
+    }
+    getFontSize(): number {
+        return window.innerWidth * (window.devicePixelRatio === 2 ? 0.12 : 0.15);
     }
     init(): void {
         this.canvas = document.querySelector('[data-canvas="title"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
-        this.setBorderStyle('152 120 210');
+        this.setBorderStyle('about');
         // 描写する
         this.render();
         this.three.clock = new THREE.Clock();
@@ -113,6 +117,12 @@ export default class Title extends Letter {
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
         if (this.three.points) this.update();
+        // this.three.object.rotateX
+        if (this.three.object && this.three.object.rotation.y === 0) {
+            const slope = radians(45);
+            this.three.object.rotation.y = slope;
+            this.three.object.position.z = -(Math.sin(slope) * this.textImage.canvas.width);
+        }
     }
     update(): void {
         const geometry = <THREE.BufferGeometry>this.three.points.geometry;
@@ -122,7 +132,7 @@ export default class Title extends Letter {
         for (let i = 0; i < positionList.length / 3; i++) {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
-            const lastX = secondList[i * 2] - window.innerWidth * 0.5 * 0.47;
+            const lastX = secondList[i * 2] - window.innerWidth * 0.5 * 0.6 * window.devicePixelRatio;
             const lastY = secondList[i * 2 + 1];
             const currentX = lerp(previousX, lastX, 0.1);
             const currentY = lerp(previousY, lastY, 0.08);

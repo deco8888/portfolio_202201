@@ -219,8 +219,7 @@ export default class Letter extends Webgl {
         this.isFlg = true;
         this.mouse = new Vector2();
         this.portfolio = [];
-        console.log(window.devicePixelRatio);
-        this.particleSize = 4.0;
+        this.particleSize = 4;
     }
     async prepare(): Promise<void> {
         this.setSize();
@@ -235,6 +234,7 @@ export default class Letter extends Webgl {
         this.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
+        this.font.size = this.viewport.width * 0.1;
         // タイトルの位置・色・アルファ情報を取得
         // テキスト画像をセット
         this.setTextImage();
@@ -461,7 +461,7 @@ export default class Letter extends Webgl {
         c.height = h;
         // 差分の再計算(文字を構成する1マスの大きさが変わる)
         this.gap = this.setGap();
-        console.log(this.gap / 2);
+
         this.size = Math.max(this.gap / 1.5, 1);
         // フォントを設定・取得
         ctx.font = this.getFont();
@@ -556,7 +556,7 @@ export default class Letter extends Webgl {
                 const y2 = position.array[i * 3 + 1] + this.three.object.position.y;
                 const z2 = position.array[i * 3 + 2] + this.three.object.position.z;
                 const mouseDistance = distance3d(mouseX, mouseY, 0, x2, y2, z2);
-                const upSize = 15.0  / window.devicePixelRatio;
+                const upSize = 15.0 / window.devicePixelRatio;
                 if (mouseDistance < 100 && size.array[i] !== upSize) {
                     size.array[i] = lerp(size.array[i], upSize, 0.1);
                 }

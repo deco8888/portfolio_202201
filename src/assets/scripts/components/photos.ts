@@ -304,12 +304,14 @@ export default class Photo extends Webgl {
         const winSizeH = this.winSize.height;
         const mesh = this.meshList[index];
         const rect = this.rectList[index];
+        const viewportW = this.viewport.width;
+        const viewportH = this.viewport.height;
         // meshの大きさを更新
-        mesh.scale.x = (this.viewport.width * rect.width) / winSizeW;
-        mesh.scale.y = (this.viewport.height * rect.height) / winSizeH;
+        mesh.scale.x = (viewportW * rect.width) / winSizeW;
+        mesh.scale.y = (viewportH * rect.height) / winSizeH;
         // meshの位置更新
-        mesh.position.x = 0; //rect.left - rect.width / 2 - winSizeW / 2;
-        mesh.position.y = 0; //winSizeH / 2 - rect.top - rect.height / 2;
+        mesh.position.x = -(viewportW / 2) + mesh.scale.x / 2 + (rect.left / winSizeW) * viewportW;
+        mesh.position.y = viewportH / 2 - mesh.scale.y / 2 - (rect.top / winSizeH) * viewportH;
         const material = this.getMaterial(this.meshList[index]);
         material.uniforms.uResolution.value = new Vector2(rect.width, rect.height);
     }
@@ -318,15 +320,17 @@ export default class Photo extends Webgl {
         const winSizeH = this.winSize.height;
         const bgMeshes = this.bgMeshList[index];
         const rect = this.rectList[index];
+        const viewportW = this.viewport.width;
+        const viewportH = this.viewport.height;
         for (const [index, bgMesh] of Object.entries(bgMeshes)) {
             const i = parseInt(index);
             const diff = i > 0 ? -10 : 10;
             // meshの大きさを更新
-            bgMesh.scale.x = (this.viewport.width * rect.width) / winSizeW;
-            bgMesh.scale.y = (this.viewport.height * rect.height) / winSizeH;
+            bgMesh.scale.x = (viewportW * rect.width) / winSizeW;
+            bgMesh.scale.y = (viewportH * rect.height) / winSizeH;
             // meshの位置更新
-            bgMesh.position.x = rect.left - rect.width / 2 - winSizeW / 2 + diff;
-            bgMesh.position.y = winSizeH / 2 - rect.top - rect.height / 2 + diff;
+            bgMesh.position.x = -(viewportW / 2) + bgMesh.scale.x / 2 + (rect.left / winSizeW) * viewportW + diff;
+            bgMesh.position.y = viewportH / 2 - bgMesh.scale.y / 2 - (rect.top / winSizeH) * viewportH + diff;
             bgMesh.position.z = i > 0 ? -2 : -1;
             // 背景サイズの設定
             const bgMaterial = this.getMaterial(bgMesh);
@@ -374,7 +378,7 @@ export default class Photo extends Webgl {
         this.setSize();
         // カメラのアスペクト比を正す
         if (this.three.camera) {
-            // this.three.camera.aspect = this.winSize.width / this.winSize.height;
+            this.three.camera.aspect = this.winSize.width / this.winSize.height;
             this.three.camera.updateProjectionMatrix();
             this.viewport = this.initViewport();
         }
@@ -505,20 +509,23 @@ export default class Photo extends Webgl {
         this.flg.isMove = false;
         const targetY = window.scrollY - this.elms.mv.clientHeight;
         const s = window.scrollY;
+        const viewportW = this.viewport.width;
+        const viewportH = this.viewport.height;
         for (const [index, rect] of Object.entries(this.rectList)) {
             const i = parseInt(index);
             // スクロール情報（current/previous/ease）
             const scroll = this.scrollList[i];
             // 画像要素
             const currentRect = this.elms.images[i].getBoundingClientRect();
-            this.meshList[i].position.y = this.winSize.height / 2 - currentRect.top - currentRect.height / 2;
+            const moveY = viewportH / 2 - this.meshList[i].scale.y / 2 - (currentRect.top / this.winSize.height) * viewportH;
+            this.meshList[i].position.y = moveY;
             for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
                 const j = parseInt(index);
                 const diff = j > 0 ? -10 : 10;
-                bgMesh.position.y = this.winSize.height / 2 - currentRect.top - currentRect.height / 2 + diff;
+                bgMesh.position.y = moveY + diff;
             }
             // 画像表示位置
-            const imagePos = currentRect.left - rect.width / 2 - this.winSize.width / 2;
+            const imagePos = -(viewportW / 2) + this.meshList[i].scale.x / 2 + (currentRect.left / this.winSize.width) * viewportW;
             if (targetY >= 0) {
                 scroll.current =
                     targetY === this.targetY
