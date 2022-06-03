@@ -4,7 +4,6 @@ import Webgl from './webgl';
 import { isMobile } from './isMobile';
 import expansionVertexShader from '../glsl/expansion/vertexshader.vert';
 import expansionFragmentShader from '../glsl/expansion/fragmentShader.frag';
-import Title from './section/index/title';
 import { addClass } from '../utils/classList';
 import { hasClass } from '../utils/hasClass';
 import { throttle } from '../utils/throttle';
@@ -188,17 +187,6 @@ export default class Expansion extends Webgl {
                 duration: 1.5,
                 ease: Power2.easeInOut,
                 onStart: () => {
-                    // new Title().setBorderStyle('37 105 165');
-                    // tl.set(this.elms.title, {
-                    //     zIndex: 1000,
-                    //     // display: 'none',
-                    // });
-                    // tl.set(this.elms.study, {
-                    //     // zIndex: 2000,
-                    //     display: 'none',
-                    // });
-
-                    // this.elms.canvas.style.zIndex = '10000';
                     addClass(this.elms.expansion, hasClass.active);
                 },
             },
@@ -206,17 +194,23 @@ export default class Expansion extends Webgl {
         const material = <THREE.ShaderMaterial>this.three.mesh.material;
         tl.set(this.elms.canvas, {
             zIndex: 1004,
+            class: hasClass.active,
         });
         tl.to(
             material.uniforms.uProgress,
             {
                 value: 1,
                 onUpdate: () => this.render(),
+                onStart: () => {
+                    addClass(this.elms.canvas, hasClass.active);
+                    setTimeout(() => {
+                        this.elms.contact.setAttribute('data-title', 'contact');
+                    }, 800);
+                },
                 onComplete: () => {
                     this.elms.study.style.display = 'none';
                     this.flg.isAnimating = false;
                     this.state = 'full';
-                    this.elms.contact.setAttribute('data-title', 'contact');
                     this.displayContent();
                 },
             },

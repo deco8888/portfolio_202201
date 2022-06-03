@@ -129,8 +129,6 @@ export default Vue.extend({
             this.expansion = new Expansion();
             this.expansion.init();
             await this.expansion.start();
-            this.title = new Title();
-            this.title.init();
             this.handleEvent();
             this.$emit('is-show', true);
         },

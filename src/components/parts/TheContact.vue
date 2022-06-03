@@ -39,6 +39,7 @@ export default Vue.extend({
     },
     async mounted() {
         const canvas = document.querySelector<HTMLElement>('[data-canvas="contact"]');
+        this.title = new Title();
         this.post = new Post();
         await this.post.init(canvas);
     },
@@ -49,13 +50,16 @@ export default Vue.extend({
     },
     methods: {
         async init(): Promise<void> {
-            this.post.setModels();
+            setTimeout(() => {
+                this.post.setModels();
+                this.title.draw();
+            }, 500);
         },
         handleEvent(): void {
             window.addEventListener(
                 'mousemove',
                 (e: MouseEvent) => {
-                    this.title.handleMove(e);
+                    // this.title.handleMove(e);
                 },
                 false
             );

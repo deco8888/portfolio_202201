@@ -113,15 +113,18 @@ export default class Title extends Letter {
             this.time.delta = this.three.clock.getDelta();
             this.time.total += this.time.delta;
         }
-        // if (this.three.object) this.three.object.rotation.y += 0.005;
+        if (this.three.object) this.three.object.rotation.y += 0.01;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
         if (this.three.points) this.update();
         // this.three.object.rotateX
-        if (this.three.object && this.three.object.rotation.y === 0) {
-            const slope = radians(45);
-            this.three.object.rotation.y = slope;
-            this.three.object.position.z = -(Math.sin(slope) * this.textImage.canvas.width);
+        if (this.three.object && this.three.object.position.x === 0) {
+            const slope = radians(0);
+            const diff = Math.cos(slope) * this.textImage.canvas.width;
+            const space = (this.viewport.width * 0.5 - diff) / 2;
+            // this.three.object.rotation.y = slope;
+            this.three.object.position.x = -space - this.textImage.canvas.width / 2;
+            this.three.object.position.z = -this.textImage.canvas.width / 4;
         }
     }
     update(): void {
@@ -132,7 +135,8 @@ export default class Title extends Letter {
         for (let i = 0; i < positionList.length / 3; i++) {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
-            const lastX = secondList[i * 2] - window.innerWidth * 0.5 * 0.6 * window.devicePixelRatio;
+            const slope = radians(0);
+            const lastX = secondList[i * 2];
             const lastY = secondList[i * 2 + 1];
             const currentX = lerp(previousX, lastX, 0.1);
             const currentY = lerp(previousY, lastY, 0.08);

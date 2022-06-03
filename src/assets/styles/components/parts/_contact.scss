@@ -44,7 +44,7 @@
         width: 100%;
         height: 100%;
         border: solid 0px;
-        transition: border 0.3s g.ease(linear);
+        // transition: border 0.3s g.ease(linear);
         &[data-title='contact'] {
             border: solid 10px;
             border-image: linear-gradient(180deg, #facb04 50%, #7caed4 50%);

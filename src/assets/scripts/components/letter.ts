@@ -219,7 +219,7 @@ export default class Letter extends Webgl {
         this.isFlg = true;
         this.mouse = new Vector2();
         this.portfolio = [];
-        this.particleSize = 4;
+        this.particleSize = 5;
     }
     async prepare(): Promise<void> {
         this.setSize();
@@ -350,8 +350,8 @@ export default class Letter extends Webgl {
         const color = this.attributes.color;
         const size = this.attributes.size;
 
-        for (let x = 0; x < width; x += 5.0) {
-            for (let y = 0; y < height; y += 5.0) {
+        for (let x = 0; x < width; x += 6.0) {
+            for (let y = 0; y < height; y += 6.0) {
                 const index = (y * width + x) * 4;
                 let a = data[index + 3] / 255;
                 // const rw = width * 5;
@@ -495,7 +495,7 @@ export default class Letter extends Webgl {
     setGap(): number {
         switch (true) {
             case this.font.size >= 70:
-                return 10;
+                return 8;
             case this.font.size >= 40 && this.font.size < 70:
                 return 6;
             case this.font.size < 40:

@@ -19,6 +19,7 @@ import {
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import Webgl from '../../webgl';
+import gsap from 'gsap';
 // import { GUI } from 'dat.gui';
 
 interface ThreeNumber {
@@ -162,10 +163,18 @@ export default class Post extends Webgl {
             const angle = Math.atan2(this.three.object.position.y, this.three.object.position.x);
             this.three.object.rotateY(angle * 1.1);
             this.render();
+            this.three.object.scale.set(0, 0, 0);
         });
     }
     setModels(): void {
         this.three.scene.add(this.three.object);
+        gsap.to(this.three.object.scale, {
+            duration: 1,
+            delay: 0.3,
+            x: 1,
+            y: 1,
+            z: 1,
+        });
     }
     render(): void {
         const elapsedTime = this.three.clock.getElapsedTime();

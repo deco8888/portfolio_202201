@@ -163,10 +163,6 @@ export default class Title extends Letter {
         this.render();
         this.three.clock = new Clock();
         this.three.clock.start();
-        // this.createPointsList();
-        // this.update();
-        const geometry = <BufferGeometry>this.three.points.geometry;
-        const geometryPosition = geometry.attributes.position;
     }
     async render(): Promise<void> {
         this.animFrame = requestAnimationFrame(this.render.bind(this));
@@ -207,8 +203,7 @@ export default class Title extends Letter {
         }
     }
     moveInStudyArea(): void {
-        const ratio = window.devicePixelRatio;
-        const horizontal = -window.innerWidth * 0.25 * ratio;
+        const horizontal = - this.viewport.width * 0.25;
         const previous = this.object.previous;
         const current = this.object.current;
         if (this.isStudyArea) {
@@ -223,14 +218,14 @@ export default class Title extends Letter {
         previous.y = this.three.object.position.y;
     }
     getCurrentX(amp: number) {
-        const horizontal = -window.innerWidth * 0.25 * window.devicePixelRatio;
+        const horizontal = - this.viewport.width * 0.25;
         let currentX = lerp(this.object.previous.x, this.object.current.x, amp);
         currentX = Math.min(0, currentX);
         currentX = Math.max(horizontal, currentX);
         this.three.object.position.setX(currentX);
     }
     getCurrentY(amp: number) {
-        const vertical = window.innerHeight * 0.35 * window.devicePixelRatio;
+        const vertical = this.viewport.height * 0.35;
         let currentY = lerp(this.object.previous.y, this.object.current.y, amp);
         currentY = Math.max(0, currentY);
         currentY = Math.min(vertical, currentY);

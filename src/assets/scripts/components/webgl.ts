@@ -64,7 +64,7 @@ export default class Webgl {
         // );
         camera.position.set(0, 0, 1000);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
-        camera.lookAt(this.three.scene.position);
+        // camera.lookAt(this.three.scene.position);
         camera.updateProjectionMatrix();
         return camera;
     }

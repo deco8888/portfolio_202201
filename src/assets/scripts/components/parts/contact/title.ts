@@ -91,11 +91,14 @@ export default class Title extends Letter {
             family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
         };
         this.text = 'CONTACT';
+        this.init();
     }
     init(): void {
         this.canvas = document.querySelector('[data-expansion="expansion"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
+    }
+    draw(): void {
         // 描写する
         this.render();
         this.three.clock = new THREE.Clock();
@@ -122,7 +125,7 @@ export default class Title extends Letter {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
             const lastX = secondList[i * 2];
-            const lastY = secondList[i * 2 + 1] + window.innerHeight * 0.5 * 0.5;
+            const lastY = secondList[i * 2 + 1] + this.viewport.height * 0.25;
             const currentX = lerp(previousX, lastX, 0.1);
             const currentY = lerp(previousY, lastY, 0.08);
             geometryPosition.setX(i, currentX);
