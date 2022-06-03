@@ -149,9 +149,6 @@ export default class Title extends Letter {
         this.pointsIndex = 0;
     }
     getFontSize(): number {
-        // return window.innerWidth * (window.devicePixelRatio === 1 ? 0.1 : window.devicePixelRatio === 2 ? 0.12 : 0.15
-        //     );
-        console.log(this.viewport.width * 0.1);
         return this.viewport.width * 0.1;
     }
     async init(): Promise<void> {
@@ -159,6 +156,8 @@ export default class Title extends Letter {
         this.canvas = document.querySelector('[data-canvas="title"]');
         // カメラ・シーン・レンダラー等の準備
         await this.prepare();
+        this.font.size = this.viewport.width * 0.12;
+        this.createTextImage();
         // 描写する
         this.render();
         this.three.clock = new Clock();

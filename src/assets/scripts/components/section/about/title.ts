@@ -94,12 +94,14 @@ export default class Title extends Letter {
         this.text = 'ABOUT';
     }
     getFontSize(): number {
-        return window.innerWidth * (window.devicePixelRatio === 2 ? 0.12 : 0.15);
+        return this.viewport.width * 0.1;
     }
     init(): void {
         this.canvas = document.querySelector('[data-canvas="title"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
+        this.font.size = this.viewport.width * 0.1;
+        this.createTextImage();
         this.setBorderStyle('about');
         // 描写する
         this.render();

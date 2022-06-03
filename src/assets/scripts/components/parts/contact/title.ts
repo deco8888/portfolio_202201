@@ -97,6 +97,8 @@ export default class Title extends Letter {
         this.canvas = document.querySelector('[data-expansion="expansion"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
+        this.font.size = this.viewport.width * 0.1;
+        this.createTextImage();
     }
     draw(): void {
         // 描写する

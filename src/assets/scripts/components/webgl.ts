@@ -83,6 +83,7 @@ export default class Webgl {
          * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
          * https://ics.media/tutorial-three/renderer_resize/
          */
+        console.log(window.devicePixelRatio);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setClearColor(0xeaf2f5, 0);
         renderer.setSize(this.winSize.width, this.winSize.height);

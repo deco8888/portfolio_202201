@@ -219,7 +219,7 @@ export default class Letter extends Webgl {
         this.isFlg = true;
         this.mouse = new Vector2();
         this.portfolio = [];
-        this.particleSize = 5;
+        this.particleSize = 4 * window.devicePixelRatio;
     }
     async prepare(): Promise<void> {
         this.setSize();
@@ -234,7 +234,8 @@ export default class Letter extends Webgl {
         this.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
-        this.font.size = this.viewport.width * 0.1;
+    }
+    async createTextImage(): Promise<void> {
         // タイトルの位置・色・アルファ情報を取得
         // テキスト画像をセット
         this.setTextImage();
