@@ -4,11 +4,11 @@
         <div class="p-index-mv__canvas" data-canvas="title" data-title="mv"></div>
         <div class="p-index-study__expansion" data-expansion="canvas">
             <div class="p-index-study__expansion-canvas expansion" data-expansion="expansion"></div>
-            <TheContact :isShow="this.showFlg" />
+            <TheContact :isShow="this.flg.show" @is-close="close" />
         </div>
         <TheMv />
         <TheBox />
-        <TheStudy @is-show="show" />
+        <TheStudy @is-show="show" :isClose="this.flg.close" />
         <TheCursor />
     </div>
 </template>
@@ -22,6 +22,7 @@ import TheContact from '~/components/parts/TheContact.vue';
 import TheCursor from '../components/parts/TheCursor.vue';
 import BaseImage from '~/components/common/TheBaseImage.vue';
 import Title from '~/assets/scripts/components/section/index/title';
+import Attract from '~/assets/scripts/modules/attract';
 import { debounce } from '~/assets/scripts/utils/debounce';
 
 export default Vue.extend({
@@ -30,13 +31,17 @@ export default Vue.extend({
     },
     data(): {
         title: Title;
-        scrollFlg: boolean;
-        showFlg: boolean;
+        flg: {
+            [key: string]: boolean;
+        };
     } {
         return {
             title: null,
-            scrollFlg: true,
-            showFlg: false,
+            flg: {
+                scroll: true,
+                show: false,
+                close: false,
+            },
         };
     },
     components: {
@@ -50,9 +55,10 @@ export default Vue.extend({
     mounted() {
         this.title = new Title();
         this.title.init();
+        new Attract();
         this.handleEvent();
         this.$router.beforeEach(async (_to, _from, next) => {
-            this.scrollFlg = false;
+            this.flg.scroll = false;
             await this.title.cancelAnimFrame();
             next();
         });
@@ -63,7 +69,7 @@ export default Vue.extend({
             window.addEventListener(
                 'scroll',
                 () => {
-                    if (path === 'index' && this.scrollFlg) {
+                    if (path === 'index' && this.flg.scroll) {
                         this.title.handleScroll();
                     }
                 },
@@ -87,8 +93,13 @@ export default Vue.extend({
                 false
             );
         },
-        show(isShow: boolean) {
-            this.showFlg = isShow;
+        show(isShow: boolean): void {
+            this.flg.show = isShow;
+            this.flg.close = !isShow;
+        },
+        close(isClose: boolean): void {
+            this.flg.close = isClose;
+            this.flg.show = !isClose;
         },
     },
 });

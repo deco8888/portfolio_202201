@@ -12,13 +12,28 @@ export default class Study {
     init(): void {
         this.photo.init();
         this.handleEvent();
+        EventBus.$on('SHOW', this.onTransition.bind(this));
+    }
+    onTransition(flg: boolean) {
+        this.photo.flg.isScroll = !flg;
+        if (flg) {
+            this.photo.cancelAnimFrame();
+        } else {
+            this.photo.render();
+        }
     }
     handleEvent(): void {
         window.addEventListener(
             'resize',
-            debounce(() => {
+            () => {
                 this.photo.handleResize();
-            }, 10),
+                if (!this.photo.flg.isScroll) {
+                    window.scrollTo({
+                        top: document.documentElement.scrollHeight,
+                        behavior: 'smooth',
+                    });
+                }
+            },
             false
         );
         window.addEventListener(
@@ -32,18 +47,15 @@ export default class Study {
             'mousedown',
             async (e: MouseEvent) => {
                 e.preventDefault();
-                await this.photo.openPage();
+                // await this.photo.openPage();
             },
             false
         );
         window.addEventListener(
             'scroll',
-            throttle(() => {
-                this.photo.handleScroll();
-                setTimeout(() => {
-                    this.photo.flg.isScroll = false;
-                }, 10);
-            }, 10),
+            () => {
+                if (this.photo.flg.isScroll) this.photo.handleScroll();
+            },
             {
                 capture: false,
                 passive: true,

@@ -4,7 +4,7 @@ import Webgl from './webgl';
 import { isMobile } from './isMobile';
 import expansionVertexShader from '../glsl/expansion/vertexshader.vert';
 import expansionFragmentShader from '../glsl/expansion/fragmentShader.frag';
-import { addClass } from '../utils/classList';
+import { addClass, removeClass } from '../utils/classList';
 import { hasClass } from '../utils/hasClass';
 import { throttle } from '../utils/throttle';
 
@@ -31,11 +31,17 @@ export default class Expansion extends Webgl {
         expansion: HTMLElement;
         title: HTMLCanvasElement;
         contact: HTMLCanvasElement;
+        contactWrap: HTMLElement;
         study: HTMLCanvasElement;
+        // envelope: HTMLElement;
+        envelopeOpener: HTMLElement;
+        envelopeLetter: HTMLElement;
     };
     isMobile: boolean;
     param: {
-        color: string;
+        color1: string;
+        color2: string;
+        color3: string;
         speed: number;
         ratio: number;
         direction: number;
@@ -62,11 +68,17 @@ export default class Expansion extends Webgl {
             expansion: document.querySelector('[data-expansion="expansion"]'),
             title: document.querySelector('[data-canvas="title"]'),
             contact: document.querySelector('[data-canvas="contact"]'),
+            contactWrap: document.querySelector('.p-contact'),
             study: document.querySelector('.p-index-study'),
+            // envelope: document.querySelector('[data-envelope]'),
+            envelopeOpener: document.querySelector('[data-envelope-opener]'),
+            envelopeLetter: document.querySelector('[data-envelope-letter]'),
         };
         this.isMobile = isMobile();
         this.param = {
-            color: '#f9f5ce', //#f8f3ba',
+            color1: '#ffffff', //'#70d872', //#f8f3ba',
+            color2: '#f9f5ce', //#f8f3ba',
+            color3: '#b0d3ee', //#f8f3ba',
             speed: 1.35,
             ratio: this.isMobile ? 0.15 : 0.26,
             direction: 1,
@@ -98,9 +110,31 @@ export default class Expansion extends Webgl {
         this.handleEvent();
     }
     initMesh(): THREE.Mesh {
+        const color1 = new THREE.Color(this.param.color1);
         this.uniforms = {
-            uColor: {
-                value: new THREE.Color(this.param.color),
+            uColor1: {
+                value: new THREE.Color('#70d872'),
+            },
+            uColor2: {
+                value: new THREE.Color(this.param.color1),
+            },
+            uColor1R: {
+                value: color1.r,
+            },
+            uColor1G: {
+                value: color1.g,
+            },
+            uColor1B: {
+                value: color1.b,
+            },
+            uColor2R: {
+                value: color1.r,
+            },
+            uColor2G: {
+                value: color1.g,
+            },
+            uColor2B: {
+                value: color1.b,
             },
             uScale: {
                 value: new THREE.Vector2(1, 1),
@@ -156,69 +190,191 @@ export default class Expansion extends Webgl {
         // 位置の原点は左上ではなく平面の中心にする
         let x = xViewUnit + widthViewUnit / 2;
         let y = -yViewUnit - heightViewUnit / 2;
+
         // 上記、新しい値を使用し、メッシュを拡大縮小して配置する
         const mesh = this.three.mesh;
         mesh.scale.x = widthViewUnit;
         mesh.scale.y = heightViewUnit;
         mesh.position.x = x;
         mesh.position.y = y;
+
         // Shaderパラメータ更新
         const material = <THREE.ShaderMaterial>mesh.material;
         material.uniforms.uScale.value.x = widthViewUnit;
         material.uniforms.uScale.value.y = heightViewUnit;
         material.uniforms.uPosition.value.x = x / widthViewUnit;
         material.uniforms.uPosition.value.y = y / heightViewUnit;
+        material.uniforms.uResolution.value = new THREE.Vector2(this.viewport.width, this.viewport.height);
     }
     render(): void {
         // 画面に描画する
         this.three.renderer.render(this.three.scene, this.three.camera);
     }
     async start(): Promise<void> {
-        // メッシュを更新
+        await this.openLetter();
         await this.update();
-        this.displayInFull();
+        await this.displayInFull();
     }
-    displayInFull(): void {
-        if (this.state === 'full' || this.flg.isAnimating) return;
-        this.flg.isAnimating = true;
+    async openLetter(): Promise<void> {
+        return new Promise((resolve) => {
+            const tl = gsap.timeline({
+                paused: true,
+                defaults: {
+                    duration: 0.5,
+                    ease: Power2.easeInOut,
+                },
+            });
+            tl.to(
+                this.elms.envelopeOpener,
+                {
+                    rotateX: '0deg',
+                    onComplete: () => (this.elms.envelopeOpener.style.zIndex = '2'),
+                },
+                0
+            ).to(
+                this.elms.envelopeLetter,
+                {
+                    top: this.isMobile ? '-200%' : '-200%',
+                    onComplete: () => {
+                        resolve();
+                    },
+                },
+                0.5
+            );
+            tl.play();
+        });
+    }
+    async closeLetter(): Promise<void> {
+        return new Promise((resolve) => {
+            const tl = gsap.timeline({
+                paused: true,
+                defaults: {
+                    duration: 0.5,
+                    ease: Power2.easeInOut,
+                },
+            });
+            tl.to(this.elms.envelopeLetter, {
+                top: '0',
+            }).to(
+                this.elms.envelopeOpener,
+                {
+                    rotateX: '180deg',
+                    zIndex: 5,
+                    onComplete: () => {
+                        resolve();
+                    },
+                },
+                0.5
+            );
+            tl.play();
+        });
+    }
+    async displayInFull(): Promise<void> {
+        // addClass(this.elms.envelope, hasClass.active)
+        return new Promise((resolve) => {
+            if (this.state === 'full' || this.flg.isAnimating) return;
+            this.flg.isAnimating = true;
+            const tl = gsap.timeline({
+                paused: true,
+                defaults: {
+                    delay: 0,
+                    ease: Power2.easeOut,
+                },
+            });
+            const material = <THREE.ShaderMaterial>this.three.mesh.material;
+            this.elms.contact.setAttribute('data-title', 'contact');
+            tl.set(this.elms.canvas, {
+                zIndex: 1004,
+            });
+            tl.to(
+                material.uniforms.uProgress,
+                {
+                    duration: 1,
+                    value: 1,
+                    onUpdate: () => this.render(),
+                    onStart: () => {
+                        addClass(document.body, hasClass.hidden);
+                        addClass(this.elms.expansion, hasClass.active);
+                        addClass(this.elms.canvas, hasClass.active);
+                        this.displayContent();
+                        setTimeout(() => {
+                            resolve();
+                        }, 600);
+                        // setTimeout(() => {
+                        //     resolve();
+                        // }, 1200);
+                    },
+                    onComplete: () => {
+                        this.elms.study.style.visibility = 'hidden';
+                        // this.elms.study.style.display = 'none';
+                        this.flg.isAnimating = false;
+                        this.state = 'full';
+                        // resolve();
+                    },
+                },
+                0
+            );
+            this.changeColor(tl, this.param.color2, this.param.color3);
+            tl.play();
+        });
+    }
+    displayContent(): void {
         const tl = gsap.timeline({
             paused: true,
             defaults: {
-                duration: 1.5,
+                duration: 0.5,
                 ease: Power2.easeInOut,
-                onStart: () => {
-                    addClass(this.elms.expansion, hasClass.active);
-                },
             },
         });
-        const material = <THREE.ShaderMaterial>this.three.mesh.material;
-        tl.set(this.elms.canvas, {
-            zIndex: 1004,
-            class: hasClass.active,
-        });
+        tl.set(this.elms.contactWrap, { visibility: 'visible' });
         tl.to(
-            material.uniforms.uProgress,
+            this.elms.contactWrap,
             {
-                value: 1,
-                onUpdate: () => this.render(),
-                onStart: () => {
-                    addClass(this.elms.canvas, hasClass.active);
-                    setTimeout(() => {
-                        this.elms.contact.setAttribute('data-title', 'contact');
-                    }, 800);
-                },
+                opacity: 1,
                 onComplete: () => {
-                    this.elms.study.style.display = 'none';
-                    this.flg.isAnimating = false;
-                    this.state = 'full';
-                    this.displayContent();
+                    addClass(this.elms.contactWrap, hasClass.active);
                 },
             },
             0
         );
         tl.play();
     }
-    displayContent(): void {
+    close(): void {
+        if (this.state === 'close' || this.flg.isAnimating) return;
+        this.flg.isAnimating = true;
+        const tl = gsap.timeline({
+            paused: true,
+            defaults: {
+                duration: 1.5,
+                ease: Power2.easeInOut,
+            },
+        });
+        const material = <THREE.ShaderMaterial>this.three.mesh.material;
+        this.hiddenContent();
+        tl.to(
+            material.uniforms.uProgress,
+            {
+                value: 0,
+                onUpdate: () => this.render(),
+                onStart: () => {
+                    removeClass(this.elms.contactWrap, hasClass.active);
+                    this.elms.study.style.visibility = 'visible';
+                    // this.elms.study.style.display = 'block';
+                },
+                onComplete: async () => {
+                    this.flg.isAnimating = false;
+                    this.state = 'close';
+                    this.elms.canvas.style.zIndex = '-1';
+                    await this.closeLetter();
+                    // this.displayContent();
+                },
+            },
+            0
+        );
+        this.changeColor(tl, this.param.color1, this.param.color1);
+        tl.play();
+    }
+    hiddenContent(): void {
         const tl = gsap.timeline({
             paused: true,
             defaults: {
@@ -226,16 +382,73 @@ export default class Expansion extends Webgl {
                 ease: Power2.easeInOut,
             },
         });
-        const content = document.querySelector<HTMLElement>('.p-index-study__content');
-        tl.set(content, { visibility: 'visible' });
         tl.to(
-            content,
+            this.elms.contactWrap,
             {
-                opacity: 1,
+                opacity: 0,
+                onComplete: () => {
+                    this.elms.contactWrap.style.visibility = 'hidden';
+                    removeClass(document.body, hasClass.hidden);
+                    removeClass(this.elms.expansion, hasClass.active);
+                    removeClass(this.elms.canvas, hasClass.active);
+                },
             },
             0
         );
         tl.play();
+    }
+    changeColor(tl: gsap.core.Timeline, color1: string, color2: string): void {
+        const material = <THREE.ShaderMaterial>this.three.mesh.material;
+        const changeColor1 = new THREE.Color(color1);
+        const changeColor2 = new THREE.Color(color2);
+        tl.to(
+            material.uniforms.uColor1R,
+            {
+                value: changeColor1.r,
+                onUpdate: () => this.render(),
+            },
+            '<'
+        );
+        tl.to(
+            material.uniforms.uColor1G,
+            {
+                value: changeColor1.g,
+                onUpdate: () => this.render(),
+            },
+            '<'
+        );
+        tl.to(
+            material.uniforms.uColor1B,
+            {
+                value: changeColor1.b,
+                onUpdate: () => this.render(),
+            },
+            '<'
+        );
+        tl.to(
+            material.uniforms.uColor2R,
+            {
+                value: changeColor2.r,
+                onUpdate: () => this.render(),
+            },
+            '<'
+        );
+        tl.to(
+            material.uniforms.uColor2G,
+            {
+                value: changeColor2.g,
+                onUpdate: () => this.render(),
+            },
+            '<'
+        );
+        tl.to(
+            material.uniforms.uColor2B,
+            {
+                value: changeColor2.b,
+                onUpdate: () => this.render(),
+            },
+            '<'
+        );
     }
     handleEvent(): void {
         window.addEventListener(
@@ -248,6 +461,7 @@ export default class Expansion extends Webgl {
     }
     handleResize(): void {
         this.setSize();
+        this.initViewport();
         if (this.three.camera) {
             // カメラのアスペクト比を正す
             this.three.camera.aspect = this.winSize.width / this.winSize.height;
@@ -257,5 +471,7 @@ export default class Expansion extends Webgl {
                 this.three.renderer.setSize(this.winSize.width, this.winSize.height);
             }
         }
+        this.update();
+        this.render();
     }
 }

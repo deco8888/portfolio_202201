@@ -1,31 +1,11 @@
 import * as THREE from 'three';
+import gsap, { Power2 } from 'gsap';
 import { lerp } from '../../../utils/math';
 import Letter from '../../letter';
+import { Material, ShaderMaterial } from 'three';
 
 export default class Title extends Letter {
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
-    borderColor: string;
-    textImage: {
-        canvas: HTMLCanvasElement;
-        ctx: CanvasRenderingContext2D;
-        data: ImageData;
-    };
-    layers: number;
-    gap: number;
-    size: number;
-    target: {
-        rotation: {
-            x: number;
-            y: number;
-        };
-    };
-    rotation: {
-        x: number;
-        y: number;
-    };
     speed: number;
-    animFrame?: number;
     vector3: {
         x: number;
         y: number;
@@ -34,22 +14,6 @@ export default class Title extends Letter {
     scroll: {
         y: number;
     };
-    color: {
-        front: string;
-        back: string;
-    };
-    font: {
-        wight: number;
-        size: number;
-        family: string;
-    };
-    horizontal: number;
-    particleX: number[];
-    text: string;
-    elms: {
-        study: HTMLElement;
-    };
-    isStudyArea: boolean;
     constructor() {
         super();
         this.borderColor = 'rgb(101 141 172)'; //'rgb(81 162 247)';
@@ -87,36 +51,49 @@ export default class Title extends Letter {
         };
         this.font = {
             wight: 900,
-            size: window.innerWidth * 0.1,
-            family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            size: this.getFontSize(),
+            family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            threshold: this.isMobile ? 0.18 : 0.12,
         };
         this.text = 'CONTACT';
+        this.isFirst = false;
         this.init();
+    }
+    getFontSize(): number {
+        return this.isMobile ? this.viewport.width * 0.15 : this.viewport.width * 0.1;
     }
     init(): void {
         this.canvas = document.querySelector('[data-expansion="expansion"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
-        this.font.size = this.viewport.width * 0.1;
-        this.createTextImage();
+        this.font.size = this.getFontSize();
+    }
+    async prepare(): Promise<void> {
+        this.setSize();
+        // カメラを作成
+        this.three.camera = this.initCamera();
+        // カメラをシーンに追加
+        this.three.scene.add(this.three.camera);
+        // レンダラーを作成
+        this.three.renderer = this.initRenderer();
+        // HTMLに追加
+        this.canvas.appendChild(this.three.renderer.domElement);
+        // ビューポート計算
+        this.viewport = this.initViewport();
     }
     draw(): void {
-        // 描写する
-        this.render();
-        this.three.clock = new THREE.Clock();
-        this.three.clock.start();
+        this.createTextImage();
+        // this.three.clock = new THREE.Clock();
+        // this.three.clock.start();
     }
     render(): void {
-        requestAnimationFrame(this.render.bind(this));
-        if (this.three.clock) {
-            // delta: 変化量
-            this.time.delta = this.three.clock.getDelta();
-            this.time.total += this.time.delta;
-        }
+        this.animFrame = requestAnimationFrame(this.render.bind(this));
         // if (this.three.object) this.three.object.rotation.y += 0.005;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
         if (this.three.points) this.update();
+        if (this.three.object && this.three.object.position.y === 0)
+            this.three.object.position.y = this.viewport.height * 0.25;
     }
     update(): void {
         const geometry = <THREE.BufferGeometry>this.three.points.geometry;
@@ -127,7 +104,7 @@ export default class Title extends Letter {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
             const lastX = secondList[i * 2];
-            const lastY = secondList[i * 2 + 1] + this.viewport.height * 0.25;
+            const lastY = secondList[i * 2 + 1];
             const currentX = lerp(previousX, lastX, 0.1);
             const currentY = lerp(previousY, lastY, 0.08);
             geometryPosition.setX(i, currentX);
@@ -145,6 +122,29 @@ export default class Title extends Letter {
         }
     }
     handleMove(e: MouseEvent): void {
-        // this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+        this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+    }
+    async removeTitle(): Promise<void> {
+        gsap.to(this.three.object.scale, {
+            duration: 0.5,
+            ease: Power2.easeOut,
+            x: 0,
+            y: 0,
+            z: 0,
+            onComplete: () => {
+                this.three.scene.remove(this.three.object);
+                this.three.object.remove(this.three.points);
+                this.three.object = null;
+                const material = <ShaderMaterial>this.three.points.material;
+                material.dispose();
+                this.three.points.geometry.dispose();
+                this.three.points = null;
+                cancelAnimationFrame(this.animFrame);
+                this.initCommonValue();
+            },
+        });
+    }
+    async initValue(): Promise<void> {
+        await this.initCommonValue();
     }
 }

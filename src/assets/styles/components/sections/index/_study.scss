@@ -33,10 +33,19 @@
     &__list {
         display: flex;
         position: absolute;
-        top: 0;
         left: 0;
-        padding: 0 g.get_vw(600) 0 150vw;
         user-select: none;
+        @include g.media('>phone') {
+            top: 50%;
+            padding: 0 g.get_vw(600) 0 150vw;
+            transform: translate(0, -50%);
+        }
+        @include g.media('<=phone') {
+            flex-flow: column;
+            align-items: center;
+            padding: 100vh 0 60vh;
+            width: 100%;
+        }
     }
     &__image {
         position: relative;
@@ -46,22 +55,44 @@
         height: auto;
         visibility: hidden;
         &-wrap {
+            display: block;
             position: relative;
-            width: g.get_vw(400);
-            max-width: 40vh;
-            height: 30vh;
-            transform: translate(0, -50%);
+            // max-width: 40vh;
+            height: 0;
             overflow: hidden;
+            @include g.media('>phone') {
+                padding-top: 18%;
+                width: g.get_size_pc(200px, 500px);
+            }
+            @include g.media('<=phone') {
+                padding-top: 55.4%;
+                width: 55rem;
+            }
             &--image1 {
-                top: 45vh;
-                margin: 0 g.get_vw(100) 0 0;
+                @include g.media('>phone') {
+                    top: 0;
+                    margin: 0 g.get_size_pc(120px, 300px) 0 0;
+                }
+                // @include g.media('<=phone') {
+                //     margin: 20rem 0 0;
+                // }
             }
             &--image2 {
-                top: 75vh;
-                margin: 0 g.get_vw(100) 0 0;
+                @include g.media('>phone') {
+                    top: 10rem;
+                    margin: 0 g.get_size_pc(120px, 300px) 0 0;
+                }
+                @include g.media('<=phone') {
+                    margin: 20rem 0 0;
+                }
             }
             &--image3 {
-                top: 45vh;
+                @include g.media('>phone') {
+                    top: 0;
+                }
+                @include g.media('<=phone') {
+                    margin: 20rem 0 0;
+                }
             }
         }
     }
@@ -81,46 +112,80 @@
         height: 100%;
     }
     &-expansion {
+        $item: &;
         position: fixed;
-        top: 50%;
-        right: 0;
-        width: g.get-vw(300);
-        height: g.get-vw(300);
         z-index: -1;
-        @include g.scroll-fadein-before(20px, -50%);
+        @include g.media('>phone') {
+            @include g.scroll-fadein-before(20px, 0);
+        }
+        @include g.media('<=phone') {
+            @include g.scroll-fadein-before();
+        }
         &.is-active {
-            @include g.scroll-fadein-after(0, -50%, 0s);
+            @include g.scroll-fadein-after(0, 0, 0s);
             z-index: 1002;
         }
         @include g.media('>phone') {
-            margin: 0 g.get_per(100) 0 0;
+            right: 0;
+            bottom: g.get_size_pc(40px, 100px);
+            margin: 0 g.get_size_pc(40px, 100px) 0 0;
+            width: g.get_size_pc(120px, 300px);
         }
         @include g.media('<=phone') {
-            margin: 0 g.get_per(100) 0 0;
+            left: 0;
+            right: 0;
+            bottom: 25rem;
+            margin: 0 auto;
+            width: 40rem;
         }
         &__inner {
             display: grid;
             width: 100%;
             height: 100%;
+            // &:hover {
+            //     #{$item}__item--back::after {
+            //         opacity: 1;
+            //     }
+            // }
         }
         &__item {
+            $item: &;
             display: flex;
-            position: relative;
-            width: g.get-vw(300);
-            height: g.get-vw(300);
-            background-color: #ebab40;
+            flex-flow: column;
             cursor: pointer;
+            &--front {
+                position: absolute;
+                top: 30%;
+                left: -30%;
+                right: 0;
+                bottom: 0;
+                margin: auto;
+                width: 60%;
+                height: 60%;
+                background-color: #70d872;
+                // transform: rotate(45deg);
+                z-index: 1;
+            }
+            &--back {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                background-color: #f6daec;
+                &::after {
+                    content: '';
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    background-image: radial-gradient(rgb(112 216 114 / 40%) 20%, transparent 20%),
+                        radial-gradient(rgb(112 216 114 / 40%) 20%, transparent 20%);
+                    background-size: 3rem 3rem;
+                    background-position: 0 0, 1.5rem 1.5rem;
+                    background-repeat: repeat;
+                    opacity: 0;
+                    transition: opacity 0.3s g.ease(OutSine);
+                }
+            }
         }
-        // &__content {
-        //     position: absolute;
-        //     top: 0;
-        //     left: 0;
-        //     width: 100%;
-        //     height: 100%;
-        //     visibility: hidden;
-        //     opacity: 0;
-        //     // display: none;
-        // }
         &__canvas {
             position: fixed;
             top: 0;
@@ -131,6 +196,150 @@
             // border-image: linear-gradient(180deg, #043e6b, #578bb3);
             // border-image-slice: 1;
             transition: border-color 1s g.ease(OutSine);
+        }
+        &__text {
+            display: inline-block;
+            color: #70d872;
+            line-height: 1;
+            font-family: 'Kola', sans-serif;
+            font-weight: bold;
+            text-align: center;
+            @include g.media('>phone') {
+                margin: g.get-per(30, 300) auto;
+                @include g.fluid-type(font-size, 20px, 50px);
+            }
+            @include g.media('<=phone') {
+                margin: 4rem auto;
+                font-size: 6rem;
+            }
+        }
+        &__envelope {
+            $envelope: &;
+            position: relative;
+            width: 0px;
+            height: 0px;
+            margin-bottom: 0;
+            -webkit-perspective: 200;
+            -webkit-perspective-origin: 50% 0;
+            -moz-perspective: 200;
+            -moz-perspective-origin: 50% 0;
+            z-index: 4;
+            @include g.media('>phone') {
+                border-top: solid g.get_size_pc(16px, 40px) transparent;
+                border-left: solid g.get_size_pc(24px, 60px) #6bcf6e;
+                border-right: solid g.get_size_pc(24px, 60px) #70d872;
+                border-bottom: solid g.get_size_pc(16px, 40px) #70d872;
+            }
+            @include g.media('<=phone') {
+                border-top: solid 6rem transparent;
+                border-left: solid 9rem #6bcf6e;
+                border-right: solid 9rem #70d872;
+                border-bottom: solid 6rem #70d872;
+            }
+            &-wrapper {
+                display: flex;
+                justify-content: center;
+                position: relative;
+                @include g.media('>phone') {
+                    margin: g.get-per(30, 300) auto 0;
+                    width: g.get_size_pc(48px, 120px);
+                    height: g.get_size_pc(32px, 80px);
+                }
+                @include g.media('<=phone') {
+                    margin: 4rem auto 0;
+                    width: 18rem;
+                    height: 12rem;
+                }
+                &.is-active {
+                    pointer-events: none;
+                    #{$envelope}-letter {
+                        // animation: takeOut 0.5s g.ease(OutSine) 0.5s forwards;
+                        top: -200%;
+                        transition-delay: 0.5s;
+                    }
+                    #{$envelope}-opener {
+                        transform: rotateX(0deg);
+                        // animation: open 0.5s g.ease(OutSine) 0s forwards;
+                        z-index: 2;
+                        transition-delay: 0s;
+                    }
+                }
+                @include g.hover-only {
+                    #{$envelope}-opener {
+                        transform: rotateX(145deg);
+                    }
+                }
+            }
+            &-bg {
+                position: absolute;
+                background-color: #64c466;
+                margin-bottom: 0;
+                z-index: 3;
+                @include g.media('>phone') {
+                    width: g.get_size_pc(48px, 120px);
+                    height: g.get_size_pc(32px, 80px);
+                }
+                @include g.media('<=phone') {
+                    width: 18rem;
+                    height: 12rem;
+                }
+            }
+            &-opener {
+                position: absolute;
+                bottom: 100%;
+                width: 0;
+                height: 0;
+                transform: rotateX(180deg);
+                transform-origin: 0 100%;
+                z-index: 5;
+                transition: transform 0.4s g.ease(OutSine);
+                @include g.media('>phone') {
+                    border-left: solid g.get_size_pc(24px, 60px) transparent;
+                    border-right: solid g.get_size_pc(24px, 60px) transparent;
+                    border-bottom: solid g.get_size_pc(18px, 45px) #64c466;
+                }
+                @include g.media('<=phone') {
+                    border-left: solid 9rem transparent;
+                    border-right: solid 9rem transparent;
+                    border-bottom: solid 6.5rem #64c466;
+                }
+            }
+            &-letter {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: auto;
+                background-color: #ffffff;
+                z-index: 3;
+                @include g.media('>phone') {
+                    width: g.get_size_pc(40px, 100px);
+                    height: g.get_size_pc(24px, 60px);
+                }
+                @include g.media('<=phone') {
+                    width: 15rem;
+                    height: 10rem;
+                }
+            }
+            @keyframes takeOut {
+                0% {
+                    top: 0;
+                }
+                100% {
+                    top: -100%;
+                }
+            }
+            @keyframes open {
+                0% {
+                    transform: rotateX(180deg);
+                    z-index: 5;
+                }
+                100% {
+                    transform: rotateX(0deg);
+                    z-index: 2;
+                }
+            }
         }
     }
 }

@@ -9,7 +9,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import EventBus from '~/utils/event-bus';
-// import Common from '~/assets/scripts/components/common';
 
 export default Vue.extend({
     watch: {
@@ -20,7 +19,12 @@ export default Vue.extend({
     mounted() {
         EventBus.$emit('TRANSITION', this.$route.name);
         EventBus.$on('TRANSITION', () => this.$route.name);
-        // new Common();
+        window.addEventListener('resize', () => this.reload(), false);
+    },
+    methods: {
+        reload(): void {
+            this.$router.go(0);
+        },
     },
 });
 </script>

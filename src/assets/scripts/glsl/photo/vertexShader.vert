@@ -4,6 +4,7 @@ uniform float uProgress;
 uniform float uSpeed;
 uniform float uWave;
 uniform float uTime;
+uniform bool uIsMobile;
 // varying: シェーダ間でデータのやり取りができる変数
 varying vec2 vUv;
 varying float vNoise;
@@ -19,9 +20,13 @@ void main() {
     // pos.z += noise * 0.5;
 
     // 横の動き（周波数）
-    float freq = 0.0001 * uTime; // 振動数（の役割） 大きくすると波が細かくなる
+    float freq = 0.0003 * uTime; // 振動数（の役割） 大きくすると波が細かくなる
 
-    pos.x = pos.x + (cos(pos.y * PI) * freq);
+    if(uIsMobile) {
+        pos.y = pos.y + (cos(pos.x * PI) * freq);
+    } else {
+        pos.x = pos.x + (cos(pos.y * PI) * freq);
+    }
 
     vUv = uv;
     vNoise = noise;

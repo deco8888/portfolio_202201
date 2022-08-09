@@ -4,13 +4,10 @@ import {
     Mesh,
     WebGLRenderer,
     PointLight,
-    Light,
     Object3D,
-    OrthographicCamera,
     sRGBEncoding,
     ACESFilmicToneMapping,
 } from 'three';
-// import { GUI } from 'dat.gui';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -21,11 +18,10 @@ export default class Webgl {
         camera: PerspectiveCamera | null;
         scene: Scene;
         mesh: Mesh | Mesh[] | null;
-        object: Object3D | null;
+        object?: Object3D | null;
         renderer: WebGLRenderer | null;
-        pointLight: PointLight | null;
+        pointLight?: PointLight | null;
     };
-    // gui: GUI;
     winSize: ThreeNumber;
     viewport!: ThreeNumber;
     constructor() {
@@ -37,7 +33,6 @@ export default class Webgl {
             renderer: null,
             pointLight: null,
         };
-        // this.gui = null;
         this.winSize = {
             width: 0,
             height: 0,
@@ -83,7 +78,6 @@ export default class Webgl {
          * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
          * https://ics.media/tutorial-three/renderer_resize/
          */
-        console.log(window.devicePixelRatio);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setClearColor(0xeaf2f5, 0);
         renderer.setSize(this.winSize.width, this.winSize.height);
@@ -114,27 +108,5 @@ export default class Webgl {
             width: window.innerWidth,
             height: window.innerHeight,
         };
-    }
-    initGui(): void {
-        // this.gui = new GUI();
-        // GUIにパラメータ設定
-        // if (this.three.camera) {
-        //     this.gui.add(this.three.camera.position, 'x').min(-5).max(5).step(1).name('cameraX');
-        //     this.gui.add(this.three.camera.position, 'y').min(-5).max(5).step(1).name('cameraY');
-        //     this.gui.add(this.three.camera.position, 'z').min(-10).max(10).step(1).name('cameraZ');
-        // }
-        // if (this.three.pointLight) {
-        //     this.gui.add(this.three.pointLight.position, 'x').min(-5).max(5).step(1).name('lightX');
-        //     this.gui.add(this.three.pointLight.position, 'y').min(-5).max(5).step(1).name('lightY');
-        //     this.gui.add(this.three.pointLight.position, 'z').min(-5).max(5s).step(1).name('lightZ');
-        // }
-        // if (this.three.mesh) {
-        //     this.gui.add(this.three.object.position, 'x').min(-5).max(5).step(1).name('positionX');
-        //     this.gui.add(this.three.object.position, 'y').min(-5).max(5).step(1).name('positionY');
-        //     this.gui.add(this.three.object.position, 'z').min(-5).max(5).step(1).name('positionZ');
-        //     this.gui.add(this.three.object.rotation, 'x').min(-5).max(5).step(1).name('rotationX');
-        //     this.gui.add(this.three.object.rotation, 'y').min(-5).max(5).step(1).name('rotationY');
-        //     this.gui.add(this.three.object.rotation, 'z').min(-5).max(5).step(1).name('rotationZ');
-        // }
     }
 }

@@ -97,12 +97,12 @@ export class Cursor extends Webgl {
             transX: {
                 previous: 0,
                 current: 0,
-                amt: 0.1,
+                amt: 0.2,
             },
             transY: {
                 previous: 0,
                 current: 0,
-                amt: 0.1,
+                amt: 0.2,
             },
             scale: {
                 previous: 0,

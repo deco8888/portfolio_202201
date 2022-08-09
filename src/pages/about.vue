@@ -30,7 +30,7 @@ export default Vue.extend({
         setTimeout(() => {
             this.title.init();
             this.handleEvent();
-        }, 1000);
+        }, 1500);
         this.$router.beforeEach(async (_to, _from, next) => {
             await this.title.cancelAnimFrame();
             next();

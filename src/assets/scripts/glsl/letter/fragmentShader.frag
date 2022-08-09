@@ -12,6 +12,5 @@ void main() {
       // 何も出力しない
       discard;
     }
-    
     gl_FragColor = vec4(v_color, v_alpha);
 }

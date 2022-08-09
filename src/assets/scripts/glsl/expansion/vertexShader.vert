@@ -5,6 +5,7 @@ uniform vec2 uScale;
 uniform vec2 uPosition;
 uniform vec2 uResolution;
 // varying: シェーダ間でデータのやり取りができる変数
+varying vec2 vUv;
 
 void main() {
     vec3 pos = position.xyz;
@@ -22,6 +23,8 @@ void main() {
     // 頂点を中心に移動させる
     pos.y += -uPosition.y * vertexProgress;
     pos.x += -uPosition.x * vertexProgress;
+
+    vUv = uv;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }

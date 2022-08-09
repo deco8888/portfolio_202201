@@ -23,6 +23,7 @@ void main() {
 
     float moz = uMoz;
 
+    // モザイク
     if(moz > 0.0) {
        uv = floor(uv / moz) * moz + (moz * 0.5);
     }

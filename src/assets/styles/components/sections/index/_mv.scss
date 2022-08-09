@@ -73,6 +73,19 @@
             //     // animation: test 3s g.ease(OutSine) infinite;
             // }
         }
+        &-canvas {
+            position: fixed;
+            width: 50%;
+            height: 100%;
+            &--top {
+                top: 0;
+                right: 0;
+            }
+            &--bottom {
+                left: 0;
+                bottom: 0;
+            }
+        }
         &-anim {
             display: flex;
             position: relative;
@@ -131,7 +144,7 @@
         // font-family: 'Red Hat Display', sans-serif;
         font-family: 'Kola', sans-serif;
         // font-weight: g.$font-weight-bold;
-        @include g.font-size(4rem, 20rem);
+        @include g.font-size(4rem, 5rem);
         // &:nth-child(odd) {
         //     animation: loop-odd 30s -15s g.ease(linear) infinite;
         // }
@@ -144,6 +157,7 @@
             top: 0;
             right: 0;
             overflow: hidden;
+            white-space: nowrap;
             // background-color: #9878d2;
             // transform: rotate(10deg);
         }
@@ -161,7 +175,7 @@
         // font-family: 'Red Hat Display', sans-serif;
         font-family: 'Kola', sans-serif;
         // font-weight: g.$font-weight-bold;
-        @include g.font-size(4rem, 20rem);
+        @include g.font-size(4rem, 5rem);
         // &:nth-child(odd) {
         //     animation: loop-odd 30s -15s g.ease(linear) reverse infinite;
         // }
@@ -176,14 +190,15 @@
             overflow: hidden;
             // background-color: #9878d2;
             // transform: rotate(10deg);
+            // animation: loop-odd 10s g.ease(linear) infinite;
         }
     }
     @keyframes loop-odd {
         0% {
-            transform: translateX(100%);
+            transform: translateX(-40%);
         }
         to {
-            transform: translateX(-100%);
+            transform: translateX(-60%);
         }
     }
     @keyframes loop-even {

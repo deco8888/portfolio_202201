@@ -1,5 +1,5 @@
 <template>
-    <section id="mv" class="p-index-mv">
+    <section id="mv" class="p-index-mv" data-mv>
         <!-- <TheCanvas :sectionName="'mv'" /> -->
         <div class="p-index-mv__title"></div>
         <div class="p-index-mv__bg js-trigger">
@@ -7,9 +7,11 @@
                 <div data-horizontal="pin">
                     <div class="p-index-mv__bg-anim to-right" data-horizontal="anim">
                         <div class="p-index-mv__bg-line p-index-mv__bg-line--top">
+                            <canvas class="p-index-mv__bg-canvas p-index-mv__bg-canvas--top" data-mv-line="canvas"></canvas>
                             <div class="p-index-mv__name-wrap">
                                 <div class="p-index-mv__name">AYAKA NAKAMURA</div>
                                 <!-- <div class="p-index-mv__name">AYAKA NAKAMURA</div>
+                                <div class="p-index-mv__name">AYAKA NAKAMURA</div>
                                 <div class="p-index-mv__name">AYAKA NAKAMURA</div>
                                 <div class="p-index-mv__name">AYAKA NAKAMURA</div>
                                 <div class="p-index-mv__name">AYAKA NAKAMURA</div> -->
@@ -22,9 +24,13 @@
                 <div data-horizontal="pin">
                     <div class="p-index-mv__bg-anim to-left" data-horizontal="anim">
                         <div class="p-index-mv__bg-line p-index-mv__bg-line--bottom">
+                            <canvas class="p-index-mv__bg-canvas p-index-mv__bg-canvas--bottom" data-mv-line="canvas"></canvas>
                             <div class="p-index-mv__position-wrap">
                                 <div class="p-index-mv__position">FRONT-END ENGINEER</div>
                                 <!-- <div class="p-index-mv__position">FRONT-END ENGINEER</div>
+                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
+                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
+                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
                                 <div class="p-index-mv__position">FRONT-END ENGINEER</div>
                                 <div class="p-index-mv__position">FRONT-END ENGINEER</div> -->
                             </div>
@@ -43,6 +49,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import BaseImage from '~/components/common/TheBaseImage.vue';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
+import Particles from '~/assets/scripts/components/section/index/particles';
 
 export default Vue.extend({
     components: {
@@ -60,6 +67,9 @@ export default Vue.extend({
     mounted() {
         gsap.registerPlugin(ScrollTrigger);
         this.moveLine();
+        document.querySelectorAll("[data-mv-line='canvas']").forEach((target: HTMLCanvasElement, index: number) => {
+            new Particles(target, index);
+        });
     },
     methods: {
         moveLine(): void {

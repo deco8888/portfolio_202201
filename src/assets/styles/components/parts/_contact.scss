@@ -6,8 +6,13 @@
  *
  ***********************/
 .p-contact {
-    position: relative;
+    $parent: &;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
+    visibility: hidden;
     @include g.media('>phone') {
         margin: 0 g.get_per(100) 0 0;
     }
@@ -18,13 +23,22 @@
         display: grid;
         width: 100%;
         height: 100%;
+        border: solid 0px;
+        border-image: linear-gradient(180deg, #facb04 50%, #7caed4 50%);
+        border-image-slice: 1;
+        transition: border 0.3s g.ease(linear) 0s;
+        #{$parent}.is-active & {
+            border: solid 10px;
+            border-image: linear-gradient(180deg, #facb04 50%, #7caed4 50%);
+            border-image-slice: 1;
+        }
     }
     &__item {
         display: flex;
         position: relative;
         width: 400px;
         height: 400px;
-        background-color: #ebab40;
+        background-color: #f9f5ce;
         cursor: pointer;
     }
     &__content {
@@ -43,12 +57,126 @@
         left: 0;
         width: 100%;
         height: 100%;
-        border: solid 0px;
-        // transition: border 0.3s g.ease(linear);
-        &[data-title='contact'] {
-            border: solid 10px;
-            border-image: linear-gradient(180deg, #facb04 50%, #7caed4 50%);
-            border-image-slice: 1;
+        transform: scale(0);
+        transition: transform 1s g.ease(OutSine) 0.2s;
+        will-change: transform;
+        &.is-active {
+            transition-delay: 0s;
+            transform: scale(1);
+            animation: floating 6s g.ease(InOutCubic) 0s alternate infinite;
+            @keyframes floating {
+                0% {
+                    top: 0;
+                }
+                50% {
+                    top: 20px;
+                }
+                100% {
+                    top: 0;
+                }
+            }
+        }
+    }
+    &__close {
+        $close: &;
+        width: g.get-vw(50);
+        height: g.get-vw(50);
+        // background-color: #7cadd3;
+        position: absolute;
+        top: g.get-vw(70);
+        right: g.get-vw(80);
+        opacity: 0;
+        z-index: 1005;
+        transition: all 0.75s g.ease(OutSine) 0.8s;
+        @include g.hover-only {
+            &::after {
+                background-color: rgb(249 203 4 / 50%);
+            }
+        }
+        &.is-open {
+            opacity: 1;
+            span {
+                &:nth-of-type(1) {
+                    transform: translateY(g.get-vw(22.5)) rotate(-45deg);
+                }
+                &:nth-of-type(2) {
+                    left: 60%;
+                    opacity: 0;
+                    animation: height 0.8s forwards;
+                }
+                &:nth-of-type(3) {
+                    transform: translateY(g.get-vw(-22.5)) rotate(45deg);
+                }
+                @keyframes height {
+                    100% {
+                        height: 0;
+                    }
+                }
+            }
+            &::after {
+                animation: draw-circle 1s 1s forwards;
+            }
+            @keyframes draw-circle {
+                0% {
+                    border-color: transparent;
+                    transform: rotate(0);
+                }
+                25% {
+                    border-color: transparent #7cadd3 transparent transparent;
+                    // transform: rotate(-45);
+                }
+                50% {
+                    border-color: #7cadd3 #7cadd3 transparent transparent;
+                    // transform: rotate(-135);
+                }
+                70% {
+                    border-color: #7cadd3 #7cadd3 transparent #7cadd3;
+                    // transform: rotate(-315);
+                }
+                100% {
+                    border-color: #7cadd3;
+                    transform: rotate(-860deg);
+                }
+            }
+        }
+        cursor: pointer;
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: g.get-vw(-30);
+            left: g.get-vw(-30);
+            width: g.get-vw(110);
+            height: g.get-vw(110);
+            border: solid g.get-vw(5) transparent;
+            border-radius: 50%;
+            // will-change: transform;
+            transition: all 0.75s;
+        }
+        span {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: g.get-vw(5);
+            background-color: #7cadd3;
+            border-radius: g.get-vw(10);
+            transition: all 0.6s g.ease(OutSine);
+            z-index: 102;
+            &:nth-of-type(1) {
+                top: 0;
+                #{$close}.is-open & {
+                    transform: translateY(g.get-vw(26.5)) rotate(-45deg);
+                }
+            }
+            &:nth-of-type(2) {
+                top: g.get-vw(22.5);
+            }
+            &:nth-of-type(3) {
+                bottom: 0;
+                #{$close}.is-open & {
+                    transform: translateY(g.get-vw(-26.5)) rotate(45deg);
+                }
+            }
         }
     }
 }

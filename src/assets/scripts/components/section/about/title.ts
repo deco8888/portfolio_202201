@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { lerp } from '../../../utils/math';
 import Letter from '../../letter';
 import { radians } from '../../../utils/helper';
+import { PerspectiveCamera } from 'three';
 
 export default class Title extends Letter {
     canvas: HTMLCanvasElement;
@@ -38,11 +39,6 @@ export default class Title extends Letter {
     color: {
         front: string;
         back: string;
-    };
-    font: {
-        wight: number;
-        size: number;
-        family: string;
     };
     horizontal: number;
     particleX: number[];
@@ -89,24 +85,52 @@ export default class Title extends Letter {
         this.font = {
             wight: 900,
             size: this.getFontSize(),
-            family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            threshold: this.isMobile ? 0.18 : 0.12,
         };
         this.text = 'ABOUT';
     }
     getFontSize(): number {
-        return this.viewport.width * 0.1;
+        return this.isMobile ? this.viewport.width * 0.15 : this.viewport.width * 0.1;
     }
     init(): void {
         this.canvas = document.querySelector('[data-canvas="title"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
-        this.font.size = this.viewport.width * 0.1;
+        this.font.size = this.getFontSize();
         this.createTextImage();
         this.setBorderStyle('about');
         // 描写する
         this.render();
         this.three.clock = new THREE.Clock();
         this.three.clock.start();
+    }
+    async prepare(): Promise<void> {
+        this.setSize();
+        // カメラを作成
+        this.three.camera = this.initCamera();
+        // カメラをシーンに追加
+        this.three.scene.add(this.three.camera);
+        // レンダラーを作成
+        this.three.renderer = this.initRenderer();
+        // HTMLに追加
+        this.canvas.appendChild(this.three.renderer.domElement);
+        // ビューポート計算
+        this.viewport = this.initViewport();
+    }
+    initCamera(): PerspectiveCamera {
+        const camera = new PerspectiveCamera(
+            45, // 画角
+            this.winSize.width / this.winSize.height, // 縦横比
+            0.1, // 視点から最も近い面までの距離
+            10000 // 視点から最も遠い面までの距離
+        );
+        const posY = this.isMobile ? this.winSize.height / 2 : 0;
+        camera.position.set(0, posY, 1000);
+        // どの位置からでも指定した座標に強制的に向かせることができる命令
+        camera.lookAt(this.three.scene.position);
+        camera.updateProjectionMatrix();
+        return camera;
     }
     render(): void {
         requestAnimationFrame(this.render.bind(this));
@@ -121,12 +145,16 @@ export default class Title extends Letter {
         if (this.three.points) this.update();
         // this.three.object.rotateX
         if (this.three.object && this.three.object.position.x === 0) {
-            const slope = radians(0);
-            const diff = Math.cos(slope) * this.textImage.canvas.width;
-            const space = (this.viewport.width * 0.5 - diff) / 2;
-            // this.three.object.rotation.y = slope;
-            this.three.object.position.x = -space - this.textImage.canvas.width / 2;
-            this.three.object.position.z = -this.textImage.canvas.width / 4;
+            if (this.isMobile) {
+                this.three.object.position.y = this.winSize.height * 0.48;
+            } else {
+                const slope = radians(0);
+                const diff = Math.cos(slope) * this.textImage.canvas.width;
+                const space = (this.viewport.width * 0.5 - diff) / 2;
+                this.three.object.rotation.y = slope;
+                this.three.object.position.x = -space - this.textImage.canvas.width / 2;
+                this.three.object.position.z = -this.textImage.canvas.width / 4;
+            }
         }
     }
     update(): void {
@@ -137,7 +165,6 @@ export default class Title extends Letter {
         for (let i = 0; i < positionList.length / 3; i++) {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
-            const slope = radians(0);
             const lastX = secondList[i * 2];
             const lastY = secondList[i * 2 + 1];
             const currentX = lerp(previousX, lastX, 0.1);

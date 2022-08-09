@@ -22,6 +22,7 @@ import { lerp } from '../utils/math';
 import Webgl from './webgl';
 import { distance3d, radians } from '../utils/helper';
 import { Vec3 } from './vec3';
+import { isMobile } from './isMobile';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -93,6 +94,11 @@ export default class Letter extends Webgl {
         y: number;
     };
     animFrame?: number;
+    vector3: {
+        x: number;
+        y: number;
+        z: number;
+    };
     start: {
         x: number;
         y: number;
@@ -105,6 +111,7 @@ export default class Letter extends Webgl {
         wight: number;
         size: number;
         family: string;
+        threshold: number;
     };
     horizontal: number;
     particleX: number[];
@@ -119,9 +126,12 @@ export default class Letter extends Webgl {
         };
     };
     isFlg: boolean;
+    isFirst: boolean;
     mouse: THREE.Vector2;
     portfolio: number[];
     particleSize: number;
+    interval: number;
+    isMobile: boolean;
     constructor() {
         super();
         this.three = {
@@ -206,7 +216,8 @@ export default class Letter extends Webgl {
         this.font = {
             wight: 900,
             size: window.innerWidth * 0.1,
-            family: "'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            threshold: 0.12,
         };
         this.horizontal = 0;
         this.particleX = [];
@@ -217,17 +228,21 @@ export default class Letter extends Webgl {
             secondList: {},
         };
         this.isFlg = true;
+        this.isFirst = true;
         this.mouse = new Vector2();
         this.portfolio = [];
-        this.particleSize = 4 * window.devicePixelRatio;
+        this.isMobile = isMobile();
+        // パーティクルの間隔
+        this.interval = this.isMobile ? 4.0 : 6.0;
+        // パーティクルサイズ
+        this.particleSize = (this.isMobile ? 2 : 5) * window.devicePixelRatio;
     }
     async prepare(): Promise<void> {
         this.setSize();
         // カメラを作成
         this.three.camera = this.initCamera();
-        const cameraHelper = new CameraHelper(this.three.camera);
         // カメラをシーンに追加
-        this.three.scene.add(cameraHelper);
+        this.three.scene.add(this.three.camera);
         // レンダラーを作成
         this.three.renderer = this.initRenderer();
         // HTMLに追加
@@ -236,13 +251,20 @@ export default class Letter extends Webgl {
         this.viewport = this.initViewport();
     }
     async createTextImage(): Promise<void> {
-        // タイトルの位置・色・アルファ情報を取得
-        // テキスト画像をセット
-        this.setTextImage();
-        this.textImage.data = await this.getImageDataFirst();
-        await this.getTitleInfo();
+        if (!this.textImage.data) {
+            // タイトルの位置・色・アルファ情報を取得
+            // テキスト画像をセット
+            this.setTextImage();
+            this.textImage.data = await this.getImageDataFirst();
+            await this.getTitleInfo();
+        }
+        this.createObject();
+    }
+    createObject(): void {
         // メッシュを作成
-        this.three.object = this.initMesh();
+        this.three.points = this.initMesh();
+        this.three.object = new Object3D();
+        this.three.object.add(this.three.points);
         this.three.object.position.z = 0;
         // メッシュをシーンに追加
         this.three.scene.add(this.three.object);
@@ -250,7 +272,7 @@ export default class Letter extends Webgl {
         // this.initFloor();
         if (this.flg) this.setDiffusion();
     }
-    initMesh(): Object3D {
+    initMesh(): Points {
         this.three.geometry = new BufferGeometry();
         for (const [attribute, list] of Object.entries(this.title.firstList)) {
             const size = attribute === 'alpha' || attribute === 'size' ? 1 : 3;
@@ -285,7 +307,7 @@ export default class Letter extends Webgl {
                 value: 0.0,
             },
             uFirst: {
-                value: true,
+                value: this.isFirst,
             },
         };
         const material = new ShaderMaterial({
@@ -305,10 +327,7 @@ export default class Letter extends Webgl {
         const points = new Points(this.three.geometry, material);
         // points.frustumCulled = false;
         this.three.points = points;
-        this.three.scene.add(this.three.points);
-        const object = new Object3D();
-        object.add(points);
-        return object;
+        return points;
     }
     setDiffusion(): void {
         const pointsMaterial = <ShaderMaterial>this.three.points.material;
@@ -351,8 +370,8 @@ export default class Letter extends Webgl {
         const color = this.attributes.color;
         const size = this.attributes.size;
 
-        for (let x = 0; x < width; x += 6.0) {
-            for (let y = 0; y < height; y += 6.0) {
+        for (let x = 0; x < width; x += this.interval) {
+            for (let y = 0; y < height; y += this.interval) {
                 const index = (y * width + x) * 4;
                 let a = data[index + 3] / 255;
                 // const rw = width * 5;
@@ -440,10 +459,10 @@ export default class Letter extends Webgl {
     }
     async getImageDataFirst(): Promise<ImageData> {
         return new Promise(async (resolve) => {
-            await this.getImageData();
+            // await this.getImageData();
             return setTimeout(async () => {
                 return resolve(await this.getImageData());
-            }, 500);
+            }, 100);
         });
     }
     async getImageData(): Promise<ImageData> {
@@ -452,22 +471,49 @@ export default class Letter extends Webgl {
         // フォントを設定・取得
         this.textImage.ctx.font = this.getFont();
         // テキストの描画幅をを測定する
-        let w = this.measureTextWidth();
+        let w = this.measureTextWidth(this.text);
         let h = this.font.size;
         this.gap = 5;
         // Adjust font and particle size to git text on screen
         w = this.adjustSize(w, ctx);
+
+        const match = this.text.match('¥n');
+        let word = '';
+        if (match) {
+            const splitWord = this.text.split('¥n');
+            const wordNum = splitWord.length;
+            h = this.font.size * wordNum * 2;
+            for (let i = 0; i < wordNum; i++) {
+                if (splitWord[i].length > word.length) word = splitWord[i];
+            }
+            w = this.measureTextWidth(word);
+        }
+
         // テキスト用のcanvasサイズを設定
         c.width = w;
         c.height = h;
         // 差分の再計算(文字を構成する1マスの大きさが変わる)
         this.gap = this.setGap();
-
         this.size = Math.max(this.gap / 1.5, 1);
         // フォントを設定・取得
         ctx.font = this.getFont();
-        // 指定した座標にテキスト文字列を描画し、その文字を現在のfillStyleで塗りつぶす
-        ctx.fillText(this.text, 0, this.font.size);
+
+        if (match) {
+            const splitWord = this.text.split('¥n');
+            const wordNum = splitWord.length;
+            let size = 0;
+            for (let i = 0; i < wordNum; i++) {
+                size = this.font.size * 2 + this.font.size * i;
+                let x = 0;
+                if (splitWord[i] !== word) {
+                    x = (w - this.measureTextWidth(splitWord[i])) / 2;
+                }
+                // 指定した座標にテキスト文字列を描画し、その文字を現在のfillStyleで塗りつぶす
+                ctx.fillText(splitWord[i], x, size);
+            }
+        } else {
+            ctx.fillText(this.text, 0, this.font.size);
+        }
         return ctx.getImageData(0, 0, c.width, c.height);
     }
     setTextImage(): void {
@@ -486,8 +532,8 @@ export default class Letter extends Webgl {
         return `${this.font.wight} ${this.font.size}px ${this.font.family}`;
     }
     // テキストの描画幅をを測定する
-    measureTextWidth(): number {
-        return this.textImage.ctx.measureText(this.text).width;
+    measureTextWidth(text: string): number {
+        return this.textImage.ctx.measureText(text).width;
     }
     adjustSize(width: number, ctx: CanvasRenderingContext2D): number {
         let w = width;
@@ -545,9 +591,9 @@ export default class Letter extends Webgl {
         const position = attributes.position;
         const size = attributes.size;
         // const intersects = this.raycaster.intersectObject(this.three.points);
-        const isRotate = this.three.points.rotation.y <= radians(90);
+        const isRotate = this.three.object.rotation.y <= radians(90);
         const imageHalfWidth = this.textImage.canvas.width / 2;
-        const mouseX = isRotate ? this.mouse.x : -this.mouse.x;
+        const mouseX = isRotate ? this.mouse.x : this.mouse.x;
         const mouseY = this.mouse.y;
         const targetZ = isRotate ? imageHalfWidth : 0;
         if (this.mouse.x !== 0) {
@@ -557,7 +603,8 @@ export default class Letter extends Webgl {
                 const y2 = position.array[i * 3 + 1] + this.three.object.position.y;
                 const z2 = position.array[i * 3 + 2] + this.three.object.position.z;
                 const mouseDistance = distance3d(mouseX, mouseY, 0, x2, y2, z2);
-                const upSize = 15.0 / window.devicePixelRatio;
+                const upSize = 10 * window.devicePixelRatio;
+
                 if (mouseDistance < 100 && size.array[i] !== upSize) {
                     size.array[i] = lerp(size.array[i], upSize, 0.1);
                 }

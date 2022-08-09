@@ -7,7 +7,7 @@ const isDev = environment === 'development';
 
 const nuxtConfig: NuxtConfig = {
     // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
-    ssr: true,
+    ssr: false,
 
     render: {
         crossorigin: 'use-credentials',

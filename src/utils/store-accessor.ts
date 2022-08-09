@@ -1,6 +1,11 @@
 import { Store } from 'vuex';
 import { getModule } from 'vuex-module-decorators';
+import Contact from '../store/contact';
 
-function initializeStore(store: Store<any>): void {}
+let contactStore: Contact;
 
-export { initializeStore };
+function initializeStore(store: Store<any>): void {
+    contactStore = getModule(Contact, store);
+}
+
+export { initializeStore, contactStore };

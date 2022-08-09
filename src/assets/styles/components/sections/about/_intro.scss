@@ -16,17 +16,20 @@
     background-color: #d8e8f8;
     overflow: hidden;
     &__inner {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        width: 50%;
-        height: 100%;
         overflow-y: auto;
         @include g.media('>phone') {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             padding: g.get_per(50) g.get_per(100) g.get_per(50) 0;
+            width: 50%;
+            height: 100%;
         }
         @include g.media('<=phone') {
-            padding: g.get_per(20);
+            display: block;
+            margin: 25rem 0 0;
+            padding: 0 5rem;
+            width: 100%;
         }
     }
     &__name {
@@ -69,7 +72,7 @@
         }
         @include g.media('<=phone') {
             margin: 1rem 0 0;
-            font-size: 2.2rem;
+            font-size: 2.8rem;
         }
     }
     &__block {
@@ -91,17 +94,16 @@
             margin: 2rem 0 0;
         }
         @include g.media('<=phone') {
+            justify-content: space-between;
             margin: 2rem 0 0;
         }
     }
     &__skill {
         display: inline-block;
         position: relative;
-        padding: 1rem;
         background-color: #eef1f4;
         border: solid 0.25rem;
         color: #51a2f6;
-        line-height: 1.5;
         letter-spacing: 0.1rem;
         font-family: 'BIZ UDPGothic', sans-serif;
         font-family: 'Red Hat Display', sans-serif;
@@ -110,7 +112,9 @@
         white-space: nowrap;
         filter: drop-shadow(0.4rem 0.4rem 0px rgba(235, 89, 52, 0.9));
         @include g.media('>phone') {
+            padding: 1rem;
             width: 20%;
+            line-height: 1.5;
             @include g.fluid-type(font-size, 10px, 20px);
             &:not(:nth-of-type(4n)) {
                 margin: 0 3% 0 0;
@@ -123,8 +127,13 @@
             }
         }
         @include g.media('<=phone') {
-            width: 22%;
-            font-size: 2rem;
+            padding: 2rem;
+            width: 31%;
+            line-height: 1;
+            font-size: 2.4rem;
+            &:nth-of-type(n + 4) {
+                margin: 3.5% 0 0;
+            }
         }
     }
 }

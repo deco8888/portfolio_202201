@@ -4,26 +4,17 @@
             <div class="p-about-intro__block">
                 <h3 class="p-about-intro__name">AYAKA NAKAMURA</h3>
                 <p class="p-about-intro__desc">
-                    After working as a test engineer for two and a half years,<br />
-                    joined the PR company as an website operator. <br />
+                    After working as a test engineer for two and a half years,<br class="pc-class" />joined the PR
+                    company as an website operator. <br />
                     After a two-year dispatch period, currently I've been involved in website production.<br /><br />
                 </p>
             </div>
             <div class="p-about-intro__block">
                 <h3 class="p-about-intro__name">SKILLS</h3>
                 <p class="p-about-intro__skills">
-                    <span class="p-about-intro__skill">HTML</span>
-                    <span class="p-about-intro__skill">CSS</span>
-                    <span class="p-about-intro__skill">JavaScript</span>
-                    <span class="p-about-intro__skill">Vue.js</span>
-                    <span class="p-about-intro__skill">Nuxt.js</span>
-                    <span class="p-about-intro__skill">Three.js</span>
-                    <span class="p-about-intro__skill">React.js</span>
-                    <span class="p-about-intro__skill">Typescript</span>
-                    <span class="p-about-intro__skill">PHP</span>
-                    <span class="p-about-intro__skill">Laravel</span>
-                    <span class="p-about-intro__skill">WordPress</span>
-                    <span class="p-about-intro__skill">Docker</span>
+                    <span v-for="(skill, index) in skillList" :key="index" class="p-about-intro__skill">
+                        {{ skill.name }}
+                    </span>
                 </p>
             </div>
         </div>
@@ -32,15 +23,50 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
 export default Vue.extend({
-    mounted() {
-        // gsap.registerPlugin(ScrollTrigger);
-        // this.moveLine();
+    data() {
+        return {
+            skillList: [
+                {
+                    name: 'HTML',
+                },
+                {
+                    name: 'CSS',
+                },
+                {
+                    name: 'JavaScript',
+                },
+                {
+                    name: 'Vue.js',
+                },
+                {
+                    name: 'Three.js',
+                },
+                {
+                    name: 'Nuxt.js',
+                },
+                {
+                    name: 'React.js',
+                },
+                {
+                    name: 'Typescript',
+                },
+                {
+                    name: 'PHP',
+                },
+                {
+                    name: 'Laravel',
+                },
+                {
+                    name: 'WordPress',
+                },
+                {
+                    name: 'Docker',
+                },
+            ],
+        };
     },
-    methods: {},
 });
 </script>
 

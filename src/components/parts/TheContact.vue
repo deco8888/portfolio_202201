@@ -1,15 +1,24 @@
 <template>
-    <transition name="fade">
-        <div class="p-contact" v-show="isShow">
-            <div class="p-contact__inner">
-                <div class="p-contact__close" data-contact="close"></div>
-                <div class="p-index-study__content">
-                    <p>TEST TEST TEST</p>
-                </div>
-                <div class="p-contact__post" data-canvas="contact"></div>
+    <!-- <transition name="fade"> -->
+    <div class="p-contact">
+        <div class="p-contact__inner">
+            <div
+                :class="['p-contact__close', { 'is-open': isOpen }]"
+                data-contact="close"
+                data-attract
+                @click="close()"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
+            <div class="p-index-study__content">
+                <p>TEST TEST TEST</p>
+            </div>
+            <div class="p-contact__post" data-canvas="contact"></div>
         </div>
-    </transition>
+    </div>
+    <!-- </transition> -->
 </template>
 
 <script lang="ts">
@@ -17,6 +26,10 @@ import Vue from 'vue';
 import Expansion from '~/assets/scripts/components/expansion';
 import Post from '~/assets/scripts/components/parts/contact/post';
 import Title from '~/assets/scripts/components/parts/contact/title';
+import { addClass, removeClass } from '~/assets/scripts/utils/classList';
+import { hasClass } from '~/assets/scripts/utils/hasClass';
+import { contactStore } from '~/store';
+import EventBus from '~/utils/event-bus';
 
 export default Vue.extend({
     props: {
@@ -30,18 +43,23 @@ export default Vue.extend({
         expansion: Expansion;
         title: Title;
         post: Post;
+        isOpen: boolean;
+        canvas: HTMLElement;
     } {
         return {
             expansion: null,
             title: null,
             post: null,
+            isOpen: false,
+            canvas: null,
         };
     },
     async mounted() {
-        const canvas = document.querySelector<HTMLElement>('[data-canvas="contact"]');
+        this.canvas = document.querySelector('[data-canvas="contact"]');
         this.title = new Title();
         this.post = new Post();
-        await this.post.init(canvas);
+        await this.post.init(this.canvas);
+        this.post.setModels();
     },
     watch: {
         isShow(val: boolean) {
@@ -49,20 +67,28 @@ export default Vue.extend({
         },
     },
     methods: {
-        async init(): Promise<void> {
+        init(): void {
+            this.isOpen = true;
+            this.title.draw();
+            this.title.render();
             setTimeout(() => {
-                this.post.setModels();
-                this.title.draw();
-            }, 500);
+                addClass(this.canvas, hasClass.active);
+            }, 300);
         },
-        handleEvent(): void {
-            window.addEventListener(
-                'mousemove',
-                (e: MouseEvent) => {
-                    // this.title.handleMove(e);
-                },
-                false
-            );
+        close(): void {
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth',
+            });
+            setTimeout(() => {
+                // this.post.removeModels();
+                removeClass(this.canvas, hasClass.active);
+                this.title.removeTitle();
+                this.isOpen = false;
+                this.$emit('is-close', true);
+                contactStore.setContactData({ isShow: false });
+                EventBus.$emit('SHOW', false);
+            }, 500);
         },
     },
 });
