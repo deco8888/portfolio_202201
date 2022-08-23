@@ -50,6 +50,7 @@ export default class Photo extends Webgl {
         images: NodeListOf<HTMLImageElement>;
         mv: HTMLCanvasElement;
         expansion: HTMLCanvasElement;
+        horizontalList: HTMLElement;
     };
     mouse: {
         x: number;
@@ -97,6 +98,7 @@ export default class Photo extends Webgl {
             images: document.querySelectorAll('[data-study="image"]'),
             mv: document.querySelector('.p-index-mv'),
             expansion: document.querySelector('[data-expansion="canvas"]'),
+            horizontalList: document.querySelector('[data-horizontal="list"]'),
         };
         this.winSize = {
             width: 0,
@@ -375,6 +377,13 @@ export default class Photo extends Webgl {
                 this.update(i);
             }
         }
+        this.elms = {
+            canvas: document.querySelector('[data-study="canvas"]'),
+            images: document.querySelectorAll('[data-study="image"]'),
+            mv: document.querySelector('.p-index-mv'),
+            expansion: document.querySelector('[data-expansion="canvas"]'),
+            horizontalList: document.querySelector('[data-horizontal="list"]'),
+        };
     }
     render(): void {
         this.animFrame = requestAnimationFrame(this.render.bind(this));
@@ -406,7 +415,6 @@ export default class Photo extends Webgl {
             const tl = gsap.timeline({
                 paused: true,
             });
-            console.log(this.isLast);
             if (targetY >= 0 && !this.isLast) {
                 scroll.previous = lerp(scroll.previous, scroll.current, 0.05);
                 const material = this.getMaterial(mesh);
@@ -550,7 +558,7 @@ export default class Photo extends Webgl {
         this.flg.isScroll = true;
         this.flg.isMove = false;
         const targetY = window.scrollY - this.elms.mv.clientHeight;
-        const studyList = document.querySelector('[data-horizontal="list"]');
+        const studyList = this.elms.horizontalList;
         const scrollArea = this.isMobile
             ? studyList.clientHeight - (window.innerHeight + 10)
             : studyList.clientWidth - (window.innerWidth + 10);
@@ -583,12 +591,7 @@ export default class Photo extends Webgl {
                 const imagePos = -(viewportW / 2) + scaleX / 2 + (currentRect.left / this.winSize.width) * viewportW;
                 if (targetY >= 0) scroll.current = imagePos;
             }
-
             this.isLast = targetY > scrollArea ? true : false;
-            console.log('-----');
-            console.log({ targetY });
-            console.log({ scrollArea });
-            console.log(targetY > scrollArea);
         }
         this.targetY = targetY;
     }

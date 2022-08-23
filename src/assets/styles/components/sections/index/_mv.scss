@@ -134,7 +134,7 @@
     &__name {
         flex: 0 0 auto;
         padding: 2rem 3rem;
-        color: #9a7ad1;
+        color: g.$color-dark-pastel-purple;
         // background: linear-gradient(20deg, rgb(247 156 23 / 50%) 20%, rgb(152 120 210 / 60%) 60%);
         // -webkit-background-clip: text;
         // -webkit-text-fill-color: transparent;
@@ -142,7 +142,7 @@
         letter-spacing: 1rem;
         // font-family: 'BIZ UDPGothic', sans-serif;
         // font-family: 'Red Hat Display', sans-serif;
-        font-family: 'Kola', sans-serif;
+        font-family: 'Gill Sans', sans-serif; //'Kola', sans-serif;
         // font-weight: g.$font-weight-bold;
         @include g.font-size(4rem, 5rem);
         // &:nth-child(odd) {
@@ -165,7 +165,7 @@
     &__position {
         flex: 0 0 auto;
         padding: 2rem 3rem;
-        color: #f9b97c;
+        color: g.$color-mellow-apricot;
         // background: linear-gradient(90deg, rgb(152 120 210 / 60%), rgb(247 156 23 / 50%));
         // -webkit-background-clip: text;
         // -webkit-text-fill-color: transparent;
@@ -173,7 +173,7 @@
         letter-spacing: 1rem;
         // font-family: 'BIZ UDPGothic', sans-serif;
         // font-family: 'Red Hat Display', sans-serif;
-        font-family: 'Kola', sans-serif;
+        font-family: 'Gill Sans', sans-serif; //'Kola', sans-serif;
         // font-weight: g.$font-weight-bold;
         @include g.font-size(4rem, 5rem);
         // &:nth-child(odd) {

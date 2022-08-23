@@ -26,6 +26,7 @@ export default class Attract {
                 gsap.to(attractButton, {
                     ease: Power4.easeOut,
                     duration: 0.1,
+                    delay: 0,
                     x: ((e.clientX - left) / attractButton.offsetWidth - 0.5) * this.strength,
                     y: ((e.clientY - top) / attractButton.offsetHeight - 0.5) * this.strength,
                 });

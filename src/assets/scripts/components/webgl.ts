@@ -94,7 +94,7 @@ export default class Webgl {
             // https://kou.benesse.co.jp/nigate/math/a14m0313.html
             // https://qiita.com/watabo_shi/items/0811d03390c18e46be86
             // tanΘ(高さの半分 / 奥行) * 奥行 * 2
-            const height = Math.tan(fov / 2) * this.three.camera.position.z * 2;
+            const height = Math.abs(Math.tan(fov / 2) * this.three.camera.position.z * 2);
             const width = height * this.three.camera.aspect;
             this.viewport = {
                 width,

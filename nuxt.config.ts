@@ -89,6 +89,8 @@ const nuxtConfig: NuxtConfig = {
         '@nuxt/postcss8',
     ],
 
+    // loading: '~/components/Loading.vue',
+
     // Modules: https://go.nuxtjs.dev/config-modules
     modules: [],
 

@@ -117,12 +117,14 @@ export default class Post extends Webgl {
         this.createModels();
         this.initAmbientLight();
         this.initDirectionalLight();
-        // // ポイントライトを作成
+        // ポイントライトを作成
         this.initPointLight();
         this.initSpotLight();
 
         this.three.clock = new Clock();
         this.three.clock.start();
+
+        // this.initGui();
     }
     initAmbientLight(): void {
         // ■AmbientLight(色, 光の強さ)
@@ -147,6 +149,7 @@ export default class Post extends Webgl {
         const directionalLight = new DirectionalLight('#ffffff', 2.0);
         this.three.directionalLight = directionalLight;
         this.three.directionalLight.castShadow = true;
+        this.three.directionalLight.shadow.mapSize.set(2048, 2048);
         this.three.directionalLight.shadow.camera.top = -12;
         this.three.directionalLight.shadow.camera.left = -12;
         this.three.directionalLight.shadow.camera.right = 12;
@@ -164,6 +167,8 @@ export default class Post extends Webgl {
         this.three.spotLight.intensity = 3.0;
         const posX = this.isMobile ? 1.5 : 0;
         this.three.spotLight.position.set(posX, -3, 990);
+        this.three.spotLight.angle = radians(45);
+        console.log(radians(45));
         const scale = this.isMobile ? 1 : 2;
         this.three.spotLight.scale.set(scale, scale, scale);
         this.three.spotLightHelper = new SpotLightHelper(this.three.spotLight);
@@ -175,30 +180,32 @@ export default class Post extends Webgl {
         dracoLoader.setDecoderPath('/draco/');
         const gltfLoader = new GLTFLoader();
         gltfLoader.setDRACOLoader(dracoLoader);
-        const objSrc = '/draco/objs/post.glb';
+        const objSrc = '/draco/objs/post_d.glb';
         gltfLoader.load(objSrc, (obj) => {
-            // const children = [...obj.scene.colle];
+            // const children = [...obj.scene.children];
             // for (const child of children) {
             //     console.log(child);
             //     // child.scale.set(1, 1, 1);
             //     this.three.object.add(child);
             // }
-            obj.scene.castShadow = true;
-            obj.scene.receiveShadow = true;
-            const scale = this.isMobile ? 0.7 : 1.1;
+            obj.scene.traverse((model) => {
+                model.castShadow = true;
+                model.receiveShadow = true;
+            });
+            const scale = this.isMobile ? 0.7 : 1.3;
             this.isMobile ? obj.scene.scale.set(scale, scale, scale) : obj.scene.scale.set(scale, scale, scale);
             this.three.object.add(obj.scene);
             const posY = this.isMobile ? -2 : -3;
             this.three.object.position.set(0, posY, 985);
             // atan2：点 (0, 0) から点 (x, y) までの半直線と、正の x 軸の間の平面上での角度 (ラジアン単位) を返す
             // const angle = Math.atan2(this.three.object.position.y, this.three.object.position.x);
-            const angleX = this.isMobile ? radians(6) : radians(10);
+            const angleX = this.isMobile ? radians(8) : radians(10);
             this.three.object.rotation.set(angleX, radians(180), 0);
             this.render();
+            // this.initGui();
         });
     }
     setModels(): void {
-        // this.initGui();
         this.three.scene.add(this.three.object);
         this.render();
         // addClass(this.canvas, hasClass.active);
@@ -240,32 +247,25 @@ export default class Post extends Webgl {
         this.three.renderer.render(this.three.scene, this.three.camera);
         // requestAnimationFrame(this.render.bind(this));
     }
-    handleEvent(): void {
-        window.addEventListener(
-            'resize',
-            throttle(() => {
-                this.handleResize();
-            }, 100),
-            false
-        );
-    }
     handleResize(): void {
         this.setSize();
         this.initViewport();
         if (this.three.camera) {
-            this.three.object.position.set(0, -3, 985);
+            const posY = this.isMobile ? -2 : -3;
+            this.three.object.position.set(0, posY, 985);
             // カメラのアスペクト比を正す
             this.three.camera.aspect = this.winSize.width / this.winSize.height;
             this.three.camera.updateProjectionMatrix();
-            if (this.three.renderer) {
-                this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                this.three.renderer.setSize(this.winSize.width, this.winSize.height);
-            }
         }
+        if (this.three.renderer) {
+            this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+        }
+        // this.three.object.position.set(0, posY, 985);
         this.render();
     }
     initGui(): void {
-        // this.gui = new GUI();
+        this.gui = new GUI();
         // GUIにパラメータ設定
         if (this.three.camera) {
             this.gui.add(this.three.camera.position, 'x').min(-5).max(5).step(1).name('cameraX');

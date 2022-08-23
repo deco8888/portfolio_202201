@@ -29,6 +29,7 @@ export default class Expansion extends Webgl {
         item: HTMLElement;
         canvas: HTMLCanvasElement;
         expansion: HTMLElement;
+        wrapper: HTMLElement;
         title: HTMLCanvasElement;
         contact: HTMLCanvasElement;
         contactWrap: HTMLElement;
@@ -49,6 +50,7 @@ export default class Expansion extends Webgl {
     viewport!: ThreeNumber;
     state: string;
     flg: {
+        isOpen: boolean;
         isAnimating: boolean;
     };
     uniforms: UniformOptions;
@@ -66,6 +68,7 @@ export default class Expansion extends Webgl {
             item: document.querySelector('[data-expansion="item"]'),
             canvas: document.querySelector('[data-expansion="canvas"]'),
             expansion: document.querySelector('[data-expansion="expansion"]'),
+            wrapper: document.querySelector('[data-expansion="wrapper"]'),
             title: document.querySelector('[data-canvas="title"]'),
             contact: document.querySelector('[data-canvas="contact"]'),
             contactWrap: document.querySelector('.p-contact'),
@@ -85,6 +88,7 @@ export default class Expansion extends Webgl {
         };
         this.state = 'grid';
         this.flg = {
+            isOpen: false,
             isAnimating: false,
         };
     }
@@ -106,8 +110,9 @@ export default class Expansion extends Webgl {
         this.three.scene.add(this.three.mesh);
         // メッシュを更新
         this.update();
-        // ハンドルイベント
-        this.handleEvent();
+        // 手紙のホバー
+        this.enter();
+        this.leave();
     }
     initMesh(): THREE.Mesh {
         const color1 = new THREE.Color(this.param.color1);
@@ -170,10 +175,10 @@ export default class Expansion extends Webgl {
         // mesh.frustumCulled = false;
         return mesh;
     }
-    async update(): Promise<void> {
-        const rect = this.elms.item.getBoundingClientRect();
-        const winSizeW = this.winSize.width;
-        const winSizeH = this.winSize.height;
+    update(): void {
+        const rect = document.querySelector('[data-expansion="item"]').getBoundingClientRect();
+        const winSizeW = window.innerWidth;
+        const winSizeH = window.innerHeight;
         const viewportW = this.viewport.width;
         const viewportH = this.viewport.height;
 
@@ -205,14 +210,20 @@ export default class Expansion extends Webgl {
         material.uniforms.uPosition.value.x = x / widthViewUnit;
         material.uniforms.uPosition.value.y = y / heightViewUnit;
         material.uniforms.uResolution.value = new THREE.Vector2(this.viewport.width, this.viewport.height);
+        material.needsUpdate = true;
     }
     render(): void {
         // 画面に描画する
         this.three.renderer.render(this.three.scene, this.three.camera);
     }
+    resetUniforms() {
+        this.uniforms.uScale.value = new THREE.Vector2(1, 1);
+        this.uniforms.uPosition.value = new THREE.Vector2(0, 0);
+        this.uniforms.uResolution.value = new THREE.Vector2(1, 1);
+    }
     async start(): Promise<void> {
         await this.openLetter();
-        await this.update();
+        this.update();
         await this.displayInFull();
     }
     async openLetter(): Promise<void> {
@@ -228,6 +239,7 @@ export default class Expansion extends Webgl {
                 this.elms.envelopeOpener,
                 {
                     rotateX: '0deg',
+                    onStart: () => (this.flg.isOpen = true),
                     onComplete: () => (this.elms.envelopeOpener.style.zIndex = '2'),
                 },
                 0
@@ -255,12 +267,13 @@ export default class Expansion extends Webgl {
             });
             tl.to(this.elms.envelopeLetter, {
                 top: '0',
+                onComplete: () => (this.elms.envelopeOpener.style.zIndex = '5'),
             }).to(
                 this.elms.envelopeOpener,
                 {
                     rotateX: '180deg',
-                    zIndex: 5,
                     onComplete: () => {
+                        this.flg.isOpen = false;
                         resolve();
                     },
                 },
@@ -277,7 +290,6 @@ export default class Expansion extends Webgl {
             const tl = gsap.timeline({
                 paused: true,
                 defaults: {
-                    delay: 0,
                     ease: Power2.easeOut,
                 },
             });
@@ -291,25 +303,22 @@ export default class Expansion extends Webgl {
                 {
                     duration: 1,
                     value: 1,
-                    onUpdate: () => this.render(),
+                    onUpdate: this.render.bind(this),
                     onStart: () => {
                         addClass(document.body, hasClass.hidden);
-                        addClass(this.elms.expansion, hasClass.active);
+                        // addClass(this.elms.expansion, hasClass.active);
                         addClass(this.elms.canvas, hasClass.active);
                         this.displayContent();
                         setTimeout(() => {
                             resolve();
                         }, 600);
-                        // setTimeout(() => {
-                        //     resolve();
-                        // }, 1200);
                     },
                     onComplete: () => {
-                        this.elms.study.style.visibility = 'hidden';
+                        // this.changeColor(tl, this.param.color2, this.param.color3);
+                        // this.elms.study.style.visibility = 'hidden';
                         // this.elms.study.style.display = 'none';
                         this.flg.isAnimating = false;
                         this.state = 'full';
-                        // resolve();
                     },
                 },
                 0
@@ -405,7 +414,6 @@ export default class Expansion extends Webgl {
             material.uniforms.uColor1R,
             {
                 value: changeColor1.r,
-                onUpdate: () => this.render(),
             },
             '<'
         );
@@ -413,7 +421,7 @@ export default class Expansion extends Webgl {
             material.uniforms.uColor1G,
             {
                 value: changeColor1.g,
-                onUpdate: () => this.render(),
+                // onUpdate: () => this.render(),
             },
             '<'
         );
@@ -421,7 +429,6 @@ export default class Expansion extends Webgl {
             material.uniforms.uColor1B,
             {
                 value: changeColor1.b,
-                onUpdate: () => this.render(),
             },
             '<'
         );
@@ -429,7 +436,6 @@ export default class Expansion extends Webgl {
             material.uniforms.uColor2R,
             {
                 value: changeColor2.r,
-                onUpdate: () => this.render(),
             },
             '<'
         );
@@ -437,7 +443,6 @@ export default class Expansion extends Webgl {
             material.uniforms.uColor2G,
             {
                 value: changeColor2.g,
-                onUpdate: () => this.render(),
             },
             '<'
         );
@@ -445,33 +450,48 @@ export default class Expansion extends Webgl {
             material.uniforms.uColor2B,
             {
                 value: changeColor2.b,
-                onUpdate: () => this.render(),
             },
             '<'
         );
-    }
-    handleEvent(): void {
-        window.addEventListener(
-            'resize',
-            throttle(() => {
-                this.handleResize();
-            }, 100),
-            false
-        );
+        // tl.play();
     }
     handleResize(): void {
         this.setSize();
         this.initViewport();
+        if (this.three.renderer) {
+            this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+        }
         if (this.three.camera) {
             // カメラのアスペクト比を正す
             this.three.camera.aspect = this.winSize.width / this.winSize.height;
             this.three.camera.updateProjectionMatrix();
-            if (this.three.renderer) {
-                this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                this.three.renderer.setSize(this.winSize.width, this.winSize.height);
-            }
         }
         this.update();
         this.render();
+    }
+    enter(): void {
+        this.elms.wrapper.addEventListener('mouseenter', () => {
+            if (!this.flg.isOpen) {
+                gsap.to(this.elms.envelopeOpener, {
+                    duration: 0.3,
+                    delay: 0,
+                    ease: Power2.easeOut,
+                    rotateX: '130deg',
+                });
+            }
+        });
+    }
+    leave(): void {
+        this.elms.wrapper.addEventListener('mouseleave', () => {
+            if (!this.flg.isOpen) {
+                gsap.to(this.elms.envelopeOpener, {
+                    duration: 0.3,
+                    delay: 0,
+                    ease: Power2.easeOut,
+                    rotateX: '180deg',
+                });
+            }
+        });
     }
 }

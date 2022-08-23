@@ -66,6 +66,7 @@ export default class Letter extends Webgl {
         };
     };
     winSize: ThreeNumber;
+    firstWinSize: ThreeNumber;
     time: ThreeNumber;
     viewport!: ThreeNumber;
     flg: {
@@ -239,6 +240,7 @@ export default class Letter extends Webgl {
     }
     async prepare(): Promise<void> {
         this.setSize();
+        this.firstWinSize = this.winSize;
         // カメラを作成
         this.three.camera = this.initCamera();
         // カメラをシーンに追加
@@ -270,7 +272,6 @@ export default class Letter extends Webgl {
         this.three.scene.add(this.three.object);
         // if (this.three.object) this.three.object.position.setZ(-1);
         // this.initFloor();
-        if (this.flg) this.setDiffusion();
     }
     initMesh(): Points {
         this.three.geometry = new BufferGeometry();
@@ -423,7 +424,7 @@ export default class Letter extends Webgl {
             const previousY = geometryPosition.getY(i);
             const lastX = promiseList[i * 2];
             const lastY = promiseList[i * 2 + 1];
-            const currentX = lerp(previousX, lastX, 0.01);
+            const currentX = lerp(previousX, lastX, 0.08);
             const currentY = lerp(previousY, lastY, 0.08 * (i + 1));
             geometryPosition.setX(i, currentX);
             geometryPosition.setY(i, currentY);
@@ -447,14 +448,18 @@ export default class Letter extends Webgl {
     // }
     onResize(): void {
         this.setSize();
+        if (this.three.renderer) {
+            this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+        }
         if (this.three.camera) {
             // カメラのアスペクト比を正す
             this.three.camera.aspect = this.winSize.width / this.winSize.height;
             this.three.camera.updateProjectionMatrix();
-            if (this.three.renderer) {
-                this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                this.three.renderer.setSize(this.winSize.width, this.winSize.height);
-            }
+        }
+        if (this.three.object) {
+            const scale = this.winSize.width / this.firstWinSize.width;
+            this.three.object.scale.set(scale, scale, scale);
         }
     }
     async getImageDataFirst(): Promise<ImageData> {
@@ -549,8 +554,17 @@ export default class Letter extends Webgl {
                 return 4;
         }
     }
-    handleMove(e: MouseEvent): void {
-        this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+    handleMove(e: Partial<MouseEvent>): void {
+        if (this.three.object) this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+        if (this.textImage.canvas) {
+            this.mouse.x = e.clientX - this.winSize.width * 0.5;
+            this.mouse.y = -(e.clientY - this.winSize.height * 0.5);
+        }
+        if (this.three.points) {
+            const geometry = <BufferGeometry>this.three.points.geometry;
+            const geometryPosition = geometry.attributes.position;
+            geometryPosition.needsUpdate = true;
+        }
     }
     async initCommonValue(): Promise<void> {
         this.horizontal = 0;
@@ -587,9 +601,9 @@ export default class Letter extends Webgl {
     raycast(): void {
         this.raycaster.setFromCamera(this.mouse, this.three.camera);
         this.raycaster.params.Points.threshold = 5;
-        const attributes = this.three.points.geometry.attributes;
-        const position = attributes.position;
-        const size = attributes.size;
+        const geometry = <BufferGeometry>this.three.points.geometry;
+        const position = geometry.attributes.position;
+        const size = geometry.attributes.size;
         // const intersects = this.raycaster.intersectObject(this.three.points);
         const isRotate = this.three.object.rotation.y <= radians(90);
         const imageHalfWidth = this.textImage.canvas.width / 2;

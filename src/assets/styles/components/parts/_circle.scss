@@ -1,0 +1,61 @@
+@use '../../global/index' as g;
+
+/***********************
+ *
+ * parts circle
+ *
+ ***********************/
+.p-circle {
+    $parent: &;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 0;
+    transform-origin: center;
+    will-change: transform;
+    &.is-active {
+        z-index: 1001;
+    }
+    @include g.media('>phone') {
+        top: g.get-size-pc(16px, 40px);
+        right: g.get-size-pc(16px, 40px);
+        padding-top: 7.8%;
+        width: g.get-per(150);
+    }
+    @include g.media('<=phone') {
+        top: 3rem;
+        right: 3rem;
+        padding-top: 20%;
+        width: g.get-per(150);
+    }
+    &__svg {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        @include g.media('>phone') {
+            font-size: 46px;
+            // font-size: g.get-size-pc(24px, 60px);
+        }
+        @include g.media('<=phone') {
+            font-size: 46px;
+        }
+        [data-title='mv'] ~ .p-page__inner & {
+            filter: drop-shadow(2px 2px 0px g.$color-mellow-apricot);
+        }
+        [data-title='study'] ~ .p-page__inner & {
+            filter: drop-shadow(2px 2px 0px g.$color-light-pink);
+        }
+        & path {
+            transition: fill 0.3s g.ease(OutSine);
+            [data-title='mv'] ~ .p-page__inner & {
+                fill: g.$color-dark-pastel-purple;
+            }
+            [data-title='study'] ~ .p-page__inner & {
+                fill: #57d05a;
+            }
+        }
+    }
+}

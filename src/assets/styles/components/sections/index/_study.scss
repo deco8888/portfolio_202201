@@ -1,6 +1,7 @@
 @use '../../../global/index' as g;
 
 .p-index-study {
+    $study: &;
     position: relative;
     top: 0;
     right: 0;
@@ -62,7 +63,7 @@
             overflow: hidden;
             @include g.media('>phone') {
                 padding-top: 18%;
-                width: g.get_size_pc(200px, 500px);
+                width: g.get-size-pc(200px, 500px);
             }
             @include g.media('<=phone') {
                 padding-top: 55.4%;
@@ -71,7 +72,7 @@
             &--image1 {
                 @include g.media('>phone') {
                     top: 0;
-                    margin: 0 g.get_size_pc(120px, 300px) 0 0;
+                    margin: 0 g.get-size-pc(120px, 300px) 0 0;
                 }
                 // @include g.media('<=phone') {
                 //     margin: 20rem 0 0;
@@ -80,7 +81,7 @@
             &--image2 {
                 @include g.media('>phone') {
                     top: 10rem;
-                    margin: 0 g.get_size_pc(120px, 300px) 0 0;
+                    margin: 0 g.get-size-pc(120px, 300px) 0 0;
                 }
                 @include g.media('<=phone') {
                     margin: 20rem 0 0;
@@ -102,7 +103,6 @@
         left: 0;
         width: 100%;
         height: 100%;
-        // z-index: 1;
     }
     &__image {
         position: absolute;
@@ -112,7 +112,8 @@
         height: 100%;
     }
     &-expansion {
-        $item: &;
+        $expansion: &;
+        display: block;
         position: fixed;
         z-index: -1;
         @include g.media('>phone') {
@@ -127,9 +128,9 @@
         }
         @include g.media('>phone') {
             right: 0;
-            bottom: g.get_size_pc(40px, 100px);
-            margin: 0 g.get_size_pc(40px, 100px) 0 0;
-            width: g.get_size_pc(120px, 300px);
+            bottom: g.get-size-pc(40px, 100px);
+            margin: 0 g.get-size-pc(40px, 100px) 0 0;
+            width: g.get-size-pc(120px, 300px);
         }
         @include g.media('<=phone') {
             left: 0;
@@ -142,49 +143,53 @@
             display: grid;
             width: 100%;
             height: 100%;
-            // &:hover {
-            //     #{$item}__item--back::after {
-            //         opacity: 1;
-            //     }
-            // }
         }
         &__item {
             $item: &;
             display: flex;
             flex-flow: column;
-            cursor: pointer;
-            &--front {
-                position: absolute;
-                top: 30%;
-                left: -30%;
-                right: 0;
-                bottom: 0;
-                margin: auto;
-                width: 60%;
-                height: 60%;
-                background-color: #70d872;
-                // transform: rotate(45deg);
-                z-index: 1;
-            }
-            &--back {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                background-color: #f6daec;
-                &::after {
-                    content: '';
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    background-image: radial-gradient(rgb(112 216 114 / 40%) 20%, transparent 20%),
-                        radial-gradient(rgb(112 216 114 / 40%) 20%, transparent 20%);
-                    background-size: 3rem 3rem;
-                    background-position: 0 0, 1.5rem 1.5rem;
-                    background-repeat: repeat;
-                    opacity: 0;
-                    transition: opacity 0.3s g.ease(OutSine);
+            cursor: none;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #f6daec;
+            @include g.hover-only {
+                #{$expansion}__char {
+                    animation: fade-up 0.4s g.ease(OutSine) 0s forwards;
                 }
             }
+            // &--front {
+            //     position: absolute;
+            //     top: 30%;
+            //     left: -30%;
+            //     right: 0;
+            //     bottom: 0;
+            //     margin: auto;
+            //     width: 60%;
+            //     height: 60%;
+            //     background-color: #70d872;
+            //     // transform: rotate(45deg);
+            //     z-index: 1;
+            // }
+            // &--back {
+            //     position: relative;
+            //     width: 100%;
+            //     height: 100%;
+            //     background-color: #f6daec;
+            //     &::after {
+            //         content: '';
+            //         position: absolute;
+            //         width: 100%;
+            //         height: 100%;
+            //         background-image: radial-gradient(rgb(112 216 114 / 40%) 20%, transparent 20%),
+            //             radial-gradient(rgb(112 216 114 / 40%) 20%, transparent 20%);
+            //         background-size: 3rem 3rem;
+            //         background-position: 0 0, 1.5rem 1.5rem;
+            //         background-repeat: repeat;
+            //         opacity: 0;
+            //         transition: opacity 0.3s g.ease(OutSine);
+            //     }
+            // }
         }
         &__canvas {
             position: fixed;
@@ -201,17 +206,24 @@
             display: inline-block;
             color: #70d872;
             line-height: 1;
-            font-family: 'Kola', sans-serif;
+            font-family: 'Gill Sans', sans-serif; //'Kola', sans-serif;
             font-weight: bold;
             text-align: center;
+            overflow: hidden;
             @include g.media('>phone') {
                 margin: g.get-per(30, 300) auto;
-                @include g.fluid-type(font-size, 20px, 50px);
+                @include g.fluid-type(font-size, 18px, 45px);
             }
             @include g.media('<=phone') {
                 margin: 4rem auto;
                 font-size: 6rem;
             }
+            & span {
+                display: inline-block;
+            }
+        }
+        &__char {
+            display: inline-block;
         }
         &__envelope {
             $envelope: &;
@@ -225,10 +237,10 @@
             -moz-perspective-origin: 50% 0;
             z-index: 4;
             @include g.media('>phone') {
-                border-top: solid g.get_size_pc(16px, 40px) transparent;
-                border-left: solid g.get_size_pc(24px, 60px) #6bcf6e;
-                border-right: solid g.get_size_pc(24px, 60px) #70d872;
-                border-bottom: solid g.get_size_pc(16px, 40px) #70d872;
+                border-top: solid g.get-size-pc(16px, 40px) transparent;
+                border-left: solid g.get-size-pc(24px, 60px) #6bcf6e;
+                border-right: solid g.get-size-pc(24px, 60px) #70d872;
+                border-bottom: solid g.get-size-pc(16px, 40px) #70d872;
             }
             @include g.media('<=phone') {
                 border-top: solid 6rem transparent;
@@ -242,8 +254,8 @@
                 position: relative;
                 @include g.media('>phone') {
                     margin: g.get-per(30, 300) auto 0;
-                    width: g.get_size_pc(48px, 120px);
-                    height: g.get_size_pc(32px, 80px);
+                    width: g.get-size-pc(48px, 120px);
+                    height: g.get-size-pc(32px, 80px);
                 }
                 @include g.media('<=phone') {
                     margin: 4rem auto 0;
@@ -264,11 +276,6 @@
                         transition-delay: 0s;
                     }
                 }
-                @include g.hover-only {
-                    #{$envelope}-opener {
-                        transform: rotateX(145deg);
-                    }
-                }
             }
             &-bg {
                 position: absolute;
@@ -276,8 +283,8 @@
                 margin-bottom: 0;
                 z-index: 3;
                 @include g.media('>phone') {
-                    width: g.get_size_pc(48px, 120px);
-                    height: g.get_size_pc(32px, 80px);
+                    width: g.get-size-pc(48px, 120px);
+                    height: g.get-size-pc(32px, 80px);
                 }
                 @include g.media('<=phone') {
                     width: 18rem;
@@ -294,9 +301,9 @@
                 z-index: 5;
                 transition: transform 0.4s g.ease(OutSine);
                 @include g.media('>phone') {
-                    border-left: solid g.get_size_pc(24px, 60px) transparent;
-                    border-right: solid g.get_size_pc(24px, 60px) transparent;
-                    border-bottom: solid g.get_size_pc(18px, 45px) #64c466;
+                    border-left: solid g.get-size-pc(24px, 60px) transparent;
+                    border-right: solid g.get-size-pc(24px, 60px) transparent;
+                    border-bottom: solid g.get-size-pc(18px, 45px) #64c466;
                 }
                 @include g.media('<=phone') {
                     border-left: solid 9rem transparent;
@@ -314,8 +321,8 @@
                 background-color: #ffffff;
                 z-index: 3;
                 @include g.media('>phone') {
-                    width: g.get_size_pc(40px, 100px);
-                    height: g.get_size_pc(24px, 60px);
+                    width: g.get-size-pc(40px, 100px);
+                    height: g.get-size-pc(24px, 60px);
                 }
                 @include g.media('<=phone') {
                     width: 15rem;

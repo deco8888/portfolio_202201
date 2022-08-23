@@ -12,9 +12,6 @@
                 <span></span>
                 <span></span>
             </div>
-            <div class="p-index-study__content">
-                <p>TEST TEST TEST</p>
-            </div>
             <div class="p-contact__post" data-canvas="contact"></div>
         </div>
     </div>
@@ -57,9 +54,11 @@ export default Vue.extend({
     async mounted() {
         this.canvas = document.querySelector('[data-canvas="contact"]');
         this.title = new Title();
+        // this.title.isFirst = true;
         this.post = new Post();
         await this.post.init(this.canvas);
         this.post.setModels();
+        this.handleEvent();
     },
     watch: {
         isShow(val: boolean) {
@@ -67,6 +66,23 @@ export default Vue.extend({
         },
     },
     methods: {
+        handleEvent(): void {
+            window.addEventListener(
+                'resize',
+                () => {
+                    this.post.handleResize();
+                    this.title.handleResize();
+                },
+                false
+            );
+            window.addEventListener(
+                'mousemove',
+                (e: MouseEvent) => {
+                    this.title.handleMove(e);
+                },
+                false
+            );
+        },
         init(): void {
             this.isOpen = true;
             this.title.draw();
@@ -81,13 +97,11 @@ export default Vue.extend({
                 behavior: 'smooth',
             });
             setTimeout(() => {
-                // this.post.removeModels();
                 removeClass(this.canvas, hasClass.active);
                 this.title.removeTitle();
                 this.isOpen = false;
                 this.$emit('is-close', true);
                 contactStore.setContactData({ isShow: false });
-                EventBus.$emit('SHOW', false);
             }, 500);
         },
     },

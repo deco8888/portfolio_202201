@@ -25,6 +25,7 @@ export default class Contact extends VuexModule {
 
     @Action
     public setContactData(contact: ContactState): void {
+        console.log(contact);
         this.setContact(contact);
     }
 }

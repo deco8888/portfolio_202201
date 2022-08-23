@@ -24,6 +24,7 @@ export default class Particles {
     total: number;
     particles: ParticleOption[];
     diff: number;
+    animFrame: number;
     constructor(canvas: HTMLCanvasElement, index: number) {
         this.index = index;
         this.canvas = {
@@ -37,7 +38,7 @@ export default class Particles {
             y: 0,
             radius: 100,
         };
-        this.total = 50;
+        this.total = 30;
         this.particles = [];
         this.diff = isMobile ? 10 : 10;
         this.init();
@@ -50,7 +51,7 @@ export default class Particles {
         this.canvas.el.height = window.innerHeight / 2;
         this.handleEvent();
         for (let i = 0; i < this.total; i++) {
-            const radius = Math.floor(Math.random() * 50);
+            const radius = Math.floor(Math.random() * 60);
             let x = Math.random() * this.canvas.el.clientWidth;
             x = Math.max(x, radius + this.diff);
             x = Math.min(x, this.canvas.el.width - radius - this.diff * 2);
@@ -75,7 +76,7 @@ export default class Particles {
         for (let i = 0; i < this.particles.length; i++) {
             this.update(this.particles[i]);
         }
-        requestAnimationFrame(this.render.bind(this));
+        this.animFrame = requestAnimationFrame(this.render.bind(this));
     }
     handleEvent(): void {
         window.addEventListener('mousemove', (event) => {
@@ -85,12 +86,12 @@ export default class Particles {
     }
     setColor(index: number): void {
         const ctx = this.canvas.ctx;
-        if(index % 3 === 0) {
+        if (index % 4 === 0 || index % 4 === 2) {
             ctx.strokeStyle = '#ffffff';
             ctx.globalAlpha = 1;
             ctx.lineWidth = 1;
             ctx.stroke();
-        } else if(index % 3 === 1) {
+        } else if (index % 4 === 1) {
             ctx.fillStyle = '#f0dcd0';
             ctx.globalAlpha = 0.4;
             ctx.fill();
@@ -164,9 +165,20 @@ export default class Particles {
         // パーティクルの描画
         const ctx = this.canvas.ctx;
         ctx.beginPath();
-        // void ctx.arc(x, y, 半径, startAngle, endAngle [, counterclockwise]);
+        // void ctx.arc(x座標, y座標, 半径, startAngle, endAngle [, counterclockwise]);
         // ※「counterclockwise」
         // console.log(particle.x, particle.y);
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2, true);
+
+        // ctx.rect(particle.x, particle.y, particle.radius, particle.radius);
+    }
+    handleResize(): void {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.canvas.el.width = window.innerWidth;
+        this.canvas.el.height = window.innerHeight / 2;
+    }
+    cancel(): void {
+        cancelAnimationFrame(this.animFrame);
     }
 }

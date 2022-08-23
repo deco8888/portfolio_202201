@@ -1,44 +1,136 @@
 @use '../../global/index' as g;
 
 .c-cursor {
+    $cursor: &;
     @include g.media('>phone') {
         position: fixed;
-        width: g.get_vw(100);
-        height: g.get_vw(100);
-        transform: scale(0.3);
+        width: 50px;
+        height: 50px;
         transition: transform 0.2s g.ease(OutSine);
         will-change: transform;
         z-index: 1004;
         cursor: none !important;
         pointer-events: none !important;
-        // &.is-active {
-        //     transform: scale(3);
-        // }
-        & span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: g.$color-greyish-brown;
-            border: solid 2px g.$color-black;
-            // border-radius: 50%;
-            color: g.$color-white;
-            font-size: 13px;
-            font-weight: g.$font-weight-bold;
-            text-align: center;
-            opacity: 0.7;
-            cursor: none !important;
-            pointer-events: none !important;
-            z-index: 1003;
-        }
         @keyframes rotate {
             0% {
                 transform: rotate(0deg);
             }
             100% {
                 transform: rotate(360deg);
+            }
+        }
+        &__path {
+            fill: #fff;
+        }
+        &__svg {
+            transform: rotate(-45deg);
+        }
+        &__shaft {
+            stroke: g.$color-greyish-brown;
+            stroke-miterlimit: 10;
+            stroke-width: 15px;
+        }
+        &__wing {
+            fill: g.$color-white;
+            stroke: g.$color-greyish-brown;
+            stroke-miterlimit: 10;
+            stroke-width: 6px;
+            &-line {
+                fill: g.$color-greyish-brown;
+                stroke: g.$color-greyish-brown;
+                stroke-miterlimit: 10;
+                stroke-width: 1px;
+            }
+        }
+        &__circle {
+            fill: g.$color-white;
+            &-line {
+                fill: g.$color-greyish-brown;
+                stroke: g.$color-greyish-brown;
+                stroke-miterlimit: 10;
+                stroke-width: 1px;
+            }
+        }
+        &__string {
+            fill: #4d4d4d;
+        }
+        &__bow {
+            position: relative;
+            fill: none;
+            stroke: #4d4d4d;
+            stroke-width: 2px;
+            transition: transform 0.3s g.ease(OutSine);
+            // &--left {
+            //     transform: rotate(-17deg);
+            //     transform-origin: left;
+            // }
+            // &--right {
+            //     transform: rotate(17deg);
+            //     transform-origin: right;
+            // }
+            // #{$cursor}.is-active & {
+            //     &--left {
+            //         transform: rotate(0deg);
+            //     }
+            //     &--right {
+            //         transform: rotate(0deg);
+            //     }
+            // }
+        }
+        &__arrow {
+            fill: g.$color-light-pink;
+            stroke-width: 6px;
+            stroke: g.$color-greyish-brown;
+            // [data-title='mv'] ~ #{$cursor} & {
+            //     fill: g.$color-mellow-apricot;
+            // }
+            // [data-title='study'] ~ #{$cursor} & {
+            //     fill: g.$color-light-pink;
+            // }
+            &-group {
+                display: block;
+                position: relative;
+                // transform: translateY(0);
+            }
+            &-line {
+                fill: g.$color-greyish-brown;
+                stroke-width: 6px;
+                stroke: g.$color-greyish-brown;
+            }
+        }
+        &__bg {
+            position: fixed;
+            bottom: 100%;
+            right: 100%;
+            width: g.get_vw(100);
+            height: g.get_vw(100);
+            transform: scale(0);
+            transition: transform 0.2s g.ease(OutSine);
+            will-change: transform;
+            z-index: 1004;
+            cursor: none !important;
+            pointer-events: none !important;
+            &.is-raycast {
+                transform: scale(1);
+            }
+            & span {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                background-color: g.$color-greyish-brown;
+                border: solid 2px g.$color-black;
+                // border-radius: 50%;
+                color: g.$color-white;
+                font-size: 13px;
+                font-weight: g.$font-weight-bold;
+                text-align: center;
+                opacity: 0.7;
+                cursor: none !important;
+                pointer-events: none !important;
+                z-index: 1003;
             }
         }
     }

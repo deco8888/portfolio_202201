@@ -20,7 +20,7 @@ void main() {
     // pos.z += noise * 0.5;
 
     // 横の動き（周波数）
-    float freq = 0.0003 * uTime; // 振動数（の役割） 大きくすると波が細かくなる
+    float freq = 0.00015 * uTime; // 振動数（の役割） 大きくすると波が細かくなる
 
     if(uIsMobile) {
         pos.y = pos.y + (cos(pos.x * PI) * freq);

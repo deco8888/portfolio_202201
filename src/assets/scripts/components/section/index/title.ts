@@ -89,7 +89,7 @@ export default class Title extends Letter {
         this.vertical = 0;
         this.horizontal = 0;
         this.particleX = [];
-        this.text = this.isMobile ? 'PORT¥nFOLIO' : 'PORTFOLIO';
+        this.text = this.isMobile ? 'PORT¥nFOLIO' : 'PORT¥nFOLIO';
         this.elms = {
             study: document.querySelector('.p-index-study'),
         };
@@ -130,13 +130,16 @@ export default class Title extends Letter {
         // カメラ・シーン・レンダラー等の準備
         await this.prepare();
         this.font.size = this.viewport.width * this.font.threshold;
-        this.createTextImage();
+        await this.createTextImage();
+    }
+    startAnim(): void {
+        if (this.flg) this.setDiffusion();
         // 描写する
         this.render();
         this.three.clock = new Clock();
         this.three.clock.start();
     }
-    async render(): Promise<void> {
+    render(): void {
         this.animFrame = requestAnimationFrame(this.render.bind(this));
         if (this.three.clock) {
             // delta: 変化量
@@ -223,9 +226,9 @@ export default class Title extends Letter {
                 if (scrollY === 0) {
                     this.rotation.y = 0;
                 } else if (scrollY > this.scroll.y) {
-                    this.rotation.y = this.three.object.rotation.y + 0.3;
+                    this.rotation.y = this.three.object.rotation.y + 0.5;
                 } else if (scrollY < this.scroll.y) {
-                    this.rotation.y = this.three.object.rotation.y - 0.3;
+                    this.rotation.y = this.three.object.rotation.y - 0.5;
                 }
             } else if (scrollY >= study * mvThreshold) {
                 addClass(this.elms.study, hasClass.active);
@@ -281,7 +284,7 @@ export default class Title extends Letter {
                 this.three.object.position.y = 0;
                 this.horizontal = 0;
                 await this.initValue();
-                this.text = this.isMobile ? 'PORT¥nFOLIO' : 'PORTFOLIO';
+                this.text = this.isMobile ? 'PORT¥nFOLIO' : 'THANKS!';
                 this.font = {
                     wight: 900,
                     size: this.getFontSize(),

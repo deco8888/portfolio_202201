@@ -1,12 +1,12 @@
 <template>
-    <section id="study" class="p-index-study">
+    <section id="study" class="p-index-study" data-study>
         <div class="p-index-study__inner js-study-trigger">
             <div class="p-index-study__canvas" data-study="canvas"></div>
             <div class="p-index-study__wrap" data-horizontal="wrapper">
                 <div class="p-index-study__list" data-horizontal="list">
                     <a
                         class="p-index-study__image-wrap p-index-study__image-wrap--image1"
-                        href=""
+                        href="https://hatarakigai.info/project/"
                         target="_blank"
                         rel=""
                     >
@@ -39,17 +39,7 @@
                 </div>
                 <div class="p-index-study-expansion" data-expansion="wrapper">
                     <div class="p-index-study-expansion__inner">
-                        <!-- <div
-                            class="p-index-study-expansion__item p-index-study-expansion__item--front"
-                            data-expansion="item"
-                            data-cursor-target
-                            @click="clickItem"
-                        ></div> -->
-                        <div
-                            class="p-index-study-expansion__item p-index-study-expansion__item--back"
-                            data-cursor-target
-                            @click="clickItem"
-                        >
+                        <div class="p-index-study-expansion__item" data-cursor-target @click="clickItem">
                             <div
                                 :class="['p-index-study-expansion__envelope-wrapper']"
                                 data-envelope
@@ -65,7 +55,16 @@
                                     data-expansion="item"
                                 ></div>
                             </div>
-                            <p class="p-index-study-expansion__text">CONTACT</p>
+                            <p class="p-index-study-expansion__text" data-split="p-index-study-expansion">
+                                <span
+                                    v-for="(word, index) in 'CONTACT'.split('')"
+                                    :key="index"
+                                    class="p-index-study-expansion__char"
+                                    data-split-char
+                                >
+                                    {{ word }}
+                                </span>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -76,17 +75,16 @@
 
 <script lang="ts">
 import Vue from 'vue';
-// import TheCanvas from '../common/TheCanvas.vue';
-import Expansion from '~/assets/scripts/components/expansion';
-import Title from '~/assets/scripts/components/parts/contact/title';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import BaseImage from '~/components/common/TheBaseImage.vue';
 import TheContact from '~/components/parts/TheContact.vue';
 import Study from '~/assets/scripts/components/study';
+import Expansion from '~/assets/scripts/components/expansion';
+import Title from '~/assets/scripts/components/parts/contact/title';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
-import { contactStore } from '~/store';
+import { contactStore, loadingStore } from '~/store';
 import { isMobile } from '~/assets/scripts/components/isMobile';
 import EventBus from '~/utils/event-bus';
 
@@ -94,6 +92,9 @@ interface StudyOptions {
     study: Study;
     studyAnim: {
         [key: string]: number;
+    };
+    elms: {
+        [key: string]: HTMLElement;
     };
     expansion: Expansion;
     title: Title;
@@ -121,6 +122,7 @@ export default Vue.extend({
                 current: 0,
                 ease: 0.1,
             },
+            elms: {},
             expansion: null,
             title: null,
             isActive: false,
@@ -131,30 +133,52 @@ export default Vue.extend({
         isClose(val: boolean) {
             if (val) this.close();
         },
+        loading(val: boolean) {
+            if (val) this.init();
+        },
+        // elms(val: Pick<StudyOptions, 'elms'>) {
+        //     const elmsList = Object.values(val);
+        //     elmsList.forEach((elm, index) => {
+        //         console.log(elm);
+        //         if (!elm) return;
+        //         if (elm && elmsList.length === index + 1) this.moveHorizontally();
+        //     });
+        // },
+    },
+    computed: {
+        loading(): boolean {
+            return loadingStore.getLoading.loaded;
+        },
     },
     mounted() {
-        // gsap.registerPlugin(ScrollTrigger);
-        this.moveHorizontally();
-        this.study = new Study();
-        this.expansion = new Expansion();
-        this.expansion.init();
-        EventBus.$emit('SHOW', false);
-        // document.querySelector('[data-envelope]').addEventListener('mouseover', () => {
-        //     this.isActive = true;
-        // });
-        // document.querySelector('[data-envelope]').addEventListener('mouseleave', () => {
-        //     this.isActive = false;
-        // });
+        if (this.loading) this.init();
+        this.$router.beforeEach(async (_to, _from, next) => {
+            console.log("photo");
+            this.study.cancel();
+            next();
+        });
     },
     methods: {
-        moveHorizontally() {
-            const horizontalWrapper = document.querySelector("[data-horizontal='wrapper']");
-            const horizontalList = document.querySelector("[data-horizontal='list']");
-            const box = document.querySelector('[data-expansion="wrapper"]');
-            const mvHeight = document.querySelector<HTMLElement>('[data-mv]').clientHeight;
+        init(): void {
+            console.log('study');
+            gsap.registerPlugin(ScrollTrigger);
+            setTimeout(() => {
+                this.handleResize();
+                this.moveHorizontally();
+            }, 1000);
+            this.study = new Study();
+            this.expansion = new Expansion();
+            this.expansion.init();
+            this.splitText();
+            EventBus.$emit('SHOW', false);
+            window.addEventListener('resize', this.handleResize.bind(this));
+        },
+        moveHorizontally(): void {
+            this.elms.horizontalList = document.querySelector("[data-horizontal='list']");
+            const mvHeight = this.elms.mv.clientHeight;
             if (this.isMobile) {
-                const scrollHeight = horizontalList.clientHeight - horizontalWrapper.clientHeight;
-                gsap.to(horizontalList, {
+                const scrollHeight = this.elms.horizontalList.clientHeight - this.elms.horizontalWrapper.clientHeight;
+                gsap.to(this.elms.horizontalList, {
                     y: () => -scrollHeight,
                     ease: 'none',
                     scrollTrigger: {
@@ -164,9 +188,9 @@ export default Vue.extend({
                         end: () => '+=' + scrollHeight,
                         onUpdate: () => {
                             if (scrollHeight < window.scrollY - mvHeight + 50) {
-                                addClass(box, hasClass.active);
+                                addClass(this.elms.box, hasClass.active);
                             } else {
-                                removeClass(box, hasClass.active);
+                                removeClass(this.elms.box, hasClass.active);
                             }
                         },
                         pin: true,
@@ -176,20 +200,30 @@ export default Vue.extend({
                     },
                 });
             } else {
-                const scrollWidth = horizontalList.clientWidth - horizontalWrapper.clientWidth;
-                gsap.to(horizontalList, {
-                    x: () => -scrollWidth,
+                gsap.to(this.elms.horizontalList, {
+                    x: () =>
+                        -(
+                            document.querySelector("[data-horizontal='list']").clientWidth -
+                            this.elms.horizontalWrapper.clientWidth
+                        ),
                     ease: 'none',
                     scrollTrigger: {
                         trigger: '.js-study-trigger',
                         markers: true,
                         start: 'top top',
-                        end: () => '+=' + scrollWidth,
+                        end: () =>
+                            '+=' +
+                            (document.querySelector("[data-horizontal='list']").clientWidth -
+                                this.elms.horizontalWrapper.clientWidth),
                         onUpdate: () => {
-                            if (scrollWidth < window.scrollY - mvHeight + 50) {
-                                addClass(box, hasClass.active);
+                            if (
+                                document.querySelector("[data-horizontal='list']").clientWidth -
+                                    this.elms.horizontalWrapper.clientWidth <
+                                window.scrollY - this.elms.mv.clientHeight + 50
+                            ) {
+                                addClass(this.elms.box, hasClass.active);
                             } else {
-                                removeClass(box, hasClass.active);
+                                removeClass(this.elms.box, hasClass.active);
                             }
                         },
                         pin: true,
@@ -201,13 +235,29 @@ export default Vue.extend({
             }
         },
         async clickItem(): Promise<void> {
+            addClass(document.body, hasClass.active);
             await this.expansion.start();
             this.$emit('is-show', true);
             contactStore.setContactData({ isShow: true });
-            EventBus.$emit('SHOW', true);
         },
         close(): void {
             this.expansion.close();
+        },
+        handleResize(): void {
+            this.expansion.handleResize();
+            this.elms = {
+                horizontalWrapper: document.querySelector("[data-horizontal='wrapper']"),
+                horizontalLis: document.querySelector("[data-horizontal='list']"),
+                box: document.querySelector('[data-expansion="wrapper"]'),
+                mv: document.querySelector('[data-mv]'),
+            };
+        },
+        splitText() {
+            const charList = document.querySelectorAll<HTMLElement>('[data-split-char]');
+            charList.forEach((char, index) => {
+                char.style.animationDelay = `${index * 0.05 + 0.1}s`;
+                char.style.setProperty('--char-index', `${index}`);
+            });
         },
     },
 });

@@ -74,7 +74,7 @@
     }
 }
 
-@function get_size_pc($min-value, $max-value, $max-vw: 1920px) {
+@function get-size-pc($min-value, $max-value, $max-vw: 1920px) {
     @return calc(
         #{$min-value} + #{strip-unit($max-value - $min-value)} * (100vw - #{size.$min-vw}) / #{strip-unit(
                 size.$max-vw - size.$min-vw

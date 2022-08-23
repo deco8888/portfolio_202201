@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import gsap, { Power2 } from 'gsap';
 import { lerp } from '../../../utils/math';
 import Letter from '../../letter';
-import { Material, ShaderMaterial } from 'three';
+import { BufferGeometry, Material, ShaderMaterial } from 'three';
 
 export default class Title extends Letter {
     speed: number;
@@ -63,6 +63,7 @@ export default class Title extends Letter {
         return this.isMobile ? this.viewport.width * 0.15 : this.viewport.width * 0.1;
     }
     init(): void {
+        this.handleMove({ clientX: 0, clientY: 0 });
         this.canvas = document.querySelector('[data-expansion="expansion"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
@@ -91,12 +92,16 @@ export default class Title extends Letter {
         // if (this.three.object) this.three.object.rotation.y += 0.005;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
-        if (this.three.points) this.update();
-        if (this.three.object && this.three.object.position.y === 0)
-            this.three.object.position.y = this.viewport.height * 0.25;
+        if (this.three.points) {
+            this.update();
+            if (this.raycaster && !this.isMobile && this.three.points.geometry) this.raycast();
+        }
+        if (this.three.object && this.three.object.position.y === 0) {
+            this.three.object.position.y = this.viewport.height * 0.3;
+        }
     }
     update(): void {
-        const geometry = <THREE.BufferGeometry>this.three.points.geometry;
+        const geometry = <BufferGeometry>this.three.points.geometry;
         const geometryPosition = geometry.attributes.position;
         const positionList = geometryPosition.array;
         const secondList = this.title.secondList.position;
@@ -114,16 +119,27 @@ export default class Title extends Letter {
     }
     handleResize(): void {
         this.setSize();
+        if (this.three.renderer) {
+            this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+        }
         if (this.three.camera) {
             // カメラのアスペクト比を正す
             this.three.camera.aspect = this.winSize.width / this.winSize.height;
             this.three.camera.updateProjectionMatrix();
-            if (this.three.renderer) this.three.renderer.setSize(this.winSize.width, this.winSize.height);
         }
     }
-    handleMove(e: MouseEvent): void {
-        this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
-    }
+    // handleMove(e: MouseEvent): void {
+    //     this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
+    //     if (this.textImage.canvas) {
+    //         this.mouse.x = e.clientX - this.winSize.width * 0.5;
+    //         this.mouse.y = -(e.clientY - this.winSize.height * 0.5);
+    //     }
+    //     if (this.three.points) {
+    //         const geometryPosition = this.three.points.geometry.attributes.position;
+    //         geometryPosition.needsUpdate = true;
+    //     }
+    // }
     async removeTitle(): Promise<void> {
         gsap.to(this.three.object.scale, {
             duration: 0.5,

@@ -22,6 +22,7 @@ import Webgl from './webgl';
 
 interface CursorOption {
     cursorSelector: string;
+    cursorBgSelector: string;
     targetSelector: string;
     headerSelector: string;
     pankuzuSelector: string;
@@ -29,6 +30,7 @@ interface CursorOption {
 
 const defaults: CursorOption = {
     cursorSelector: '[data-cursor]',
+    cursorBgSelector: '[data-cursor-bg]',
     targetSelector: '[data-cursor-target]',
     headerSelector: 'header',
     pankuzuSelector: '#pankuzu',
@@ -50,6 +52,7 @@ export class Cursor extends Webgl {
     };
     elms: {
         cursor: HTMLElement;
+        cursorBg: HTMLElement;
         targets: NodeListOf<HTMLElement>;
     };
     mouse: {
@@ -87,6 +90,7 @@ export class Cursor extends Webgl {
         this.params = { ...defaults, ...props };
         this.elms = {
             cursor: document.querySelector(this.params.cursorSelector),
+            cursorBg: document.querySelector(this.params.cursorBgSelector),
             targets: document.querySelectorAll(this.params.targetSelector),
         };
         this.mouse = {
@@ -107,7 +111,7 @@ export class Cursor extends Webgl {
             scale: {
                 previous: 0,
                 current: 0,
-                amt: 0.1,
+                amt: 1,
             },
         };
         this.rect = {
@@ -159,7 +163,7 @@ export class Cursor extends Webgl {
             this.styles.transX.current = this.mouse.x - this.rect.width * 0.5;
             this.styles.transY.current = this.mouse.y - this.rect.height * 0.5;
             for (const styles of Object.values(this.styles)) {
-                styles.previous = lerp(styles.previous, styles.current, styles.amt);
+                styles.previous = styles.current;
             }
 
             if (this.flg.isRaycaster) {
@@ -167,16 +171,13 @@ export class Cursor extends Webgl {
                     duration: 0,
                     left: this.styles.transX.previous,
                     top: this.styles.transY.previous,
-                    scaleX: 1,
-                    scaleY: 1,
                 });
             } else {
                 this.styles.scale.current = this.flg.isScaleUp ? 1 : 0.3;
                 gsap.to(this.elms.cursor, {
+                    duration: 0,
                     left: this.styles.transX.previous,
                     top: this.styles.transY.previous,
-                    scaleX: this.styles.scale.current,
-                    scaleY: this.styles.scale.current,
                 });
             }
         }
@@ -188,8 +189,8 @@ export class Cursor extends Webgl {
             this.mouse.y = e.clientY;
         });
         this.elms.targets.forEach((target) => {
-            target.addEventListener('mouseenter', () => this.enter());
-            target.addEventListener('mouseleave', () => this.leave());
+            target.addEventListener('mouseenter', () => this.enter(target));
+            target.addEventListener('mouseleave', () => this.leave(target));
         });
     }
     mouseover(flg: boolean): void {
@@ -213,12 +214,14 @@ export class Cursor extends Webgl {
         const pankuzuHeight = pankuzu ? pankuzu.clientHeight : 0;
         this.headerHeight = headerHeight + pankuzuHeight;
     }
-    enter(): void {
+    enter(target: HTMLElement): void {
         addClass(this.elms.cursor, hasClass.active);
+        addClass(target, 'is-hover');
         this.flg.isScaleUp = true;
     }
-    leave(): void {
+    leave(target: HTMLElement): void {
         removeClass(this.elms.cursor, hasClass.active);
+        removeClass(target, 'is-hover');
         this.flg.isScaleUp = false;
     }
     initFloor(): void {
@@ -239,9 +242,13 @@ export class Cursor extends Webgl {
         this.three.scene.add(this.three.floor);
     }
     setText(text: string): void {
-        this.elms.cursor.querySelector('span').innerHTML = text;
+        const target = document.querySelector('[data-cursor-bg]');
+        target.querySelector('span').innerHTML = text;
+        addClass(target, 'is-raycast');
     }
     deleteText(): void {
-        this.elms.cursor.querySelector('span').innerHTML = '';
+        const target = document.querySelector('[data-cursor-bg]');
+        target.querySelector('span').innerHTML = '';
+        removeClass(target, 'is-raycast');
     }
 }

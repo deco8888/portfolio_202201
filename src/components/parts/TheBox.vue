@@ -1,7 +1,7 @@
 <template>
     <div class="p-box" data-cursor-target>
         <div class="p-box__inner">
-            <nuxt-link to="/about">
+            <nuxt-link to="/about" class="p-box__link">
                 <BaseImage :pcImg="'balloon.gif'" :alt="'about'" :width="500" :height="500" :decodingAsync="true" />
             </nuxt-link>
         </div>

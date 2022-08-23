@@ -1,8 +1,9 @@
 <template>
     <div class="p-about">
-        <div class="p-about__canvas" data-canvas="title"> </div>
+        <div class="p-about__canvas" data-canvas="title"></div>
         <TheAboutTransition />
         <TheAboutIntro />
+        <TheCursor />
     </div>
 </template>
 
@@ -12,11 +13,13 @@ import Title from '~/assets/scripts/components/section/about/title';
 import { debounce } from '~/assets/scripts/utils/debounce';
 import TheAboutIntro from '~/components/section/about/_TheAboutIntro.vue';
 import TheAboutTransition from '~/components/section/about/_TheAboutTransition.vue';
+import TheCursor from '~/components/parts/TheCursor.vue';
 
 export default Vue.extend({
     components: {
         TheAboutIntro,
         TheAboutTransition,
+        TheCursor,
     },
     data(): {
         title: Title;
