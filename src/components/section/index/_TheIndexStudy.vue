@@ -2,37 +2,50 @@
     <section id="study" class="p-index-study" data-study>
         <div class="p-index-study__inner js-study-trigger">
             <div class="p-index-study__canvas" data-study="canvas"></div>
-            <div class="p-index-study__wrap" data-horizontal="wrapper">
-                <div class="p-index-study__list" data-horizontal="list">
+            <div class="p-index-study__wrap" data-horizontal="wrapper" ref="horizontalWrapper">
+                <div class="p-index-study__list" data-horizontal="list" ref="horizontalList">
                     <a
                         class="p-index-study__image-wrap p-index-study__image-wrap--image1"
                         href="https://hatarakigai.info/project/"
                         target="_blank"
                         rel=""
+                        @mouseenter="mouseenter($event, 0.0)"
+                        @mouseleave="mouseleave($event, 0.02)"
+                        data-study="link"
+                        data-study-title="No.1"
                     >
                         <div
                             class="p-index-study__image"
                             data-study="image"
                             data-study-image="sakura.jpg"
-                            data-study-title="No.1"
                             data-study-link="https://hatarakigai.info/project/"
                         ></div>
                     </a>
-                    <a class="p-index-study__image-wrap p-index-study__image-wrap--image2">
+                    <a
+                        class="p-index-study__image-wrap p-index-study__image-wrap--image2"
+                        @mouseenter="mouseenter($event, 0.0)"
+                        @mouseleave="mouseleave($event, 0.02)"
+                        data-study="link"
+                        data-study-title="No.2"
+                    >
                         <div
                             class="p-index-study__image"
                             data-study="image"
                             data-study-image="sakura.jpg"
-                            data-study-title="No.2"
                             data-study-link="https://works.yuta-takahashi.dev/"
                         ></div>
                     </a>
-                    <a class="p-index-study__image-wrap p-index-study__image-wrap--image3">
+                    <a
+                        class="p-index-study__image-wrap p-index-study__image-wrap--image3"
+                        @mouseenter="mouseenter($event, 0.0)"
+                        @mouseleave="mouseleave($event, 0.02)"
+                        data-study="link"
+                        data-study-title="No.3"
+                    >
                         <div
                             class="p-index-study__image"
                             data-study="image"
                             data-study-image="sakura.jpg"
-                            data-study-title="No.3"
                             data-study-link="https://nuxtjs.org/ja/docs/concepts/views/#layouts"
                         ></div>
                     </a>
@@ -79,9 +92,9 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import BaseImage from '~/components/common/TheBaseImage.vue';
 import TheContact from '~/components/parts/TheContact.vue';
-import Study from '~/assets/scripts/components/study';
 import Expansion from '~/assets/scripts/components/expansion';
 import Title from '~/assets/scripts/components/parts/contact/title';
+import Photo from '~/assets/scripts/components/photos';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { contactStore, loadingStore } from '~/store';
@@ -89,7 +102,7 @@ import { isMobile } from '~/assets/scripts/components/isMobile';
 import EventBus from '~/utils/event-bus';
 
 interface StudyOptions {
-    study: Study;
+    photo: Photo;
     studyAnim: {
         [key: string]: number;
     };
@@ -98,8 +111,10 @@ interface StudyOptions {
     };
     expansion: Expansion;
     title: Title;
+    timeline: gsap.core.Tween;
     isActive: boolean;
     isMobile: boolean;
+    hoverFlg: boolean;
 }
 
 export default Vue.extend({
@@ -116,7 +131,7 @@ export default Vue.extend({
     },
     data(): StudyOptions {
         return {
-            study: null,
+            photo: null,
             studyAnim: {
                 previous: 0,
                 current: 0,
@@ -125,8 +140,10 @@ export default Vue.extend({
             elms: {},
             expansion: null,
             title: null,
+            timeline: null,
             isActive: false,
             isMobile: isMobile(),
+            hoverFlg: false,
         };
     },
     watch: {
@@ -136,39 +153,66 @@ export default Vue.extend({
         loading(val: boolean) {
             if (val) this.init();
         },
-        // elms(val: Pick<StudyOptions, 'elms'>) {
-        //     const elmsList = Object.values(val);
-        //     elmsList.forEach((elm, index) => {
-        //         console.log(elm);
-        //         if (!elm) return;
-        //         if (elm && elmsList.length === index + 1) this.moveHorizontally();
-        //     });
-        // },
     },
     computed: {
         loading(): boolean {
             return loadingStore.getLoading.loaded;
         },
+        getTitle() {
+            return (event: MouseEvent): string => {
+                const target = event.target as HTMLElement;
+                return target.getAttribute('data-study-title');
+            };
+        },
     },
     mounted() {
         if (this.loading) this.init();
+        // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
-            console.log("photo");
-            this.study.cancel();
+            if (this.photo) this.photo.cancelAnimFrame();
             next();
         });
     },
     methods: {
         init(): void {
-            console.log('study');
+            // console.log('studyなんだよ');
+            // スクロールトリガー
             gsap.registerPlugin(ScrollTrigger);
             setTimeout(() => {
                 this.handleResize();
                 this.moveHorizontally();
             }, 1000);
-            this.study = new Study();
+            this.photo = new Photo();
+
+            window.addEventListener(
+                'resize',
+                () => {
+                    this.photo.handleResize();
+                },
+                false
+            );
+            // window.addEventListener(
+            //     'mousemove',
+            //     (e: MouseEvent) => {
+            //         this.photo.handleMouse(e);
+            //     },
+            //     false
+            // );
+            window.addEventListener(
+                'scroll',
+                () => {
+                    this.photo.handleScroll();
+                },
+                {
+                    capture: false,
+                    passive: true,
+                }
+            );
+
+            // 「Contact」の背景拡張
             this.expansion = new Expansion();
             this.expansion.init();
+            // 1文字に切り分ける
             this.splitText();
             EventBus.$emit('SHOW', false);
             window.addEventListener('resize', this.handleResize.bind(this));
@@ -258,6 +302,30 @@ export default Vue.extend({
                 char.style.animationDelay = `${index * 0.05 + 0.1}s`;
                 char.style.setProperty('--char-index', `${index}`);
             });
+        },
+        mouseenter(e: MouseEvent, mozSize: number): void {
+            if (this.timeline && !this.hoverFlg) this.timeline.pause();
+            this.hoverFlg = true;
+            const title = this.getTitle(e);
+            this.changeMoz(title, 1, mozSize);
+        },
+        mouseleave(e: MouseEvent, mozSize: number): void {
+            if (this.timeline && this.hoverFlg) this.timeline.pause();
+            this.hoverFlg = false;
+            const title = this.getTitle(e);
+            this.changeMoz(title, 0.3, mozSize);
+        },
+        changeMoz(title: string, duration: number, value: number): void {
+            for (const mesh of Object.values(this.photo.meshList)) {
+                const material = this.photo.getMaterial(mesh);
+                if (mesh.userData.title === title) {
+                    this.timeline = gsap.to(material.uniforms.uMoz, {
+                        duration,
+                        delay: 0,
+                        value,
+                    });
+                }
+            }
         },
     },
 });

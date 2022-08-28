@@ -10,7 +10,6 @@
             <TheCircle />
             <TheBox />
             <TheStudy @is-show="showContact" :isClose="this.contact.close" />
-            <TheCursor />
         </div>
     </div>
 </template>
@@ -81,14 +80,16 @@ export default Vue.extend({
         },
     },
     async mounted() {
+        console.log("index");
         this.title = new Title();
         await this.title.init();
         if (this.loading) this.title.startAnim();
         new Attract();
         this.handleEvent();
+        // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
             this.flg.scroll = false;
-            await this.title.cancelAnimFrame();
+            await this.title.cancel();
             next();
         });
     },

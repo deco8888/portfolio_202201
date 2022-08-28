@@ -95,17 +95,20 @@ export default Vue.extend({
     },
     methods: {
         init(): void {
+            // スクロールトリガー
             gsap.registerPlugin(ScrollTrigger);
+            // 上下のライン・左右にスクロール
             this.moveLine();
+            // パーティクル用Canvas
             this.canvasList = document.querySelectorAll("[data-mv-line='canvas']");
             this.canvasList.forEach((target, index) => {
                 this.particles[index] = new Particles(target, index);
             });
+            // リサイズ
             window.addEventListener('resize', this.handleResize.bind(this));
+            // 画面遷移時に「cancelAnimationFrame」を実行
             this.$router.beforeEach(async (_to, _from, next) => {
-                console.log('photo');
                 this.canvasList.forEach((_, index) => {
-                    console.log("particle");
                     this.particles[index].cancel();
                 });
                 next();

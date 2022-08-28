@@ -11,9 +11,12 @@
     top: 0;
     right: 0;
     height: 0;
+    opacity: 0;
     transform-origin: center;
+    transition: opacity 0.3s g.ease(OutSine);
     will-change: transform;
     &.is-active {
+        opacity: 1;
         z-index: 1001;
     }
     @include g.media('>phone') {

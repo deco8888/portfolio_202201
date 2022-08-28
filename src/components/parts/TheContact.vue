@@ -26,7 +26,6 @@ import Title from '~/assets/scripts/components/parts/contact/title';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { contactStore } from '~/store';
-import EventBus from '~/utils/event-bus';
 
 export default Vue.extend({
     props: {
@@ -59,6 +58,12 @@ export default Vue.extend({
         await this.post.init(this.canvas);
         this.post.setModels();
         this.handleEvent();
+        // 画面遷移時に「cancelAnimationFrame」を実行
+        this.$router.beforeEach(async (_to, _from, next) => {
+            this.title.cancel();
+            this.post.removeModels();
+            next();
+        });
     },
     watch: {
         isShow(val: boolean) {

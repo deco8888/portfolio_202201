@@ -583,9 +583,15 @@ export default class Letter extends Webgl {
             data: null,
         };
     }
-    async cancelAnimFrame(): Promise<void> {
+    async cancel(): Promise<void> {
         return new Promise((resolve) => {
             cancelAnimationFrame(this.animFrame);
+            while (this.three.scene.children.length > 0) {
+                this.three.scene.remove(this.three.scene.children[0]);
+            }
+            this.three.points.geometry.dispose();
+            const material = <ShaderMaterial>this.three.points.material;
+            material.dispose();
             resolve();
         });
     }

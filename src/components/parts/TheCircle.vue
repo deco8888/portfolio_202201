@@ -102,8 +102,8 @@ export default Vue.extend({
     },
     mounted() {
         this.circle = new Circle();
+        // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
-            console.log("photo");
             this.circle.cancel();
             next();
         });

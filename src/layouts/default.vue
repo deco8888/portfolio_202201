@@ -4,6 +4,7 @@
             <Loading ref="loading" />
             <div class="wrapper" ref="wrapper">
                 <Nuxt />
+                <TheCursor />
             </div>
         </main>
     </div>
@@ -14,6 +15,7 @@ import Vue from 'vue';
 import gsap, { Power4 } from 'gsap';
 import EventBus from '~/utils/event-bus';
 import Loading from '~/components/Loading.vue';
+import TheCursor from '~/components/parts/TheCursor.vue';
 import { loadingStore } from '~/store';
 import { addClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
@@ -21,6 +23,7 @@ import { hasClass } from '~/assets/scripts/utils/hasClass';
 export default Vue.extend({
     components: {
         Loading,
+        TheCursor,
     },
     data() {
         return {

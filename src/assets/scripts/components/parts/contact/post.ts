@@ -19,12 +19,10 @@ import {
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import Webgl from '../../webgl';
-import gsap, { Power2 } from 'gsap';
 import { radians } from '~/assets/scripts/utils/helper';
 import { GUI } from 'dat.gui';
-import { addClass, removeClass } from '~/assets/scripts/utils/classList';
+import { removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
-import { throttle } from '~/assets/scripts/utils/throttle';
 import { isMobile } from '../../isMobile';
 
 interface ThreeNumber {

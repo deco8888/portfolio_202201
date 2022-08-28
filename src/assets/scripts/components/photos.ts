@@ -1,19 +1,13 @@
 import * as THREE from 'three';
-// import { BufferGeometry, Mesh } from 'three';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
 import photoVertexShader from '../glsl/photo/vertexshader.vert';
 import photoFragmentShader from '../glsl/photo/fragmentShader.frag';
 import photoBgVertexShader from '../glsl/photo/bg/vertexshader.vert';
 import photoBgFragmentShader from '../glsl/photo/bg/fragmentShader.frag';
-import { throttle } from '../utils/throttle';
 import { lerp } from '../utils/math';
 import { Vector2, Vector3 } from 'three';
-import { debounce } from '../utils/debounce';
 import { Cursor } from './cursor';
 import Webgl from './webgl';
-import { hasClass } from '../utils/hasClass';
-import { isContains } from '../utils/classList';
 import { isMobile } from './isMobile';
 
 interface ThreeNumber {
@@ -31,7 +25,6 @@ interface UniformOptions {
 }
 
 export default class Photo extends Webgl {
-    [x: string]: any;
     three: {
         camera: THREE.PerspectiveCamera | null;
         scene: THREE.Scene;
@@ -47,6 +40,7 @@ export default class Photo extends Webgl {
     };
     elms: {
         canvas: HTMLCanvasElement;
+        link: NodeListOf<HTMLImageElement>;
         images: NodeListOf<HTMLImageElement>;
         mv: HTMLCanvasElement;
         expansion: HTMLCanvasElement;
@@ -95,6 +89,7 @@ export default class Photo extends Webgl {
         this.rectList = [];
         this.elms = {
             canvas: document.querySelector('[data-study="canvas"]'),
+            link: document.querySelectorAll('[data-study="link"]'),
             images: document.querySelectorAll('[data-study="image"]'),
             mv: document.querySelector('.p-index-mv'),
             expansion: document.querySelector('[data-expansion="canvas"]'),
@@ -131,6 +126,7 @@ export default class Photo extends Webgl {
         this.cursor = new Cursor();
         this.isLast = false;
         this.isMobile = isMobile();
+        this.init();
     }
     init(): void {
         for (const el of Object.values(this.elms)) {
@@ -239,7 +235,8 @@ export default class Photo extends Webgl {
     }
     // 遷移先タイトルを取得
     getTitle(index: number): string {
-        return this.elms.images[index].getAttribute('data-study-title');
+        if (!this.elms.link[index]) return;
+        return this.elms.link[index].getAttribute('data-study-title');
     }
     initBgMesh(): THREE.Mesh[] {
         const bgMeshList = [] as THREE.Mesh[];
@@ -379,6 +376,7 @@ export default class Photo extends Webgl {
         }
         this.elms = {
             canvas: document.querySelector('[data-study="canvas"]'),
+            link: document.querySelectorAll('[data-study="link"]'),
             images: document.querySelectorAll('[data-study="image"]'),
             mv: document.querySelector('.p-index-mv'),
             expansion: document.querySelector('[data-expansion="canvas"]'),
@@ -393,6 +391,7 @@ export default class Photo extends Webgl {
     }
     cancelAnimFrame(): void {
         cancelAnimationFrame(this.animFrame);
+        this.three.raycaster = null;
     }
     setIsMobile(): void {
         for (const [index, mesh] of Object.entries(this.meshList)) {
@@ -520,39 +519,6 @@ export default class Photo extends Webgl {
             tl.play();
         }
     }
-    async setRaycaster(): Promise<void> {
-        this.three.raycaster.setFromCamera(this.mouse, this.three.camera);
-        // 交差するオブジェクトを計算
-        const intersectObjects = this.three.raycaster.intersectObjects(this.three.scene.children);
-        for (const object of Object.values(intersectObjects)) {
-            const intersectObject = <THREE.Mesh>object.object;
-            const intersectMaterial = this.getMaterial(intersectObject);
-            for (const mesh of Object.values(this.meshList)) {
-                const material = this.getMaterial(mesh);
-                if (intersectMaterial.id === material.id) {
-                    this.studyData.url = mesh.userData.url;
-                    this.studyData.title = mesh.userData.title;
-                    this.cursor.setText(this.studyData.title);
-                    material.uniforms.uMoz.value = lerp(material.uniforms.uMoz.value, 0.0, 0.08);
-                    !this.flg.isScroll && this.flg.isMove ? this.cursor.mouseover(true) : this.cursor.mouseover(false);
-                }
-            }
-        }
-        if (intersectObjects.length === 0) {
-            this.studyData.url = '';
-            this.studyData.title = '';
-            this.cursor.deleteText();
-            for (const mesh of Object.values(this.meshList)) {
-                const material = this.getMaterial(mesh);
-                material.uniforms.uMoz.value = lerp(material.uniforms.uMoz.value, 0.02, 0.2);
-                this.cursor.mouseover(false);
-            }
-        }
-    }
-    async openPage(): Promise<void> {
-        if (this.studyData.url) window.open(this.studyData.url, '_blank', 'noreferrer');
-        this.studyData.url = '';
-    }
     // スクロール
     handleScroll(): void {
         this.flg.isScroll = true;
@@ -601,7 +567,6 @@ export default class Photo extends Webgl {
             x: (e.clientX / window.innerWidth) * 2 - 1,
             y: -(e.clientY / window.innerHeight) * 2 + 1,
         };
-        if (!isContains(this.elms.expansion, hasClass.active)) this.setRaycaster();
     }
     handleClick(e: MouseEvent): void {
         this.mouse = {

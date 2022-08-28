@@ -195,11 +195,11 @@ export class Cursor extends Webgl {
     }
     mouseover(flg: boolean): void {
         if (flg) {
-            // addClass(this.elms.cursor, hasClass.active);
+            addClass(this.elms.cursor, hasClass.active);
             this.styles.scale.current = 1;
             this.flg.isRaycaster = true;
         } else {
-            // removeClass(this.elms.cursor, hasClass.active);
+            removeClass(this.elms.cursor, hasClass.active);
             this.styles.scale.current = 0.3;
             this.flg.isRaycaster = false;
         }

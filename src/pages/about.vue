@@ -3,7 +3,6 @@
         <div class="p-about__canvas" data-canvas="title"></div>
         <TheAboutTransition />
         <TheAboutIntro />
-        <TheCursor />
     </div>
 </template>
 
@@ -34,8 +33,9 @@ export default Vue.extend({
             this.title.init();
             this.handleEvent();
         }, 1500);
+        // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
-            await this.title.cancelAnimFrame();
+            await this.title.cancel();
             next();
         });
     },
