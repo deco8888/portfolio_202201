@@ -1,9 +1,19 @@
 import { lerp } from 'three/src/math/MathUtils';
-import { isMobile } from '../../isMobile';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 interface ParticleOption {
-    x: number;
-    y: number;
+    first: {
+        x: number;
+        y: number;
+    };
+    second: {
+        x: number;
+        y: number;
+    };
+    current: {
+        x: number;
+        y: number;
+    };
     radius: number;
     directionX: number;
     directionY: number;
@@ -25,6 +35,7 @@ export default class Particles {
     particles: ParticleOption[];
     diff: number;
     animFrame: number;
+    isStart: boolean;
     constructor(canvas: HTMLCanvasElement, index: number) {
         this.index = index;
         this.canvas = {
@@ -38,10 +49,14 @@ export default class Particles {
             y: 0,
             radius: 100,
         };
-        this.total = 30;
+        this.total = 40;
         this.particles = [];
         this.diff = isMobile ? 10 : 10;
+        this.isStart = true;
         this.init();
+        for (let i = 0; i < this.particles.length; i++) {
+            this.create(this.particles[i]);
+        }
         this.render();
     }
     init(): void {
@@ -49,20 +64,33 @@ export default class Particles {
         // this.canvas.ctx = this.canvas.el.getContext('2d');
         this.canvas.el.width = window.innerWidth;
         this.canvas.el.height = window.innerHeight / 2;
+        const canvasPos = this.canvas.el.getAttribute('data-mv-line-pos');
+        const firstX = this.canvas.el.width / 2;
+        const firstY = canvasPos === 'top' ? this.canvas.el.height : 0;
         this.handleEvent();
         for (let i = 0; i < this.total; i++) {
             const radius = Math.floor(Math.random() * 60);
-            let x = Math.random() * this.canvas.el.clientWidth;
-            x = Math.max(x, radius + this.diff);
-            x = Math.min(x, this.canvas.el.width - radius - this.diff * 2);
-            let y = Math.floor(Math.random() * this.canvas.el.clientHeight);
-            y = Math.max(y, radius + this.diff);
-            y = Math.min(y, this.canvas.el.clientHeight - radius);
+            let secondX = Math.random() * this.canvas.el.clientWidth;
+            secondX = Math.max(secondX, radius + this.diff);
+            secondX = Math.min(secondX, this.canvas.el.width - radius - this.diff * 2);
+            let secondY = Math.floor(Math.random() * this.canvas.el.clientHeight);
+            secondY = Math.max(secondY, radius + this.diff);
+            secondY = Math.min(secondY, this.canvas.el.clientHeight - radius);
             const directionX = Math.random() * 2;
             const directionY = Math.random() * 2 - 1;
             const particle = {
-                x,
-                y: y,
+                first: {
+                    x: firstX,
+                    y: firstY,
+                },
+                second: {
+                    x: secondX,
+                    y: secondY,
+                },
+                current: {
+                    x: firstX,
+                    y: firstY,
+                },
                 radius,
                 directionX,
                 directionY,
@@ -74,9 +102,22 @@ export default class Particles {
     render(): void {
         this.canvas.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let i = 0; i < this.particles.length; i++) {
-            this.update(this.particles[i]);
+            const particle = this.particles[i];
+            if (!this.isStart) {
+                this.update(particle);
+            } else {
+                this.start(particle);
+            }
         }
         this.animFrame = requestAnimationFrame(this.render.bind(this));
+    }
+    start(particle: ParticleOption): void {
+        this.create(particle);
+        particle.current.x = lerp(particle.current.x, particle.second.x, 0.08);
+        particle.current.y = lerp(particle.current.y, particle.second.y, 0.08);
+        if (Math.round(particle.current.y) === Math.round(particle.second.y)) {
+            this.isStart = false;
+        }
     }
     handleEvent(): void {
         window.addEventListener('mousemove', (event) => {
@@ -103,60 +144,68 @@ export default class Particles {
     }
     update(particle: ParticleOption): void {
         if (this.detectCollision(particle)) {
-            if (particle.x > this.mouse.x) {
-                particle.x = lerp(particle.x, particle.x + particle.radius, 0.05);
+            if (particle.second.x > this.mouse.x) {
+                particle.second.x = lerp(particle.second.x, particle.second.x + particle.radius, 0.03);
                 if (particle.directionX < 0) particle.directionX = -particle.directionX;
             }
-            if (particle.x < this.mouse.x) {
-                particle.x = lerp(particle.x, particle.x - particle.radius, 0.05);
+            if (particle.second.x < this.mouse.x) {
+                particle.second.x = lerp(particle.second.x, particle.second.x - particle.radius, 0.03);
                 if (particle.directionX > 0) particle.directionX = -particle.directionX;
             }
-            if (particle.y > this.mouse.y) {
-                particle.y = lerp(particle.y, particle.y + particle.radius, 0.05);
+            if (particle.second.y > this.mouse.y) {
+                particle.second.y = lerp(particle.second.y, particle.second.y + particle.radius, 0.03);
                 if (particle.directionY < 0) particle.directionY = -particle.directionY;
             }
-            if (particle.y < this.mouse.y) {
-                particle.y = lerp(particle.y, particle.y - particle.radius, 0.05);
+            if (particle.second.y < this.mouse.y) {
+                particle.second.y = lerp(particle.second.y, particle.second.y - particle.radius, 0.03);
                 if (particle.directionY > 0) particle.directionY = -particle.directionY;
             }
         }
-        particle.x += particle.directionX;
-        particle.y += particle.directionY;
+        particle.second.x += particle.directionX;
+        particle.second.y += particle.directionY;
         const canvasW = this.canvas.el.width;
         const canvasH = this.canvas.el.height;
         const maxX = canvasW - particle.radius - this.diff * 2;
         const maxY = canvasH - particle.radius;
         const min = particle.radius + this.diff;
-        if ((particle.x >= maxX && particle.x < canvasW) || (particle.x <= min && particle.x > 0)) {
+        if (
+            (particle.second.x >= maxX && particle.second.x < canvasW) ||
+            (particle.second.x <= min && particle.second.x > 0)
+        ) {
             particle.directionX = -particle.directionX;
         }
-        if (particle.x >= maxX && particle.x >= canvasW) {
-            particle.x = maxX;
+        if (particle.second.x >= maxX && particle.second.x >= canvasW) {
+            particle.second.x = maxX;
         }
-        if (particle.x <= min && particle.x <= 0) {
-            particle.x = min * 2;
+        if (particle.second.x <= min && particle.second.x <= 0) {
+            particle.second.x = min * 2;
         }
-        if ((particle.y >= maxY && particle.y < canvasH) || (particle.y <= min && particle.y > 0)) {
+        if (
+            (particle.second.y >= maxY && particle.second.y < canvasH) ||
+            (particle.second.y <= min && particle.second.y > 0)
+        ) {
             particle.directionY = -particle.directionY;
         }
-        if (particle.y >= maxY && particle.y >= canvasH) {
-            particle.y = maxY - this.diff * 2;
+        if (particle.second.y >= maxY && particle.second.y >= canvasH) {
+            particle.second.y = maxY - this.diff * 2;
         }
-        if (particle.y <= min && particle.y <= 0) {
-            particle.y = min * 2;
+        if (particle.second.y <= min && particle.second.y <= 0) {
+            particle.second.y = min * 2;
         }
+        particle.current.x = particle.second.x;
+        particle.current.y = particle.second.y;
         this.create(particle);
     }
     judgeX(particle: ParticleOption): boolean {
         return (
-            particle.x > this.canvas.el.width - particle.radius - this.diff * 2 ||
-            particle.x < particle.radius + this.diff
+            particle.second.x > this.canvas.el.width - particle.radius - this.diff * 2 ||
+            particle.second.x < particle.radius + this.diff
         );
     }
     // パーティクルが衝突しているかどうか
     detectCollision(particle: ParticleOption): boolean {
-        const dx = this.mouse.x - particle.x;
-        const dy = this.mouse.y - particle.y;
+        const dx = this.mouse.x - particle.second.x;
+        const dy = this.mouse.y - particle.second.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         return distance < this.mouse.radius + particle.radius;
     }
@@ -167,10 +216,10 @@ export default class Particles {
         ctx.beginPath();
         // void ctx.arc(x座標, y座標, 半径, startAngle, endAngle [, counterclockwise]);
         // ※「counterclockwise」
-        // console.log(particle.x, particle.y);
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2, true);
+        // console.log(particle.second.x, particle.second.y);
+        ctx.arc(particle.current.x, particle.current.y, particle.radius, 0, Math.PI * 2, true);
 
-        // ctx.rect(particle.x, particle.y, particle.radius, particle.radius);
+        // ctx.rect(particle.second.x, particle.second.y, particle.radius, particle.radius);
     }
     handleResize(): void {
         this.canvas.width = window.innerWidth;

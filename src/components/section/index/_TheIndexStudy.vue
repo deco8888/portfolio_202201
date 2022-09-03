@@ -91,14 +91,14 @@ import Vue from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import BaseImage from '~/components/common/TheBaseImage.vue';
-import TheContact from '~/components/parts/TheContact.vue';
-import Expansion from '~/assets/scripts/components/expansion';
-import Title from '~/assets/scripts/components/parts/contact/title';
-import Photo from '~/assets/scripts/components/photos';
+import TheContact from '~/components/parts/index/TheContact.vue';
+import Expansion from '~/assets/scripts/modules/expansion';
+import Title from '~/assets/scripts/components/parts/index/contact/title';
+import Photo from '~/assets/scripts/components/parts/index/study/photos';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { contactStore, loadingStore } from '~/store';
-import { isMobile } from '~/assets/scripts/components/isMobile';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 import EventBus from '~/utils/event-bus';
 
 interface StudyOptions {
@@ -227,7 +227,7 @@ export default Vue.extend({
                     ease: 'none',
                     scrollTrigger: {
                         trigger: '.js-study-trigger',
-                        markers: true,
+                        // markers: true,
                         start: 'top top',
                         end: () => '+=' + scrollHeight,
                         onUpdate: () => {
@@ -253,7 +253,7 @@ export default Vue.extend({
                     ease: 'none',
                     scrollTrigger: {
                         trigger: '.js-study-trigger',
-                        markers: true,
+                        // markers: true,
                         start: 'top top',
                         end: () =>
                             '+=' +

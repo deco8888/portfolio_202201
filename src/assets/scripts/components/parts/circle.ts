@@ -47,7 +47,6 @@ export default class Circle {
             duration: 0.1,
             rotate: this.scroll.previous,
         });
-
         this.animFrame = requestAnimationFrame(() => this.rotate());
     }
     cancel(): void {

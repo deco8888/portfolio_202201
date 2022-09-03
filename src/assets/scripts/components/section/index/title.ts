@@ -1,9 +1,9 @@
 import { BufferGeometry, Clock, Vector3 } from 'three';
 import { addClass, isContains, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
-import { lerp } from '../../../utils/math';
-import { isMobile } from '../../isMobile';
-import Letter from '../../letter';
+import { lerp } from '~/assets/scripts/utils/math';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
+import Letter from '~/assets/scripts/modules/letter';
 
 interface PointsListType {
     [key: number]: Vector3[];

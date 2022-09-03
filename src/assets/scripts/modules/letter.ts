@@ -13,7 +13,6 @@ import {
     Raycaster,
     Vector2,
     PointLight,
-    CameraHelper,
 } from 'three';
 import gsap, { Sine, Back } from 'gsap';
 import letterVertexShader from '../glsl/letter/vertexshader.vert';
@@ -21,8 +20,7 @@ import letterFragmentShader from '../glsl/letter/fragmentShader.frag';
 import { lerp } from '../utils/math';
 import Webgl from './webgl';
 import { distance3d, radians } from '../utils/helper';
-import { Vec3 } from './vec3';
-import { isMobile } from './isMobile';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -418,7 +416,6 @@ export default class Letter extends Webgl {
         const geometryPosition = geometry.attributes.position;
         const positionList = geometryPosition.array;
         const promiseList = this.title.secondList.position;
-        const p = Vec3;
         for (let i = 0; i < positionList.length / 3; i++) {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
@@ -589,9 +586,12 @@ export default class Letter extends Webgl {
             while (this.three.scene.children.length > 0) {
                 this.three.scene.remove(this.three.scene.children[0]);
             }
-            this.three.points.geometry.dispose();
-            const material = <ShaderMaterial>this.three.points.material;
-            material.dispose();
+            console.log(this.three.points);
+            if (this.three.points) {
+                this.three.points.geometry.dispose();
+                const material = <ShaderMaterial>this.three.points.material;
+                material.dispose();
+            }
             resolve();
         });
     }

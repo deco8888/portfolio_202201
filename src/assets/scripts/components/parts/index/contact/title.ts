@@ -1,8 +1,7 @@
-import * as THREE from 'three';
 import gsap, { Power2 } from 'gsap';
-import { lerp } from '../../../utils/math';
-import Letter from '../../letter';
-import { BufferGeometry, Material, ShaderMaterial } from 'three';
+import { lerp } from '~/assets/scripts/utils/math';
+import Letter from '~/assets/scripts/modules/letter';
+import { BufferGeometry, ShaderMaterial } from 'three';
 
 export default class Title extends Letter {
     speed: number;

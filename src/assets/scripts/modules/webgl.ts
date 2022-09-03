@@ -49,25 +49,12 @@ export default class Webgl {
             0.1, // 視点から最も近い面までの距離
             10000 // 視点から最も遠い面までの距離
         );
-        // const camera = new OrthographicCamera(
-        //     this.winSize.width / 2,
-        //     this.winSize.width / 2,
-        //     this.winSize.height / 2,
-        //     this.winSize.height / -2,
-        //     -1,
-        //     10000
-        // );
         camera.position.set(0, 0, 1000);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
         // camera.lookAt(this.three.scene.position);
         camera.updateProjectionMatrix();
         return camera;
     }
-    // initPointLight(): PointLight {
-    //     const light = new PointLight('#fff');
-    //     light.position.set(0, 0, 0);
-    //     return light;
-    // }
     initRenderer(): WebGLRenderer {
         const renderer = new WebGLRenderer({
             alpha: true,

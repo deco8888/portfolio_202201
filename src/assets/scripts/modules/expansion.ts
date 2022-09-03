@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 import gsap, { Power2 } from 'gsap';
-import Webgl from './webgl';
-import { isMobile } from './isMobile';
+import Webgl from '~/assets/scripts/modules/webgl';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 import expansionVertexShader from '../glsl/expansion/vertexshader.vert';
 import expansionFragmentShader from '../glsl/expansion/fragmentShader.frag';
 import { addClass, removeClass } from '../utils/classList';
 import { hasClass } from '../utils/hasClass';
-import { throttle } from '../utils/throttle';
 
 interface ThreeNumber {
     [key: string]: number;

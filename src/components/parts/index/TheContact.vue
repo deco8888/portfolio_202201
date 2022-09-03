@@ -20,9 +20,9 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import Expansion from '~/assets/scripts/components/expansion';
-import Post from '~/assets/scripts/components/parts/contact/post';
-import Title from '~/assets/scripts/components/parts/contact/title';
+import Expansion from '~/assets/scripts/modules/expansion';
+import Post from '~/assets/scripts/components/parts/index/contact/post';
+import Title from '~/assets/scripts/components/parts/index/contact/title';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { contactStore } from '~/store';

@@ -13,13 +13,12 @@ import {
     Vector2,
     PointLight,
     Object3D,
-    OrthographicCamera,
 } from 'three';
 import gsap, { Power2 } from 'gsap';
 import Webgl from './webgl';
-import { isMobile } from './isMobile';
-import transitionVertexShader from '../glsl/transition/vertexshader.vert';
-import transitionFragmentShader from '../glsl/transition/fragmentShader.frag';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
+import transitionVertexShader from '~/assets/scripts/glsl/transition/vertexshader.vert';
+import transitionFragmentShader from '~/assets/scripts/glsl/transition/fragmentShader.frag';
 
 interface ThreeNumber {
     [key: string]: number;

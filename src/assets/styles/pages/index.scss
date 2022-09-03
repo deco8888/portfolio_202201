@@ -1,1 +1,6 @@
-@use '../components/sections/mv';
+.p-page {
+    display: block;
+    position: relative;
+    width: 100%;
+    opacity: 0;
+}

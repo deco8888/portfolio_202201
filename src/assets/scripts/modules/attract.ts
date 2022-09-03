@@ -1,4 +1,4 @@
-import { isMobile } from '../components/isMobile';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 import gsap, { Power4 } from 'gsap';
 
 export default class Attract {

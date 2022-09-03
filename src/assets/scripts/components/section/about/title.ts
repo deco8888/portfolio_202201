@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { lerp } from '../../../utils/math';
-import Letter from '../../letter';
+import Letter from '~/assets/scripts/modules/letter';
 import { radians } from '../../../utils/helper';
 import { PerspectiveCamera } from 'three';
 

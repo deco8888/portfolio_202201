@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import Art from '~/assets/scripts/components/art';
+// import Art from '~/assets/scripts/components/art';
 import EventBus from '~/utils/event-bus';
 
 export default Vue.extend({
@@ -23,9 +23,9 @@ export default Vue.extend({
     mounted() {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
         // eslint-disable-next-line no-new
-        new Art({
-            canvas,
-        });
+        // new Art({
+        //     canvas,
+        // });
         EventBus.$emit('TRANSITION', this.sectionName);
     },
 });

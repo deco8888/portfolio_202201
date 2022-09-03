@@ -10,14 +10,28 @@
                             <canvas
                                 class="p-index-mv__bg-canvas p-index-mv__bg-canvas--top"
                                 data-mv-line="canvas"
+                                data-mv-line-pos="top"
                             ></canvas>
                             <div class="p-index-mv__name-wrap">
-                                <div class="p-index-mv__name">AYAKA NAKAMURA</div>
-                                <!-- <div class="p-index-mv__name">AYAKA NAKAMURA</div>
-                                <div class="p-index-mv__name">AYAKA NAKAMURA</div>
-                                <div class="p-index-mv__name">AYAKA NAKAMURA</div>
-                                <div class="p-index-mv__name">AYAKA NAKAMURA</div>
-                                <div class="p-index-mv__name">AYAKA NAKAMURA</div> -->
+                                <p :class="['p-index-mv__name', { 'is-active': isActive }]">
+                                    <span
+                                        v-for="(word, index1) in splitWord('firstName')"
+                                        :key="index1"
+                                        class="p-index-mv__name-char"
+                                        data-split-char="name"
+                                    >
+                                        {{ word }}
+                                    </span>
+                                    &nbsp;
+                                    <span
+                                        v-for="(word, index2) in splitWord('familyName')"
+                                        :key="splitWord('firstName').length + index2 + 1"
+                                        class="p-index-mv__name-char"
+                                        data-split-char="name"
+                                    >
+                                        {{ word }}
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -30,15 +44,28 @@
                             <canvas
                                 class="p-index-mv__bg-canvas p-index-mv__bg-canvas--bottom"
                                 data-mv-line="canvas"
+                                data-mv-line-pos="bottom"
                             ></canvas>
                             <div class="p-index-mv__position-wrap">
-                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
-                                <!-- <div class="p-index-mv__position">FRONT-END ENGINEER</div>
-                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
-                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
-                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
-                                <div class="p-index-mv__position">FRONT-END ENGINEER</div>
-                                <div class="p-index-mv__position">FRONT-END ENGINEER</div> -->
+                                <p :class="['p-index-mv__position', { 'is-active': isActive }]">
+                                    <span
+                                        v-for="(word, index3) in splitWord('front')"
+                                        :key="index3"
+                                        class="p-index-mv__position-char"
+                                        data-split-char="position"
+                                    >
+                                        {{ word }}
+                                    </span>
+                                    &nbsp;
+                                    <span
+                                        v-for="(word, index4) in splitWord('front')"
+                                        :key="splitWord('rear') + index4 + 1"
+                                        class="p-index-mv__position-char"
+                                        data-split-char="position"
+                                    >
+                                        {{ word }}
+                                    </span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -64,10 +91,20 @@ interface MvOptions {
     };
     canvasList: NodeListOf<HTMLCanvasElement>;
     particles: Particles[];
+    string: {
+        [key: string]: string;
+    };
 }
 export default Vue.extend({
     components: {
         BaseImage,
+    },
+    props: {
+        isActive: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     },
     data(): MvOptions {
         return {
@@ -78,6 +115,12 @@ export default Vue.extend({
             },
             canvasList: null,
             particles: [],
+            string: {
+                firstName: 'AYAKA',
+                familyName: 'NAKAMURA',
+                front: 'FRONT-END',
+                rear: 'ENGINEER',
+            },
         };
     },
     watch: {
@@ -90,9 +133,6 @@ export default Vue.extend({
             return loadingStore.getLoading.loaded;
         },
     },
-    mounted() {
-        if (this.loading) this.init();
-    },
     methods: {
         init(): void {
             // スクロールトリガー
@@ -104,6 +144,8 @@ export default Vue.extend({
             this.canvasList.forEach((target, index) => {
                 this.particles[index] = new Particles(target, index);
             });
+            // 1文字に切り分ける
+            this.splitText();
             // リサイズ
             window.addEventListener('resize', this.handleResize.bind(this));
             // 画面遷移時に「cancelAnimationFrame」を実行
@@ -158,10 +200,20 @@ export default Vue.extend({
             });
         },
         handleResize(): void {
-            console.log('mv');
             this.particles.forEach((particle) => {
                 particle.handleResize();
             });
+        },
+        splitText(): void {
+            const charList = document.querySelectorAll<HTMLElement>(`[data-split-char]`);
+            charList.forEach((char, index) => {
+                char.style.animationDelay = `${index * 0.04 + 0.3}s`;
+                char.style.setProperty('--char-index', `${index}`);
+            });
+        },
+        splitWord(key: string): string[] {
+            console.log(this.string[key]);
+            return this.string[key].split('');
         },
     },
 });

@@ -1,3 +1,5 @@
+@use './colors' as c;
+
 @keyframes scale {
     0% {
         transform: scale(1);
@@ -127,5 +129,41 @@
     }
     100% {
         transform: rotate(0deg) translate3d(0, 0, 0);
+    }
+}
+
+@keyframes change-color-name {
+    0% {
+        color: transparent;
+    }
+    25% {
+        color: #9696d3;
+    }
+    50% {
+        color: #a56ee4;
+    }
+    75% {
+        color: #9696d3;
+    }
+    100% {
+        color: c.$color-dark-pastel-purple;
+    }
+}
+
+@keyframes change-color-position {
+    0% {
+        color: transparent;
+    }
+    25% {
+        color: #efe2b5;
+    }
+    50% {
+        color: #ede165;
+    }
+    75% {
+        color: #efe2b5;
+    }
+    100% {
+        color: c.$color-mellow-apricot;
     }
 }

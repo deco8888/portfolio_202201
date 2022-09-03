@@ -1,25 +1,5 @@
 <template>
     <div class="c-cursor" data-cursor>
-        <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65.89 288.47" class="c-cursor__svg">
-            <g>
-                <rect class="c-cursor__shaft" x="27.95" y="83.93" width="10" height="100" />
-                <polygon
-                    class="c-cursor__arrow"
-                    points="32.95 7.48 61.95 89.2 32.95 81.43 32.95 81.43 3.95 89.2 32.95 7.48 32.95 7.48"
-                />
-                <polygon
-                    class="c-cursor__wing"
-                    points="37.95 186.93 57.45 227.36 57.45 281.83 32.95 253.89 8.45 281.83 8.45 227.36 27.95 186.93 32.95 186.93 37.95 186.93"
-                />
-                <line class="c-cursor__line" x1="32.95" y1="187.43" x2="32.95" y2="254.43" />
-                <line class="c-cursor__line" x1="32.7" y1="208.59" x2="57.2" y2="236.59" />
-                <line class="c-cursor__line" x1="32.7" y1="223.53" x2="57.2" y2="251.53" />
-                <line class="c-cursor__line" x1="32.7" y1="237.85" x2="57.2" y2="265.85" />
-                <line class="c-cursor__line" x1="32.77" y1="209.12" x2="8.27" y2="237.12" />
-                <line class="c-cursor__line" x1="32.77" y1="224.05" x2="8.27" y2="252.05" />
-                <line class="c-cursor__line" x1="32.77" y1="238.38" x2="8.27" y2="266.38" />
-            </g>
-        </svg> -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 285.56 292.86" class="c-cursor__svg">
             <g>
                 <g class="c-cursor__string-group">
@@ -102,7 +82,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import BaseImage from '~/components/common/TheBaseImage.vue';
-import { Cursor } from '~/assets/scripts/components/cursor';
+import { Cursor } from '~/assets/scripts/components/parts/common/cursor';
 import gsap, { Power2 } from 'gsap';
 
 export default Vue.extend({
@@ -112,7 +92,6 @@ export default Vue.extend({
     mounted() {
         new Cursor();
         window.addEventListener('click', () => {
-            console.log('click');
             const arrow = document.querySelector('[data-cursor-arrow]');
             const tl = gsap.timeline({
                 paused: true,

@@ -1,14 +1,28 @@
-import * as THREE from 'three';
+import {
+    PerspectiveCamera,
+    Scene,
+    Mesh,
+    Object3D,
+    WebGLRenderer,
+    Clock,
+    ShaderMaterial,
+    Color,
+    Vector2,
+    IUniform,
+    Texture,
+    PointLight,
+    TextureLoader,
+    PlaneBufferGeometry,
+    Vector3,
+} from 'three';
 import gsap from 'gsap';
-import photoVertexShader from '../glsl/photo/vertexshader.vert';
-import photoFragmentShader from '../glsl/photo/fragmentShader.frag';
-import photoBgVertexShader from '../glsl/photo/bg/vertexshader.vert';
-import photoBgFragmentShader from '../glsl/photo/bg/fragmentShader.frag';
-import { lerp } from '../utils/math';
-import { Vector2, Vector3 } from 'three';
-import { Cursor } from './cursor';
-import Webgl from './webgl';
-import { isMobile } from './isMobile';
+import photoVertexShader from '~/assets/scripts/glsl/photo/vertexshader.vert';
+import photoFragmentShader from '~/assets/scripts/glsl/photo/fragmentShader.frag';
+import photoBgVertexShader from '~/assets/scripts/glsl/photo/bg/vertexshader.vert';
+import photoBgFragmentShader from '~/assets/scripts/glsl/photo/bg/fragmentShader.frag';
+import { lerp } from '~/assets/scripts/utils/math';
+import Webgl from '~/assets/scripts/modules/webgl';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 interface ThreeNumber {
     [key: string]: number;
@@ -21,22 +35,21 @@ interface ScrollOptions {
 }
 
 interface UniformOptions {
-    [uniform: string]: THREE.IUniform;
+    [uniform: string]: IUniform;
 }
 
 export default class Photo extends Webgl {
     three: {
-        camera: THREE.PerspectiveCamera | null;
-        scene: THREE.Scene;
-        mesh: THREE.Mesh;
-        bgMesh: THREE.Mesh[];
-        textureList: THREE.Texture[];
-        renderer: THREE.WebGLRenderer;
-        object: THREE.Object3D;
+        camera: PerspectiveCamera | null;
+        scene: Scene;
+        mesh: Mesh;
+        bgMesh: Mesh[];
+        textureList: Texture[];
+        renderer: WebGLRenderer;
+        object: Object3D;
         // control: OrbitControls | null;
-        clock: THREE.Clock;
-        raycaster: THREE.Raycaster;
-        pointLight: THREE.PointLight | null;
+        clock: Clock;
+        pointLight: PointLight | null;
     };
     elms: {
         canvas: HTMLCanvasElement;
@@ -58,8 +71,8 @@ export default class Photo extends Webgl {
         [key: string]: boolean;
     };
     scrollList: ScrollOptions[];
-    meshList: THREE.Mesh[];
-    bgMeshList: THREE.Mesh[][];
+    meshList: Mesh[];
+    bgMeshList: Mesh[][];
     srcList: string[];
     studyData: {
         url: string;
@@ -67,7 +80,6 @@ export default class Photo extends Webgl {
     };
     imagePath: string;
     targetY: number;
-    cursor: Cursor;
     animFrame?: number;
     isLast: boolean;
     isMobile: boolean;
@@ -75,15 +87,14 @@ export default class Photo extends Webgl {
         super();
         this.three = {
             camera: null,
-            scene: new THREE.Scene(),
+            scene: new Scene(),
             mesh: null,
             bgMesh: null,
             textureList: [],
             renderer: null,
             object: null,
             // control: null,
-            clock: new THREE.Clock(),
-            raycaster: new THREE.Raycaster(),
+            clock: new Clock(),
             pointLight: null,
         };
         this.rectList = [];
@@ -123,7 +134,6 @@ export default class Photo extends Webgl {
             title: '',
         };
         this.targetY = 0;
-        this.cursor = new Cursor();
         this.isLast = false;
         this.isMobile = isMobile();
         this.init();
@@ -158,10 +168,10 @@ export default class Photo extends Webgl {
             if (imageName) await this.texture(index, imageName);
         }
     }
-    async texture(index: string, imageName: string): Promise<THREE.Texture> {
+    async texture(index: string, imageName: string): Promise<Texture> {
         return new Promise((resolve) => {
             const imageSrc = `/textures/${imageName}`;
-            const textureLoader = new THREE.TextureLoader();
+            const textureLoader = new TextureLoader();
             textureLoader.load(imageSrc, async (texture) => {
                 this.three.textureList.push(texture);
                 await this.set(parseInt(index));
@@ -185,13 +195,13 @@ export default class Photo extends Webgl {
         this.update(index);
         this.scrollList[index].previous = this.meshList[index].position.x;
     }
-    initMesh(index: number): THREE.Mesh {
+    initMesh(index: number): Mesh {
         const uniforms = {
             uResolution: {
-                value: new THREE.Vector2(0.0, 0.0), // 画面サイズ
+                value: new Vector2(0.0, 0.0), // 画面サイズ
             },
             uImageResolution: {
-                value: new THREE.Vector2(400, 300), // 画像サイズ
+                value: new Vector2(400, 300), // 画像サイズ
             },
             uTexture: {
                 value: this.three.textureList[index], // 読み込んだ画像
@@ -218,15 +228,15 @@ export default class Photo extends Webgl {
         // 分割数
         const segments = 30;
         // 形状データを作成
-        const geometry = new THREE.PlaneBufferGeometry(1, 1, segments, segments);
+        const geometry = new PlaneBufferGeometry(1, 1, segments, segments);
         // 質感を作成
-        const material = new THREE.ShaderMaterial({
+        const material = new ShaderMaterial({
             uniforms: uniforms,
             vertexShader: photoVertexShader,
             fragmentShader: photoFragmentShader,
             transparent: false,
         });
-        const mesh = new THREE.Mesh(geometry, material);
+        const mesh = new Mesh(geometry, material);
         return mesh;
     }
     // 遷移先リンクを取得
@@ -238,21 +248,21 @@ export default class Photo extends Webgl {
         if (!this.elms.link[index]) return;
         return this.elms.link[index].getAttribute('data-study-title');
     }
-    initBgMesh(): THREE.Mesh[] {
-        const bgMeshList = [] as THREE.Mesh[];
+    initBgMesh(): Mesh[] {
+        const bgMeshList = [] as Mesh[];
         for (let i = 0; i < 2; i++) {
             const bgMesh = this.createBgMesh();
             bgMeshList.push(bgMesh);
         }
         return bgMeshList;
     }
-    createBgMesh(): THREE.Mesh {
+    createBgMesh(): Mesh {
         const uniforms: UniformOptions = {
             uResolution: {
-                value: new THREE.Vector2(0.0, 0.0), // 画面サイズ
+                value: new Vector2(0.0, 0.0), // 画面サイズ
             },
             uImageResolution: {
-                value: new THREE.Vector2(400, 300), // 画像サイズ
+                value: new Vector2(400, 300), // 画像サイズ
             },
             uProgress: {
                 value: 1.0,
@@ -267,7 +277,7 @@ export default class Photo extends Webgl {
                 value: 0.0,
             },
             uColor: {
-                value: new THREE.Vector3(1.0, 0.1, 1.0),
+                value: new Vector3(1.0, 0.1, 1.0),
             },
             uIsMobile: {
                 value: this.isMobile ? true : false,
@@ -276,14 +286,14 @@ export default class Photo extends Webgl {
         // 分割数
         const segments = 30;
         // 形状データを作成
-        const bgGeometry = new THREE.PlaneBufferGeometry(1, 1, segments, segments);
-        const bgMaterial = new THREE.ShaderMaterial({
+        const bgGeometry = new PlaneBufferGeometry(1, 1, segments, segments);
+        const bgMaterial = new ShaderMaterial({
             uniforms: uniforms,
             vertexShader: photoBgVertexShader,
             fragmentShader: photoBgFragmentShader,
             transparent: true,
         });
-        const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
+        const bgMesh = new Mesh(bgGeometry, bgMaterial);
         return bgMesh;
     }
     update(index: number): void {
@@ -308,7 +318,7 @@ export default class Photo extends Webgl {
                 const bgMaterial = this.getMaterial(bgMesh);
                 // 背景色の設定
                 const rgb = i > 0 ? '255, 135, 232' : '0, 190, 8';
-                const color = new THREE.Color(`rgb(${rgb})`);
+                const color = new Color(`rgb(${rgb})`);
                 bgMaterial.uniforms.uColor.value = new Vector3(color.r, color.g, color.b);
             }
         }
@@ -391,7 +401,6 @@ export default class Photo extends Webgl {
     }
     cancelAnimFrame(): void {
         cancelAnimationFrame(this.animFrame);
-        this.three.raycaster = null;
     }
     setIsMobile(): void {
         for (const [index, mesh] of Object.entries(this.meshList)) {
@@ -574,7 +583,7 @@ export default class Photo extends Webgl {
             y: -(e.clientY / window.innerHeight) * 2 + 1,
         };
     }
-    getMaterial(mesh: THREE.Mesh): THREE.ShaderMaterial {
-        return <THREE.ShaderMaterial>mesh.material;
+    getMaterial(mesh: Mesh): ShaderMaterial {
+        return <ShaderMaterial>mesh.material;
     }
 }

@@ -13,12 +13,11 @@ import {
     ShadowMaterial,
 } from 'three';
 import gsap from 'gsap';
-import { addClass, isContains, removeClass } from '../utils/classList';
-import { debounce } from '../utils/debounce';
-import { hasClass } from '../utils/hasClass';
-import { lerp } from '../utils/math';
-import { throttle } from '../utils/throttle';
-import Webgl from './webgl';
+import { addClass, removeClass } from '~/assets/scripts/utils/classList';
+import { debounce } from '~/assets/scripts/utils/debounce';
+import { hasClass } from '~/assets/scripts/utils/hasClass';
+import { throttle } from '~/assets/scripts/utils/throttle';
+import Webgl from '../../../modules/webgl';
 
 interface CursorOption {
     cursorSelector: string;
@@ -133,7 +132,7 @@ export class Cursor extends Webgl {
             this.getRect();
             this.event();
             this.initFloor();
-            this.render();
+            // this.render();
             window.addEventListener(
                 'resize',
                 debounce(() => {
@@ -145,6 +144,16 @@ export class Cursor extends Webgl {
                 'scroll',
                 throttle(() => {
                     // this.handelScroll();
+                }, 30),
+                {
+                    capture: false,
+                    passive: true,
+                }
+            );
+            window.addEventListener(
+                'mousemove',
+                throttle(() => {
+                    this.render();
                 }, 30),
                 {
                     capture: false,
@@ -181,7 +190,7 @@ export class Cursor extends Webgl {
                 });
             }
         }
-        this.animFrame = requestAnimationFrame(this.render.bind(this));
+        // this.animFrame = requestAnimationFrame(this.render.bind(this));
     }
     event(): void {
         document.addEventListener('mousemove', (e: MouseEvent) => {

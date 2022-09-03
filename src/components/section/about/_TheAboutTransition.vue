@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import Transition from '~/assets/scripts/components/transition';
+import Transition from '~/assets/scripts/modules/transition';
 
 export default Vue.extend({
     data(): {
