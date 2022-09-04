@@ -444,19 +444,17 @@ export default class Photo extends Webgl {
             const i = parseInt(index);
             const scroll = this.scrollList[i];
 
-            if (this.isMobile) {
-                // 画像表示位置
-                const imagePos = this.getPosY(i);
-                if (targetY >= 0) scroll.current = imagePos;
-            } else {
-                // 画像表示位置
-                const imagePos = this.getPosX(i);
-                if (targetY >= 0) scroll.current = imagePos;
-            }
+            const posX = this.getPosX(i);
+            const posY = this.getPosY(i);
+
+            // scroll.current = this.isMobile ? posY : posX;
+
+            if (this.isMobile) scroll.current = this.isMobile ? posY : posX;
 
             const tl = gsap.timeline({
                 paused: true,
             });
+            // console.log(mesh.position);
             if (targetY > 0 && !this.isLast) {
                 scroll.previous = lerp(scroll.previous, scroll.current, 0.08);
                 const material = this.getMaterial(mesh);
@@ -465,8 +463,8 @@ export default class Photo extends Webgl {
                     mesh.position,
                     {
                         duration: duration,
-                        x: this.isMobile ? mesh.position.x : scroll.previous,
-                        y: this.isMobile ? scroll.previous : mesh.position.y,
+                        x: this.isMobile ? posX : scroll.previous,
+                        y: this.isMobile ? scroll.previous : posY,
                     },
                     0
                 );
@@ -478,111 +476,67 @@ export default class Photo extends Webgl {
                         bgMesh.position,
                         {
                             duration: duration,
-                            // y: scroll.previous + diff,
-                            x: this.isMobile ? bgMesh.position.x : scroll.previous + diff,
-                            y: this.isMobile ? scroll.previous + diff : bgMesh.position.y,
+                            x: this.isMobile ? posX + diff : scroll.previous + diff,
+                            y: this.isMobile ? scroll.previous + diff : posY + diff,
                         },
                         '<'
                     );
                 }
                 timeline.play();
-                // if (this.isMobile) {
-                //     const timeline = tl.to(
-                //         mesh.position,
-                //         {
-                //             duration: duration,
-                //             y: this.isMobile ? scroll.previous : mesh.position.y,
-                //         },
-                //         0
-                //     );
-                //     for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
-                //         const diff = parseInt(index) > 0 ? -10 : 10;
-                //         const bgMaterial = this.getMaterial(bgMesh);
-                //         bgMaterial.uniforms.uTime.value = scroll.current - scroll.previous;
-                //         timeline.to(
-                //             bgMesh.position,
-                //             {
-                //                 duration: duration,
-                //                 y: scroll.previous + diff,
-                //             },
-                //             '<'
-                //         );
-                //     }
-                //     timeline.play();
-                // } else {
-                //     const timeline = tl.to(
-                //         mesh.position,
-                //         {
-                //             duration: duration,
-                //             x: this.isMobile ? mesh.position.x : scroll.previous,
-                //         },
-                //         0
-                //     );
-                //     for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
-                //         const diff = parseInt(index) > 0 ? -10 : 10;
-                //         const bgMaterial = this.getMaterial(bgMesh);
-                //         bgMaterial.uniforms.uTime.value = scroll.current - scroll.previous;
-                //         timeline.to(
-                //             bgMesh.position,
-                //             {
-                //                 duration: duration,
-                //                 x: scroll.previous + diff,
-                //             },
-                //             '<'
-                //         );
-                //     }
-                //     timeline.play();
-                // }
             } else {
                 const material = this.getMaterial(mesh);
                 material.uniforms.uTime.value = 0;
-                if (this.isMobile) {
-                    const posY = this.getPosY(i);
-                    scroll.previous = posY;
-                    if (mesh.position.y !== scroll.previous) {
-                        const timeline = tl.to(mesh.position, {
-                            duration: 1,
-                            y: posY,
-                        });
-                        for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
-                            const diff = parseInt(index) > 0 ? -10 : 10;
-                            const bgMaterial = this.getMaterial(bgMesh);
-                            bgMaterial.uniforms.uTime.value = 0;
-                            timeline.to(
-                                bgMesh.position,
-                                {
-                                    duration: 1,
-                                    y: posY + diff,
-                                },
-                                '<'
-                            );
-                        }
-                        timeline.play();
+                // if (this.isMobile) {
+                // const posX = this.getPosX(i);
+                // const posY = this.getPosY(i);
+                scroll.previous = this.isMobile ? posY : posX;
+                if (mesh.position.y !== scroll.previous) {
+                    const timeline = tl.to(mesh.position, {
+                        duration: 1,
+                        x: posX,
+                        y: posY,
+                    });
+                    for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
+                        const diff = parseInt(index) > 0 ? -10 : 10;
+                        const bgMaterial = this.getMaterial(bgMesh);
+                        bgMaterial.uniforms.uTime.value = 0;
+                        timeline.to(
+                            bgMesh.position,
+                            {
+                                duration: 1,
+                                x: posX + diff,
+                                y: posY + diff,
+                            },
+                            '<'
+                        );
                     }
-                } else {
-                    const posX = this.getPosX(i);
-                    scroll.previous = posX;
-                    if (mesh.position.x !== scroll.previous) {
-                        const timeline = tl.to(mesh.position, {
-                            duration: 1,
-                            x: posX,
-                        });
-                        for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
-                            const diff = parseInt(index) > 0 ? -10 : 10;
-                            const bgMaterial = this.getMaterial(bgMesh);
-                            bgMaterial.uniforms.uTime.value = 0;
-                            timeline.to(
-                                bgMesh.position,
-                                {
-                                    duration: 1,
-                                    x: posX + diff,
-                                },
-                                '<'
-                            );
-                        }
-                        timeline.play();
-                    }
+                    timeline.play();
                 }
+                // }
+                // else {
+                //     const posX = this.getPosX(i);
+                //     scroll.previous = posX;
+                //     if (mesh.position.x !== scroll.previous) {
+                //         const timeline = tl.to(mesh.position, {
+                //             duration: 1,
+                //             x: posX,
+                //         });
+                //         for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
+                //             const diff = parseInt(index) > 0 ? -10 : 10;
+                //             const bgMaterial = this.getMaterial(bgMesh);
+                //             bgMaterial.uniforms.uTime.value = 0;
+                //             timeline.to(
+                //                 bgMesh.position,
+                //                 {
+                //                     duration: 1,
+                //                     x: posX + diff,
+                //                 },
+                //                 '<'
+                //             );
+                //         }
+                //         timeline.play();
+                //     }
+                // }
             }
         }
     }
