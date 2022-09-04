@@ -20,7 +20,7 @@ void main() {
     v_alpha = alpha;
     vec3 pos = position;
 
-    // if(uFirst) {
+    if(uFirst) {
         // 方向
         // normalize(x)	xを正規化した値を返す
         // vec3 vertexDirection = vec3(position.x, position.y, position.z) + vec3(uTime);
@@ -30,7 +30,7 @@ void main() {
         vec3 diffuse = vertexDirection * 100.0 * uRatio * rand;
         vec3 finalPosition = position + noise + diffuse;
         pos = finalPosition;
-    // }
+    }
 
     // 半径範囲
     // float radiusRange = 10.0;

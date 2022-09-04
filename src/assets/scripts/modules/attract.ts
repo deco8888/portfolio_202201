@@ -13,7 +13,7 @@ export default class Attract {
             body: document.body,
             targets: document.querySelectorAll('[data-attract]'),
         };
-        this.strength = 30;
+        this.strength = 20;
         this.isMobile = isMobile();
         this.init();
     }
@@ -36,8 +36,8 @@ export default class Attract {
                     ease: Power4.easeOut,
                     x: 0,
                     y: 0,
-                })
-            })
+                });
+            });
         });
     }
 }

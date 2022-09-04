@@ -166,7 +166,6 @@ export default class Post extends Webgl {
         const posX = this.isMobile ? 1.5 : 0;
         this.three.spotLight.position.set(posX, -3, 990);
         this.three.spotLight.angle = radians(45);
-        console.log(radians(45));
         const scale = this.isMobile ? 1 : 2;
         this.three.spotLight.scale.set(scale, scale, scale);
         this.three.spotLightHelper = new SpotLightHelper(this.three.spotLight);
@@ -182,7 +181,6 @@ export default class Post extends Webgl {
         gltfLoader.load(objSrc, (obj) => {
             // const children = [...obj.scene.children];
             // for (const child of children) {
-            //     console.log(child);
             //     // child.scale.set(1, 1, 1);
             //     this.three.object.add(child);
             // }
@@ -204,7 +202,6 @@ export default class Post extends Webgl {
         });
     }
     setModels(): void {
-        console.log(this.three.scene.children);
         this.three.scene.add(this.three.object);
         this.render();
         // addClass(this.canvas, hasClass.active);
@@ -221,8 +218,10 @@ export default class Post extends Webgl {
     removeModels(): void {
         removeClass(this.canvas, hasClass.active);
         setTimeout(() => {
-            this.three.scene.remove(this.three.object);
-            this.render();
+            this.three.scene.clear();
+            this.three.renderer.clear();
+            this.three.renderer.dispose();
+            this.three.renderer.domElement.remove();
         }, 1000);
         // gsap.to(this.three.object.scale, {
         //     onUpdate: () => this.render(),

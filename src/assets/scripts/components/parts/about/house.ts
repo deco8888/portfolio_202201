@@ -210,7 +210,6 @@ export default class House extends Webgl {
         gltfLoader.load(objSrc, (obj) => {
             // const children = [...obj.scene.children];
             // for (const child of children) {
-            //     console.log(child);
             //     // child.scale.set(1, 1, 1);
             //     this.three.object.add(child);
             // }
@@ -247,10 +246,12 @@ export default class House extends Webgl {
     }
     removeModels(): void {
         removeClass(this.canvas, hasClass.active);
-        setTimeout(() => {
-            this.three.scene.remove(this.three.object);
-            this.render();
-        }, 1000);
+        this.three.scene.clear();
+        this.three.renderer.clear();
+        this.three.renderer.dispose();
+        this.three.renderer.domElement.remove();
+            this.three.renderer = null;
+        // this.three.renderer.forceContextLoss();
         // gsap.to(this.three.object.scale, {
         //     onUpdate: () => this.render(),
         //     duration: 0.5,
@@ -290,82 +291,82 @@ export default class House extends Webgl {
         // this.three.object.position.set(0, posY, 985);
         this.render();
     }
-    initGui(): void {
-        this.gui = new GUI();
-        // GUIにパラメータ設定
-        if (this.three.camera) {
-            this.gui.add(this.three.camera.position, 'x').min(-5).max(5).step(1).name('cameraX');
-            this.gui.add(this.three.camera.position, 'y').min(-5).max(5).step(1).name('cameraY');
-            this.gui.add(this.three.camera.position, 'z').min(-10).max(1000).step(1).name('cameraZ');
-        }
-        this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
-            this.three.ambientLight.intensity = e;
-        });
-        this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
-            this.three.directionalLight.intensity = e;
-        });
-        this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
-            this.three.pointLight.intensity = e;
-        });
-        this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
-            this.three.spotLight.intensity = e;
-        });
-        if (this.three.directionalLight) {
-            this.gui.add(this.three.directionalLight.position, 'x').min(-5).max(5).step(1).name('lightX');
-            this.gui.add(this.three.directionalLight.position, 'y').min(-5).max(5).step(1).name('lightY');
-            this.gui.add(this.three.directionalLight.position, 'z').min(-5).max(1500).step(1).name('lightZ');
-            this.gui.add(this.three.directionalLight.shadow.camera, 'top').min(-5).max(50).step(1).name('shadow top');
-            this.gui.add(this.three.directionalLight.shadow.camera, 'left').min(-5).max(50).step(1).name('shadow left');
-            this.gui
-                .add(this.three.directionalLight.shadow.camera, 'right')
-                .min(-5)
-                .max(50)
-                .step(1)
-                .name('shadow right');
-            this.gui
-                .add(this.three.directionalLight.shadow.camera, 'bottom')
-                .min(-5)
-                .max(50)
-                .step(1)
-                .name('shadow bottom');
-            this.gui
-                .add(this.three.directionalLight.shadow.mapSize, 'width')
-                .min(-5)
-                .max(50)
-                .step(1)
-                .name('mapSize.width');
-            this.gui
-                .add(this.three.directionalLight.shadow.mapSize, 'height')
-                .min(-5)
-                .max(50)
-                .step(1)
-                .name('mapSize.height');
-        }
-        if (this.three.pointLight) {
-            this.gui.add(this.three.pointLight.position, 'x').min(-5).max(5).step(1).name('helperLightX');
-            this.gui.add(this.three.pointLight.position, 'y').min(-5).max(5).step(1).name('helperLightY');
-            this.gui.add(this.three.pointLight.position, 'z').min(900).max(1000).step(1).name('helperLightZ');
-            this.gui.add(this.three.pointLight.scale, 'x').min(-5).max(5).step(1).name('helperScaleX');
-            this.gui.add(this.three.pointLight.scale, 'y').min(-5).max(5).step(1).name('helperScaleY');
-            this.gui.add(this.three.pointLight.scale, 'z').min(-5).max(5).step(1).name('helperScalesZ');
-            this.gui.add(this.three.pointLight, 'decay').min(-5).max(5).step(1).name('decay');
-        }
-        if (this.three.spotLight) {
-            this.gui.add(this.three.spotLight.position, 'x').min(-5).max(5).step(1).name('spotLightX');
-            this.gui.add(this.three.spotLight.position, 'y').min(-5).max(5).step(1).name('spotLightY');
-            this.gui.add(this.three.spotLight.position, 'z').min(0).max(1500).step(1).name('spotLightZ');
-            this.gui.add(this.three.spotLight.scale, 'x').min(-5).max(5).step(1).name('spotLightScaleX');
-            this.gui.add(this.three.spotLight.scale, 'y').min(-5).max(5).step(1).name('spotLightScaleY');
-            this.gui.add(this.three.spotLight.scale, 'z').min(-5).max(5).step(1).name('spotLightScaleZ');
-            this.gui.add(this.three.spotLight, 'angle').min(-5).max(5).step(0.1).name('angle');
-        }
-        if (this.three.object) {
-            this.gui.add(this.three.object.position, 'x').min(-5).max(5).step(1).name('positionX');
-            this.gui.add(this.three.object.position, 'y').min(-5).max(5).step(1).name('positionY');
-            this.gui.add(this.three.object.position, 'z').min(980).max(1000).step(1).name('positionZ');
-            this.gui.add(this.three.object.rotation, 'x').min(-5).max(5).step(1).name('rotationX');
-            this.gui.add(this.three.object.rotation, 'y').min(-5).max(5).step(1).name('rotationY');
-            this.gui.add(this.three.object.rotation, 'z').min(-5).max(5).step(1).name('rotationZ');
-        }
-    }
+    // initGui(): void {
+    //     this.gui = new GUI();
+    //     // GUIにパラメータ設定
+    //     if (this.three.camera) {
+    //         this.gui.add(this.three.camera.position, 'x').min(-5).max(5).step(1).name('cameraX');
+    //         this.gui.add(this.three.camera.position, 'y').min(-5).max(5).step(1).name('cameraY');
+    //         this.gui.add(this.three.camera.position, 'z').min(-10).max(1000).step(1).name('cameraZ');
+    //     }
+    //     this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
+    //         this.three.ambientLight.intensity = e;
+    //     });
+    //     this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
+    //         this.three.directionalLight.intensity = e;
+    //     });
+    //     this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
+    //         this.three.pointLight.intensity = e;
+    //     });
+    //     this.gui.add({ intensity: 1 }, 'intensity', 0, 5).onChange((e) => {
+    //         this.three.spotLight.intensity = e;
+    //     });
+    //     if (this.three.directionalLight) {
+    //         this.gui.add(this.three.directionalLight.position, 'x').min(-5).max(5).step(1).name('lightX');
+    //         this.gui.add(this.three.directionalLight.position, 'y').min(-5).max(5).step(1).name('lightY');
+    //         this.gui.add(this.three.directionalLight.position, 'z').min(-5).max(1500).step(1).name('lightZ');
+    //         this.gui.add(this.three.directionalLight.shadow.camera, 'top').min(-5).max(50).step(1).name('shadow top');
+    //         this.gui.add(this.three.directionalLight.shadow.camera, 'left').min(-5).max(50).step(1).name('shadow left');
+    //         this.gui
+    //             .add(this.three.directionalLight.shadow.camera, 'right')
+    //             .min(-5)
+    //             .max(50)
+    //             .step(1)
+    //             .name('shadow right');
+    //         this.gui
+    //             .add(this.three.directionalLight.shadow.camera, 'bottom')
+    //             .min(-5)
+    //             .max(50)
+    //             .step(1)
+    //             .name('shadow bottom');
+    //         this.gui
+    //             .add(this.three.directionalLight.shadow.mapSize, 'width')
+    //             .min(-5)
+    //             .max(50)
+    //             .step(1)
+    //             .name('mapSize.width');
+    //         this.gui
+    //             .add(this.three.directionalLight.shadow.mapSize, 'height')
+    //             .min(-5)
+    //             .max(50)
+    //             .step(1)
+    //             .name('mapSize.height');
+    //     }
+    //     if (this.three.pointLight) {
+    //         this.gui.add(this.three.pointLight.position, 'x').min(-5).max(5).step(1).name('helperLightX');
+    //         this.gui.add(this.three.pointLight.position, 'y').min(-5).max(5).step(1).name('helperLightY');
+    //         this.gui.add(this.three.pointLight.position, 'z').min(900).max(1000).step(1).name('helperLightZ');
+    //         this.gui.add(this.three.pointLight.scale, 'x').min(-5).max(5).step(1).name('helperScaleX');
+    //         this.gui.add(this.three.pointLight.scale, 'y').min(-5).max(5).step(1).name('helperScaleY');
+    //         this.gui.add(this.three.pointLight.scale, 'z').min(-5).max(5).step(1).name('helperScalesZ');
+    //         this.gui.add(this.three.pointLight, 'decay').min(-5).max(5).step(1).name('decay');
+    //     }
+    //     if (this.three.spotLight) {
+    //         this.gui.add(this.three.spotLight.position, 'x').min(-5).max(5).step(1).name('spotLightX');
+    //         this.gui.add(this.three.spotLight.position, 'y').min(-5).max(5).step(1).name('spotLightY');
+    //         this.gui.add(this.three.spotLight.position, 'z').min(0).max(1500).step(1).name('spotLightZ');
+    //         this.gui.add(this.three.spotLight.scale, 'x').min(-5).max(5).step(1).name('spotLightScaleX');
+    //         this.gui.add(this.three.spotLight.scale, 'y').min(-5).max(5).step(1).name('spotLightScaleY');
+    //         this.gui.add(this.three.spotLight.scale, 'z').min(-5).max(5).step(1).name('spotLightScaleZ');
+    //         this.gui.add(this.three.spotLight, 'angle').min(-5).max(5).step(0.1).name('angle');
+    //     }
+    //     if (this.three.object) {
+    //         this.gui.add(this.three.object.position, 'x').min(-5).max(5).step(1).name('positionX');
+    //         this.gui.add(this.three.object.position, 'y').min(-5).max(5).step(1).name('positionY');
+    //         this.gui.add(this.three.object.position, 'z').min(980).max(1000).step(1).name('positionZ');
+    //         this.gui.add(this.three.object.rotation, 'x').min(-5).max(5).step(1).name('rotationX');
+    //         this.gui.add(this.three.object.rotation, 'y').min(-5).max(5).step(1).name('rotationY');
+    //         this.gui.add(this.three.object.rotation, 'z').min(-5).max(5).step(1).name('rotationZ');
+    //     }
+    // }
 }

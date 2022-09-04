@@ -43,6 +43,7 @@ export default class Webgl {
         };
     }
     initCamera(): PerspectiveCamera {
+        if (this.three.camera) return;
         const camera = new PerspectiveCamera(
             45, // 画角
             this.winSize.width / this.winSize.height, // 縦横比

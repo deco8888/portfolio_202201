@@ -401,6 +401,22 @@ export default class Photo extends Webgl {
     }
     cancelAnimFrame(): void {
         cancelAnimationFrame(this.animFrame);
+        this.three.scene.clear();
+        for (const [index, mesh] of Object.entries(this.meshList)) {
+            const i = parseInt(index);
+            const material = this.getMaterial(mesh);
+            material.dispose();
+            mesh.geometry.dispose();
+            for (const [_, bgMesh] of Object.entries(this.bgMeshList[i])) {
+                const bgMaterial = this.getMaterial(bgMesh);
+                bgMaterial.dispose;
+                bgMesh.geometry.dispose();
+            }
+        }
+        this.three.renderer.dispose();
+        this.three.renderer.domElement.remove();
+        this.three.renderer = null;
+        // this.three.renderer.forceContextLoss();
     }
     setIsMobile(): void {
         for (const [index, mesh] of Object.entries(this.meshList)) {
@@ -417,71 +433,114 @@ export default class Photo extends Webgl {
     moveImages(): void {
         const targetY = window.scrollY - this.elms.mv.clientHeight;
         let duration = 0.1;
+
+        const studyList = this.elms.horizontalList;
+        const scrollArea = this.isMobile
+            ? studyList.clientHeight - (window.innerHeight + 10)
+            : studyList.clientWidth - (window.innerWidth + 10);
+        this.isLast = targetY > scrollArea ? true : false;
+
         for (const [index, mesh] of Object.entries(this.meshList)) {
             const i = parseInt(index);
             const scroll = this.scrollList[i];
+
+            if (this.isMobile) {
+                // 画像表示位置
+                const imagePos = this.getPosY(i);
+                if (targetY >= 0) scroll.current = imagePos;
+            } else {
+                // 画像表示位置
+                const imagePos = this.getPosX(i);
+                if (targetY >= 0) scroll.current = imagePos;
+            }
+
             const tl = gsap.timeline({
                 paused: true,
             });
-            if (targetY >= 0 && !this.isLast) {
-                scroll.previous = lerp(scroll.previous, scroll.current, 0.05);
+            if (targetY > 0 && !this.isLast) {
+                scroll.previous = lerp(scroll.previous, scroll.current, 0.08);
                 const material = this.getMaterial(mesh);
                 material.uniforms.uTime.value = scroll.current - scroll.previous;
-                if (this.isMobile) {
-                    tl.to(
-                        mesh.position,
-                        {
-                            duration: duration,
-                            y: scroll.previous,
-                        },
-                        0
-                    );
-                } else {
-                    tl.to(
-                        mesh.position,
-                        {
-                            duration: duration,
-                            x: scroll.previous,
-                        },
-                        0
-                    );
-                }
+                const timeline = tl.to(
+                    mesh.position,
+                    {
+                        duration: duration,
+                        x: this.isMobile ? mesh.position.x : scroll.previous,
+                        y: this.isMobile ? scroll.previous : mesh.position.y,
+                    },
+                    0
+                );
                 for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
                     const diff = parseInt(index) > 0 ? -10 : 10;
                     const bgMaterial = this.getMaterial(bgMesh);
                     bgMaterial.uniforms.uTime.value = scroll.current - scroll.previous;
-                    if (this.isMobile) {
-                        tl.to(
-                            bgMesh.position,
-                            {
-                                duration: duration,
-                                y: scroll.previous + diff,
-                            },
-                            '<'
-                        );
-                    } else {
-                        tl.to(
-                            bgMesh.position,
-                            {
-                                duration: duration,
-                                x: scroll.previous + diff,
-                            },
-                            '<'
-                        );
-                    }
+                    timeline.to(
+                        bgMesh.position,
+                        {
+                            duration: duration,
+                            // y: scroll.previous + diff,
+                            x: this.isMobile ? bgMesh.position.x : scroll.previous + diff,
+                            y: this.isMobile ? scroll.previous + diff : bgMesh.position.y,
+                        },
+                        '<'
+                    );
                 }
+                timeline.play();
+                // if (this.isMobile) {
+                //     const timeline = tl.to(
+                //         mesh.position,
+                //         {
+                //             duration: duration,
+                //             y: this.isMobile ? scroll.previous : mesh.position.y,
+                //         },
+                //         0
+                //     );
+                //     for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
+                //         const diff = parseInt(index) > 0 ? -10 : 10;
+                //         const bgMaterial = this.getMaterial(bgMesh);
+                //         bgMaterial.uniforms.uTime.value = scroll.current - scroll.previous;
+                //         timeline.to(
+                //             bgMesh.position,
+                //             {
+                //                 duration: duration,
+                //                 y: scroll.previous + diff,
+                //             },
+                //             '<'
+                //         );
+                //     }
+                //     timeline.play();
+                // } else {
+                //     const timeline = tl.to(
+                //         mesh.position,
+                //         {
+                //             duration: duration,
+                //             x: this.isMobile ? mesh.position.x : scroll.previous,
+                //         },
+                //         0
+                //     );
+                //     for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
+                //         const diff = parseInt(index) > 0 ? -10 : 10;
+                //         const bgMaterial = this.getMaterial(bgMesh);
+                //         bgMaterial.uniforms.uTime.value = scroll.current - scroll.previous;
+                //         timeline.to(
+                //             bgMesh.position,
+                //             {
+                //                 duration: duration,
+                //                 x: scroll.previous + diff,
+                //             },
+                //             '<'
+                //         );
+                //     }
+                //     timeline.play();
+                // }
             } else {
-                // 画像要素
-                const currentRect = this.elms.images[i].getBoundingClientRect();
                 const material = this.getMaterial(mesh);
                 material.uniforms.uTime.value = 0;
                 if (this.isMobile) {
-                    const viewportH = this.viewport.height;
-                    const scaleY = this.meshList[i].scale.y;
-                    const posY = viewportH / 2 - scaleY / 2 - (currentRect.top / this.winSize.height) * viewportH;
+                    const posY = this.getPosY(i);
                     scroll.previous = posY;
                     if (mesh.position.y !== scroll.previous) {
-                        tl.to(mesh.position, {
+                        const timeline = tl.to(mesh.position, {
                             duration: 1,
                             y: posY,
                         });
@@ -489,7 +548,7 @@ export default class Photo extends Webgl {
                             const diff = parseInt(index) > 0 ? -10 : 10;
                             const bgMaterial = this.getMaterial(bgMesh);
                             bgMaterial.uniforms.uTime.value = 0;
-                            tl.to(
+                            timeline.to(
                                 bgMesh.position,
                                 {
                                     duration: 1,
@@ -498,14 +557,13 @@ export default class Photo extends Webgl {
                                 '<'
                             );
                         }
+                        timeline.play();
                     }
                 } else {
-                    const viewportW = this.viewport.width;
-                    const scaleX = this.meshList[i].scale.x;
-                    const posX = -(viewportW / 2) + scaleX / 2 + (currentRect.left / this.winSize.width) * viewportW;
+                    const posX = this.getPosX(i);
                     scroll.previous = posX;
                     if (mesh.position.x !== scroll.previous) {
-                        tl.to(mesh.position, {
+                        const timeline = tl.to(mesh.position, {
                             duration: 1,
                             x: posX,
                         });
@@ -513,7 +571,7 @@ export default class Photo extends Webgl {
                             const diff = parseInt(index) > 0 ? -10 : 10;
                             const bgMaterial = this.getMaterial(bgMesh);
                             bgMaterial.uniforms.uTime.value = 0;
-                            tl.to(
+                            timeline.to(
                                 bgMesh.position,
                                 {
                                     duration: 1,
@@ -522,11 +580,25 @@ export default class Photo extends Webgl {
                                 '<'
                             );
                         }
+                        timeline.play();
                     }
                 }
             }
-            tl.play();
         }
+    }
+    getPosX(index: number) {
+        // 画像要素
+        const currentRect = this.elms.images[index].getBoundingClientRect();
+        const viewportW = this.viewport.width;
+        const scaleX = this.meshList[index].scale.x;
+        return -(viewportW / 2) + scaleX / 2 + (currentRect.left / this.winSize.width) * viewportW;
+    }
+    getPosY(index: number) {
+        // 画像要素
+        const currentRect = this.elms.images[index].getBoundingClientRect();
+        const viewportH = this.viewport.height;
+        const scaleY = this.meshList[index].scale.y;
+        return viewportH / 2 - scaleY / 2 - (currentRect.top / this.winSize.height) * viewportH;
     }
     // スクロール
     handleScroll(): void {
@@ -537,19 +609,12 @@ export default class Photo extends Webgl {
         const scrollArea = this.isMobile
             ? studyList.clientHeight - (window.innerHeight + 10)
             : studyList.clientWidth - (window.innerWidth + 10);
-        const viewportW = this.viewport.width;
-        const viewportH = this.viewport.height;
         for (const [index, _] of Object.entries(this.rectList)) {
             const i = parseInt(index);
             // スクロール情報（current/previous/ease）
             const scroll = this.scrollList[i];
-            // メッシュのスケール
-            const scaleX = this.meshList[i].scale.x;
-            const scaleY = this.meshList[i].scale.y;
-            // 画像要素
-            const currentRect = this.elms.images[i].getBoundingClientRect();
-            const moveX = -(viewportW / 2) + scaleX / 2 + (currentRect.left / this.winSize.width) * viewportW;
-            const moveY = viewportH / 2 - scaleY / 2 - (currentRect.top / this.winSize.height) * viewportH;
+            const moveX = this.getPosX(i);
+            const moveY = this.getPosY(i);
             this.meshList[i].position.x = moveX;
             this.meshList[i].position.y = moveY;
             for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
@@ -559,11 +624,11 @@ export default class Photo extends Webgl {
             }
             if (this.isMobile) {
                 // 画像表示位置
-                const imagePos = viewportH / 2 - scaleY / 2 - (currentRect.top / this.winSize.height) * viewportH;
+                const imagePos = this.getPosY(i);
                 if (targetY >= 0) scroll.current = imagePos;
             } else {
                 // 画像表示位置
-                const imagePos = -(viewportW / 2) + scaleX / 2 + (currentRect.left / this.winSize.width) * viewportW;
+                const imagePos = this.getPosX(i);
                 if (targetY >= 0) scroll.current = imagePos;
             }
             this.isLast = targetY > scrollArea ? true : false;

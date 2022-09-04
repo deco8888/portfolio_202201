@@ -74,11 +74,9 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" scoped>
 import Vue from 'vue';
 import Circle from '~/assets/scripts/components/parts/circle';
-import { distance2d } from '~/assets/scripts/utils/helper';
-import { throttle } from '~/assets/scripts/utils/throttle';
 
 export default Vue.extend({
     props: {

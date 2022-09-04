@@ -264,8 +264,8 @@ export default class Title extends Letter {
                     this.horizontal = current > 0 ? winSizeW * -0.3 : -0;
                     this.vertical = current > winSizeH ? winSizeH * 0.3 : 0;
                 } else if (scrollY < this.scroll.y) {
-                    this.horizontal = current < winSizeH ? winSizeW * 0.3 : 0;
-                    this.vertical = current < studyList * 0.5 ? winSizeH * -0.3 : 0;
+                    this.horizontal = current < winSizeH * 0.3 ? winSizeW * 0.3 : 0;
+                    this.vertical = current < winSizeW ? winSizeH * -0.3 : 0;
                 }
                 this.object.current.x = this.three.object.position.x + this.horizontal;
                 this.object.current.y = this.three.object.position.y + this.vertical;

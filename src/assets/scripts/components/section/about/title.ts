@@ -183,7 +183,4 @@ export default class Title extends Letter {
             if (this.three.renderer) this.three.renderer.setSize(this.winSize.width, this.winSize.height);
         }
     }
-    handleMove(e: MouseEvent): void {
-        // this.three.object.rotation.x = (e.clientY - window.innerHeight / 2) / window.innerHeight;
-    }
 }

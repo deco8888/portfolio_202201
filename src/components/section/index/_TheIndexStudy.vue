@@ -111,6 +111,7 @@ interface StudyOptions {
     };
     expansion: Expansion;
     title: Title;
+    scrollTrigger: gsap.core.Tween;
     timeline: gsap.core.Tween;
     isActive: boolean;
     isMobile: boolean;
@@ -140,6 +141,7 @@ export default Vue.extend({
             elms: {},
             expansion: null,
             title: null,
+            scrollTrigger: null,
             timeline: null,
             isActive: false,
             isMobile: isMobile(),
@@ -169,15 +171,29 @@ export default Vue.extend({
         if (this.loading) this.init();
         // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
-            if (this.photo) this.photo.cancelAnimFrame();
+            if (this.photo) {
+                this.photo.cancelAnimFrame();
+                this.photo = null;
+            }
+            if (this.scrollTrigger) {
+                this.scrollTrigger.pause();
+                this.scrollTrigger.kill();
+                this.scrollTrigger = null;
+            }
+            if (this.expansion) {
+                this.expansion.dispose();
+                this.expansion = null;
+            }
             next();
         });
     },
+    beforeRouteLeave() {
+        console.log('beforeRouteLeave');
+    },
     methods: {
         init(): void {
-            // console.log('studyなんだよ');
             // スクロールトリガー
-            gsap.registerPlugin(ScrollTrigger);
+            // gsap.registerPlugin(ScrollTrigger);
             setTimeout(() => {
                 this.handleResize();
                 this.moveHorizontally();
@@ -201,7 +217,7 @@ export default Vue.extend({
             window.addEventListener(
                 'scroll',
                 () => {
-                    this.photo.handleScroll();
+                    if (this.photo) this.photo.handleScroll();
                 },
                 {
                     capture: false,
@@ -222,7 +238,7 @@ export default Vue.extend({
             const mvHeight = this.elms.mv.clientHeight;
             if (this.isMobile) {
                 const scrollHeight = this.elms.horizontalList.clientHeight - this.elms.horizontalWrapper.clientHeight;
-                gsap.to(this.elms.horizontalList, {
+                this.scrollTrigger = gsap.to(this.elms.horizontalList, {
                     y: () => -scrollHeight,
                     ease: 'none',
                     scrollTrigger: {
@@ -244,7 +260,7 @@ export default Vue.extend({
                     },
                 });
             } else {
-                gsap.to(this.elms.horizontalList, {
+                this.scrollTrigger = gsap.to(this.elms.horizontalList, {
                     x: () =>
                         -(
                             document.querySelector("[data-horizontal='list']").clientWidth -

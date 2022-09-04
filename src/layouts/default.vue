@@ -36,7 +36,6 @@ export default Vue.extend({
         },
     },
     mounted() {
-        console.log('default');
         EventBus.$emit('TRANSITION', this.$route.name);
         EventBus.$on('TRANSITION', () => this.$route.name);
         // window.addEventListener('resize', () => this.reload(), false);
@@ -56,8 +55,5 @@ export default Vue.extend({
         //     next();
         // });
     },
-    // methods: {
-
-    // },
 });
 </script>

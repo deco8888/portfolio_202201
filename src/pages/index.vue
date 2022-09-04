@@ -107,7 +107,10 @@ export default Vue.extend({
         // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
             this.flg.scroll = false;
-            await this.title.cancel();
+            if (this.title) {
+                this.title.cancel();
+                this.title = null;
+            }
             loadingStore.setLoadingData({ loaded: false });
             next();
         });
@@ -152,7 +155,7 @@ export default Vue.extend({
                 'scroll',
                 () => {
                     if (path === 'index' && this.flg.scroll) {
-                        this.title.handleScroll();
+                        if (this.title) this.title.handleScroll();
                     }
                 },
                 {
@@ -163,14 +166,14 @@ export default Vue.extend({
             window.addEventListener(
                 'resize',
                 () => {
-                    this.title.handleResize();
+                    if (this.title) this.title.handleResize();
                 },
                 false
             );
             window.addEventListener(
                 'mousemove',
                 (e: MouseEvent) => {
-                    this.title.handleMove(e);
+                    if (this.title) this.title.handleMove(e);
                 },
                 false
             );

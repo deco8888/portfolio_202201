@@ -212,7 +212,6 @@ export default Vue.extend({
             });
         },
         splitWord(key: string): string[] {
-            console.log(this.string[key]);
             return this.string[key].split('');
         },
     },

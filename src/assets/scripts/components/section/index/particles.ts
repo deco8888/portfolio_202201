@@ -216,7 +216,6 @@ export default class Particles {
         ctx.beginPath();
         // void ctx.arc(x座標, y座標, 半径, startAngle, endAngle [, counterclockwise]);
         // ※「counterclockwise」
-        // console.log(particle.second.x, particle.second.y);
         ctx.arc(particle.current.x, particle.current.y, particle.radius, 0, Math.PI * 2, true);
 
         // ctx.rect(particle.second.x, particle.second.y, particle.radius, particle.radius);
@@ -229,5 +228,6 @@ export default class Particles {
     }
     cancel(): void {
         cancelAnimationFrame(this.animFrame);
+        this.canvas.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }

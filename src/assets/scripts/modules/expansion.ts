@@ -345,6 +345,13 @@ export default class Expansion extends Webgl {
             },
             0
         );
+        tl.to(
+            '[data-title="contact"]',
+            {
+                opacity: 1,
+            },
+            0
+        );
         tl.play();
     }
     close(): void {
@@ -400,6 +407,13 @@ export default class Expansion extends Webgl {
                     removeClass(this.elms.expansion, hasClass.active);
                     removeClass(this.elms.canvas, hasClass.active);
                 },
+            },
+            0
+        );
+        tl.to(
+            '[data-title="contact"]',
+            {
+                opacity: 0,
             },
             0
         );
@@ -492,5 +506,12 @@ export default class Expansion extends Webgl {
                 });
             }
         });
+    }
+    dispose(): void {
+        this.three.scene.clear();
+        this.three.renderer.clear();
+        this.three.renderer.dispose();
+        this.three.renderer.domElement.remove();
+            this.three.renderer = null;
     }
 }

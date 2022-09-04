@@ -583,15 +583,40 @@ export default class Letter extends Webgl {
     async cancel(): Promise<void> {
         return new Promise((resolve) => {
             cancelAnimationFrame(this.animFrame);
-            while (this.three.scene.children.length > 0) {
-                this.three.scene.remove(this.three.scene.children[0]);
-            }
-            console.log(this.three.points);
+            this.three.scene.clear();
+            // this.three.scene.remove(this.three.object);
+            // this.three.object = null;
+
             if (this.three.points) {
-                this.three.points.geometry.dispose();
                 const material = <ShaderMaterial>this.three.points.material;
                 material.dispose();
+                this.three.points.geometry.dispose();
+                // this.three.points = null;
             }
+            // this.three.renderer.forceContextLoss();
+            // const gl = this.three.renderer.getContext();
+            // console.log('-----');
+            // console.log(gl);
+            // gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            // gl.clear(gl.COLOR_BUFFER_BIT);
+            // console.log(gl);
+            // this.three.renderer.domElement.remove()
+            // this.three.renderer.clear();
+            this.three.renderer.dispose();
+            this.three.renderer.domElement.remove();
+            this.three.renderer = null;
+            // this.three.renderer = null;
+            // console.log(this.three.renderer.domElement);
+            // console.log(this.three.renderer.getContext());
+            // if (gl) {
+            //     gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            //     gl.clear(gl.COLOR_BUFFER_BIT);
+            //     this.three.renderer.domElement = null;
+            //     console.log(this.three.renderer.forceContextLoss());
+            //     this.three.renderer = null;
+            // }
+            // // this.three.renderer.context = null;
+            // // this.three.renderer.domElement = null;
             resolve();
         });
     }

@@ -96,7 +96,7 @@ const nuxtConfig: NuxtConfig = {
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
-        transpile: ['three'],
+        // transpile: ['three'],
         babel: {
             // コンパイルに必要なプラグインのリストをBabel本体に渡す役割
             presets({ isServer }: any) {

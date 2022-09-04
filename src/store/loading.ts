@@ -25,7 +25,6 @@ export default class Contact extends VuexModule {
 
     @Action
     public setLoadingData(loading: LoadingState): void {
-        console.log({loading});
         this.setLoading(loading);
     }
 }

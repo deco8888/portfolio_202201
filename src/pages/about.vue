@@ -44,7 +44,10 @@ export default Vue.extend({
         }, 1500);
         // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
-            await this.title.cancel();
+            if (this.title) {
+                this.title.cancel();
+                this.title = null;
+            }
             next();
         });
     },
@@ -61,7 +64,7 @@ export default Vue.extend({
             window.addEventListener(
                 'mousemove',
                 (e: MouseEvent) => {
-                    this.title.handleMove(e);
+                    if (this.title) this.title.handleMove(e);
                 },
                 false
             );

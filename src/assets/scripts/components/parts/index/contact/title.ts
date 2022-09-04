@@ -63,7 +63,7 @@ export default class Title extends Letter {
     }
     init(): void {
         this.handleMove({ clientX: 0, clientY: 0 });
-        this.canvas = document.querySelector('[data-expansion="expansion"]');
+        this.canvas = document.querySelector('[data-title="contact"]');
         // カメラ・シーン・レンダラー等の準備
         this.prepare();
         this.font.size = this.getFontSize();
@@ -147,14 +147,18 @@ export default class Title extends Letter {
             y: 0,
             z: 0,
             onComplete: () => {
-                this.three.scene.remove(this.three.object);
+                cancelAnimationFrame(this.animFrame);
+                this.three.scene.clear();
+                // this.three.scene.remove(this.three.object);
                 this.three.object.remove(this.three.points);
                 this.three.object = null;
                 const material = <ShaderMaterial>this.three.points.material;
                 material.dispose();
                 this.three.points.geometry.dispose();
                 this.three.points = null;
-                cancelAnimationFrame(this.animFrame);
+                // const gl = this.three.renderer.getContext();
+                this.three.renderer.dispose();
+                // this.three.renderer.forceContextLoss();
                 this.initCommonValue();
             },
         });

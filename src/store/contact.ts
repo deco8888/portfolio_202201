@@ -1,21 +1,21 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators';
 
 type ContactState = {
-    isShow: boolean
-}
+    isShow: boolean;
+};
 
 @Module({
-    name: "contact",
+    name: 'contact',
     stateFactory: true, // Nuxt.jsのモジュールであることを宣言
-    namespaced: true
+    namespaced: true,
 })
 export default class Contact extends VuexModule {
     private contact: ContactState = {
-        isShow: false
-    }
+        isShow: false,
+    };
 
     public get getContact() {
-         return this.contact;
+        return this.contact;
     }
 
     @Mutation
@@ -25,7 +25,6 @@ export default class Contact extends VuexModule {
 
     @Action
     public setContactData(contact: ContactState): void {
-        console.log(contact);
         this.setContact(contact);
     }
 }

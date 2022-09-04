@@ -1,6 +1,7 @@
 <template>
     <!-- <transition name="fade"> -->
     <div class="p-contact">
+        <div class="p-contact__title" data-title="contact"></div>
         <div class="p-contact__inner">
             <div
                 :class="['p-contact__close', { 'is-open': isOpen }]"
@@ -60,8 +61,14 @@ export default Vue.extend({
         this.handleEvent();
         // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
-            this.title.cancel();
-            this.post.removeModels();
+            if (this.title) {
+                this.title.cancel();
+                this.title = null;
+            }
+            if (this.post) {
+                this.post.removeModels();
+                this.post = null;
+            }
             next();
         });
     },
@@ -76,14 +83,14 @@ export default Vue.extend({
                 'resize',
                 () => {
                     this.post.handleResize();
-                    this.title.handleResize();
+                    if (this.title) this.title.handleResize();
                 },
                 false
             );
             window.addEventListener(
                 'mousemove',
                 (e: MouseEvent) => {
-                    this.title.handleMove(e);
+                    if (this.title) this.title.handleMove(e);
                 },
                 false
             );

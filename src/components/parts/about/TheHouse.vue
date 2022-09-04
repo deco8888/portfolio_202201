@@ -34,6 +34,16 @@ export default Vue.extend({
             if (val) this.init();
         },
     },
+    mounted() {
+        // 画面遷移時に「cancelAnimationFrame」を実行
+        this.$router.beforeEach(async (_to, _from, next) => {
+            if (this.house) {
+                this.house.removeModels();
+                this.house = null;
+            }
+            next();
+        });
+    },
     methods: {
         async init(): Promise<void> {
             this.canvas = this.$refs.house as HTMLCanvasElement;

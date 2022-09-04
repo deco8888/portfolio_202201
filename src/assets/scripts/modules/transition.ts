@@ -299,4 +299,11 @@ export default class Transition extends Webgl {
     getMaterial(mesh: Mesh): ShaderMaterial {
         return <ShaderMaterial>mesh.material;
     }
+    dispose(): void {
+        this.three.scene.clear();
+        this.three.renderer.clear();
+        this.three.renderer.dispose();
+        this.three.renderer.domElement.remove();
+            this.three.renderer = null;
+    }
 }

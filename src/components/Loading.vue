@@ -19,6 +19,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import gsap, { Power4 } from 'gsap';
+import { removeClass } from '~/assets/scripts/utils/classList';
+import { hasClass } from '~/assets/scripts/utils/hasClass';
 
 export default Vue.extend({
     data() {
@@ -29,6 +31,7 @@ export default Vue.extend({
     mounted() {
         // DOM更新をする非同期関数を全て実行した後に、第1引数として渡された関数を実行
         this.$nextTick(() => {
+            removeClass(document.body, hasClass.active);
             this.start();
         });
     },
