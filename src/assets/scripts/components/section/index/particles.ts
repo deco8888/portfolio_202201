@@ -71,8 +71,8 @@ export default class Particles {
         for (let i = 0; i < this.total; i++) {
             const radius = Math.floor(Math.random() * 60);
             let secondX = Math.random() * this.canvas.el.clientWidth;
-            secondX = Math.max(secondX, radius + this.diff);
-            secondX = Math.min(secondX, this.canvas.el.width - radius - this.diff * 2);
+            secondX = Math.max(secondX, radius * 2 + this.diff);
+            secondX = Math.min(secondX, this.canvas.el.width - radius * 2 - this.diff * 2);
             let secondY = Math.floor(Math.random() * this.canvas.el.clientHeight);
             secondY = Math.max(secondY, radius + this.diff);
             secondY = Math.min(secondY, this.canvas.el.clientHeight - radius);
@@ -144,6 +144,7 @@ export default class Particles {
     }
     update(particle: ParticleOption): void {
         if (this.detectCollision(particle)) {
+            // const min = particle.radius * 2 + this.diff;
             if (particle.second.x > this.mouse.x) {
                 particle.second.x = lerp(particle.second.x, particle.second.x + particle.radius, 0.03);
                 if (particle.directionX < 0) particle.directionX = -particle.directionX;
@@ -166,7 +167,7 @@ export default class Particles {
         const canvasW = this.canvas.el.width;
         const canvasH = this.canvas.el.height;
         const maxX = canvasW - particle.radius - this.diff * 2;
-        const maxY = canvasH - particle.radius;
+        const maxY = canvasH - particle.radius * 2 - this.diff * 2;
         const min = particle.radius + this.diff;
         if (
             (particle.second.x >= maxX && particle.second.x < canvasW) ||

@@ -73,7 +73,7 @@
                                     v-for="(word, index) in 'CONTACT'.split('')"
                                     :key="index"
                                     class="p-index-study-expansion__char"
-                                    data-split-char
+                                    data-split-char="contact"
                                 >
                                     {{ word }}
                                 </span>
@@ -89,9 +89,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import BaseImage from '~/components/common/TheBaseImage.vue';
-import TheContact from '~/components/parts/index/TheContact.vue';
+import BaseImage from '~/components/common/BaseImage.vue';
 import Expansion from '~/assets/scripts/modules/expansion';
 import Title from '~/assets/scripts/components/parts/index/contact/title';
 import Photo from '~/assets/scripts/components/parts/index/study/photos';
@@ -121,7 +119,6 @@ interface StudyOptions {
 export default Vue.extend({
     components: {
         BaseImage,
-        TheContact,
     },
     props: {
         isClose: {
@@ -187,9 +184,6 @@ export default Vue.extend({
             next();
         });
     },
-    beforeRouteLeave() {
-        console.log('beforeRouteLeave');
-    },
     methods: {
         init(): void {
             // スクロールトリガー
@@ -203,7 +197,7 @@ export default Vue.extend({
             window.addEventListener(
                 'resize',
                 () => {
-                    this.photo.handleResize();
+                    if (this.photo) this.photo.handleResize();
                 },
                 false
             );
@@ -231,7 +225,9 @@ export default Vue.extend({
             // 1文字に切り分ける
             this.splitText();
             EventBus.$emit('SHOW', false);
-            window.addEventListener('resize', this.handleResize.bind(this));
+            window.addEventListener('resize', () => {
+                if (this.expansion) this.handleResize();
+            });
         },
         moveHorizontally(): void {
             this.elms.horizontalList = document.querySelector("[data-horizontal='list']");
@@ -313,9 +309,9 @@ export default Vue.extend({
             };
         },
         splitText() {
-            const charList = document.querySelectorAll<HTMLElement>('[data-split-char]');
+            const charList = document.querySelectorAll<HTMLElement>('[data-split-char="contact"]');
             charList.forEach((char, index) => {
-                char.style.animationDelay = `${index * 0.05 + 0.1}s`;
+                char.style.animationDelay = `${index * 0.05 + 0}s`;
                 char.style.setProperty('--char-index', `${index}`);
             });
         },

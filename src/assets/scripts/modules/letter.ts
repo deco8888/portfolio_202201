@@ -35,7 +35,7 @@ interface elemInfoOptions {
 }
 
 export default class Letter extends Webgl {
-    three: {
+    declare three: {
         camera: PerspectiveCamera | null;
         scene: Scene;
         geometry: BufferGeometry | null;
@@ -63,10 +63,8 @@ export default class Letter extends Webgl {
             z: number;
         };
     };
-    winSize: ThreeNumber;
     firstWinSize: ThreeNumber;
     time: ThreeNumber;
-    viewport!: ThreeNumber;
     flg: {
         isMove: boolean;
     };
@@ -215,7 +213,7 @@ export default class Letter extends Webgl {
         this.font = {
             wight: 900,
             size: window.innerWidth * 0.1,
-            family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
             threshold: 0.12,
         };
         this.horizontal = 0;
@@ -636,11 +634,16 @@ export default class Letter extends Webgl {
         const position = geometry.attributes.position;
         const size = geometry.attributes.size;
         // const intersects = this.raycaster.intersectObject(this.three.points);
-        const isRotate = this.three.object.rotation.y <= radians(90);
+
+        const rotateY = this.three.object.rotation.y;
+        const degree = (rotateY * 180) / Math.PI;
+        const remainder = Math.floor(degree / 90) % 4;
+        const isRotate = remainder === 0 || remainder === 3;
         const imageHalfWidth = this.textImage.canvas.width / 2;
-        const mouseX = isRotate ? this.mouse.x : this.mouse.x;
+
+        const mouseX = isRotate ? this.mouse.x : -this.mouse.x;
         const mouseY = this.mouse.y;
-        const targetZ = isRotate ? imageHalfWidth : 0;
+        const targetZ = isRotate ? 0 : imageHalfWidth;
         if (this.mouse.x !== 0) {
             for (let i = 0; i < position.array.length / 3; i++) {
                 // 交際位置からグリッド要素までの距離を計算

@@ -1,10 +1,16 @@
 {
   "cSpell.words": [
+    "crossorigin",
+    "glsl",
     "gsap",
     "interpolant",
+    "lerp",
+    "nuxt",
+    "nuxtjs",
     "raycast",
     "raycaster",
-    "vertexshader"
+    "vertexshader",
+    "Vuex"
   ],
   "typescript.tsdk": "node_modules/typescript/lib"
 }

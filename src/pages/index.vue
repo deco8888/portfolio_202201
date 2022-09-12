@@ -2,16 +2,17 @@
     <div class="wrapper">
         <Loading ref="loading" @is-start="startLoading" />
         <div class="p-page" ref="wrapper">
+            <TheTransition ref="transition" />
             <div class="p-index-mv__canvas" data-canvas="title" data-title="mv"></div>
             <div class="p-page__inner">
                 <div class="p-index-study__expansion" data-expansion="canvas">
                     <div class="p-index-study__expansion-canvas expansion" data-expansion="expansion"></div>
-                    <TheContact :isShow="this.contact.show" @is-close="closeContact" />
+                    <TheIndexContact :isShow="this.contact.show" @is-close="closeContact" />
                 </div>
-                <TheMv :isActive="this.mv.active" />
+                <TheIndexMv :isActive="this.mv.active" />
                 <TheCircle />
-                <TheBox />
-                <TheStudy @is-show="showContact" :isClose="this.contact.close" />
+                <TheIndexBox />
+                <TheIndexStudy @is-show="showContact" :isClose="this.contact.close" />
             </div>
         </div>
         <TheCursor />
@@ -21,20 +22,22 @@
 <script lang="ts">
 import Vue from 'vue';
 import gsap, { Power4 } from 'gsap';
-// import EventBus from '~/utils/event-bus';
 import Loading from '~/components/Loading.vue';
-import { addClass } from '~/assets/scripts/utils/classList';
-import { hasClass } from '~/assets/scripts/utils/hasClass';
-import TheCircle from '~/components/parts/index/TheCircle.vue';
-import TheBox from '~/components/parts/index/TheBox.vue';
-import TheMv from '~/components/section/index/_TheIndexMv.vue';
-import TheStudy from '~/components/section/index/_TheIndexStudy.vue';
-import TheContact from '~/components/parts/index/TheContact.vue';
-import TheCursor from '../components/parts/common/TheCursor.vue';
-import BaseImage from '~/components/common/TheBaseImage.vue';
+import TheCircle from '~/components/parts/index/TheIndexCircle.vue';
+import TheIndexBox from '~/components/parts/index/TheIndexBox.vue';
+import TheIndexMv from '~/components/section/index/_TheIndexMv.vue';
+import TheIndexStudy from '~/components/section/index/_TheIndexStudy.vue';
+import TheIndexContact from '~/components/parts/index/TheIndexContact.vue';
+import TheCursor from '../components/common/TheCursor.vue';
+import TheTransition from '../components/common/TheTransition.vue';
+import BaseImage from '~/components/common/BaseImage.vue';
 import Title from '~/assets/scripts/components/section/index/title';
 import Attract from '~/assets/scripts/modules/attract';
+import { addClass, removeClass } from '~/assets/scripts/utils/classList';
+import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { loadingStore } from '~/store';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
+import { nextTick } from 'process';
 
 export default Vue.extend({
     head: {
@@ -42,6 +45,7 @@ export default Vue.extend({
     },
     data(): {
         title: Title;
+        isMobile: boolean;
         flg: {
             [key: string]: boolean;
         };
@@ -57,6 +61,7 @@ export default Vue.extend({
     } {
         return {
             title: null,
+            isMobile: isMobile(),
             flg: {
                 scroll: true,
                 start: false,
@@ -77,11 +82,12 @@ export default Vue.extend({
     components: {
         Loading,
         TheCircle,
-        TheBox,
-        TheMv,
-        TheStudy,
-        TheContact,
+        TheIndexBox,
+        TheIndexMv,
+        TheIndexStudy,
+        TheIndexContact,
         TheCursor,
+        TheTransition,
         BaseImage,
     },
     watch: {
@@ -98,21 +104,22 @@ export default Vue.extend({
         },
     },
     async mounted() {
-        // this.start();
         this.title = new Title();
         await this.title.init();
-        // if (this.loading) this.title.startAnim();
         new Attract();
         this.handleEvent();
+        const onTransition = this.$refs.transition as any;
         // 画面遷移時に「cancelAnimationFrame」を実行
-        this.$router.beforeEach(async (_to, _from, next) => {
-            this.flg.scroll = false;
-            if (this.title) {
-                this.title.cancel();
-                this.title = null;
+        this.$router.beforeEach(async (_to, from, next) => {
+            removeClass(document.body, hasClass.active);
+            if (from.name === 'index') {
+                await onTransition.start();
+                this.cancel();
+                next();
+            } else {
+                this.cancel();
+                next();
             }
-            loadingStore.setLoadingData({ loaded: false });
-            next();
         });
     },
     methods: {
@@ -192,6 +199,14 @@ export default Vue.extend({
         closeContact(isClose: boolean): void {
             this.contact.close = isClose;
             this.contact.show = !isClose;
+        },
+        cancel(): void {
+            this.flg.scroll = false;
+            if (this.title) {
+                this.title.cancel();
+                this.title = null;
+            }
+            loadingStore.setLoadingData({ loaded: false });
         },
     },
 });

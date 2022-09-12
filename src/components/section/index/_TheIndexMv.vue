@@ -1,7 +1,6 @@
 <template>
     <section id="mv" class="p-index-mv" data-mv>
         <!-- <TheCanvas :sectionName="'mv'" /> -->
-        <div class="p-index-mv__title"></div>
         <div class="p-index-mv__bg js-trigger">
             <div class="p-index-mv__bg-horizontal" data-horizontal="bg-line">
                 <div data-horizontal="pin">
@@ -58,7 +57,7 @@
                                     </span>
                                     &nbsp;
                                     <span
-                                        v-for="(word, index4) in splitWord('front')"
+                                        v-for="(word, index4) in splitWord('rear')"
                                         :key="splitWord('rear') + index4 + 1"
                                         class="p-index-mv__position-char"
                                         data-split-char="position"
@@ -72,17 +71,22 @@
                 </div>
             </div>
         </div>
+        <TheIndexBalloon :isShow="isActive" />
+        <!-- <div class="p-index-mv__watch">
+            <BaseImage :pcImg="'watch.png'" :alt="''" :width="2000" :height="2000" :decodingAsync="true" />
+        </div> -->
     </section>
 </template>
 
 <script lang="ts" scoped>
 import Vue from 'vue';
 import gsap from 'gsap';
+import BaseImage from '~/components/common/BaseImage.vue';
+import TheIndexBalloon from '~/components/parts/index/TheIndexBalloon.vue';
+import Particles from '~/assets/scripts/components/section/index/particles';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
-import BaseImage from '~/components/common/TheBaseImage.vue';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
-import Particles from '~/assets/scripts/components/section/index/particles';
 import { loadingStore } from '~/store';
 
 interface MvOptions {
@@ -98,6 +102,7 @@ interface MvOptions {
 export default Vue.extend({
     components: {
         BaseImage,
+        TheIndexBalloon,
     },
     props: {
         isActive: {
@@ -162,7 +167,7 @@ export default Vue.extend({
                 const pinWrap = line.querySelector("[data-horizontal='pin']");
                 const animWrap = pinWrap.querySelector("[data-horizontal='anim']");
                 const circle = document.querySelector('[data-circle]');
-                const box = document.querySelector('.p-box');
+                const box = document.querySelector('.p-index-box');
                 const xStart = (): number => (animWrap.classList.contains('to-right') ? -window.innerWidth : 0);
                 const xEnd = (): number =>
                     animWrap.classList.contains('to-right') ? -animWrap.scrollWidth : window.innerWidth;

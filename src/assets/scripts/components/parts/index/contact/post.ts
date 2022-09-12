@@ -15,6 +15,8 @@ import {
     DirectionalLightHelper,
     SpotLight,
     SpotLightHelper,
+    sRGBEncoding,
+    ACESFilmicToneMapping,
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
@@ -30,7 +32,7 @@ interface ThreeNumber {
 }
 
 export default class Post extends Webgl {
-    three: {
+    declare three: {
         camera: PerspectiveCamera | null;
         scene: Scene;
         geometry: BufferGeometry | null;
@@ -48,9 +50,7 @@ export default class Post extends Webgl {
         spotLightHelper: SpotLightHelper | null;
     };
     raycaster: Raycaster;
-    winSize: ThreeNumber;
     time: ThreeNumber;
-    viewport!: ThreeNumber;
     flg: {
         isMove: boolean;
     };
@@ -98,6 +98,7 @@ export default class Post extends Webgl {
         // this.init();
     }
     async init(canvas: HTMLElement): Promise<void> {
+        this.canvas = canvas;
         // 画面サイズを取得
         this.setSize();
         // カメラを作成
@@ -108,8 +109,7 @@ export default class Post extends Webgl {
         this.three.renderer = this.initRenderer();
         this.three.renderer.shadowMap.enabled = true;
         // HTMLに追加
-        this.canvas = canvas;
-        this.canvas.appendChild(this.three.renderer.domElement);
+        // this.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
         this.createModels();
@@ -124,36 +124,68 @@ export default class Post extends Webgl {
 
         // this.initGui();
     }
+    initCamera(): PerspectiveCamera {
+        const camera = new PerspectiveCamera(
+            45, // 画角
+            this.canvas.closest('div').clientWidth / this.canvas.closest('div').clientHeight, // 縦横比
+            0.1, // 視点から最も近い面までの距離
+            200 // 視点から最も遠い面までの距離
+        );
+        camera.position.set(0, 0, 90);
+        // どの位置からでも指定した座標に強制的に向かせることができる命令
+        // camera.lookAt(this.three.scene.position);
+        camera.updateProjectionMatrix();
+        return camera;
+    }
+    initRenderer(): WebGLRenderer {
+        const renderer = new WebGLRenderer({
+            canvas: this.canvas,
+            alpha: true,
+            antialias: true, // 物体の輪郭を滑らかにする
+        });
+        /**
+         * デスクトップでは、メインディスプレイ・サブディスプレイでPixelRatioの異なる可能性がある。
+         * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
+         * https://ics.media/tutorial-three/renderer_resize/
+         */
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0xeaf2f5, 0);
+        renderer.setSize(this.canvas.closest('div').clientWidth, this.canvas.closest('div').clientHeight);
+        renderer.physicallyCorrectLights = true;
+        renderer.outputEncoding = sRGBEncoding; // 出力エンコーディングを指定
+        renderer.toneMapping = ACESFilmicToneMapping;
+        return renderer;
+    }
     initAmbientLight(): void {
         // ■AmbientLight(色, 光の強さ)
         // 環境光源を実現する。3D空間全体に均等に光を当てる。一律に明るくしたいときに使う。
         // ※陰影や影(cast shadow)ができないので、この光源だけだと立体感を表現することはできない。
-        const ambientLight = new AmbientLight('#ffffff', 1.0);
+        const ambientLight = new AmbientLight('#ffffff', 1.5);
         this.three.ambientLight = ambientLight;
         this.three.scene.add(this.three.ambientLight);
     }
     initPointLight(): void {
         // decay: 光源からの光の減衰
-        const pointLight = new PointLight('#ffffff', 2.6, 50, 0.5);
+        const pointLight = new PointLight('#ffffff', 3.0);
         this.three.pointLight = pointLight;
         this.three.pointLight.castShadow = true;
-        this.three.pointLight.position.set(0, 0, 985);
+        this.three.pointLight.position.set(0, -1, 88);
         this.three.scene.add(this.three.pointLight);
     }
     initDirectionalLight(): void {
         // DirectionalLight(色, 光の強さ)
         // 特定の方向に放射される光。光源は無限に離れているものとして、そこから発生する光線はすべて平行になる。
         // ※平行光源
-        const directionalLight = new DirectionalLight('#ffffff', 2.0);
-        this.three.directionalLight = directionalLight;
-        this.three.directionalLight.castShadow = true;
-        this.three.directionalLight.shadow.mapSize.set(2048, 2048);
-        this.three.directionalLight.shadow.camera.top = -12;
-        this.three.directionalLight.shadow.camera.left = -12;
-        this.three.directionalLight.shadow.camera.right = 12;
-        this.three.directionalLight.shadow.camera.bottom = 12;
-        this.three.directionalLight.position.set(0, 1, 9);
-        this.three.scene.add(this.three.directionalLight);
+        // const directionalLight = new DirectionalLight('#ffffff', 1.0);
+        // this.three.directionalLight = directionalLight;
+        // this.three.directionalLight.castShadow = true;
+        // this.three.directionalLight.shadow.mapSize.set(2048, 2048);
+        // this.three.directionalLight.shadow.camera.top = -12;
+        // this.three.directionalLight.shadow.camera.left = -12;
+        // this.three.directionalLight.shadow.camera.right = 12;
+        // this.three.directionalLight.shadow.camera.bottom = 12;
+        // this.three.directionalLight.position.set(0, 0, 88);
+        // this.three.scene.add(this.three.directionalLight);
     }
     initSpotLight(): void {
         // DirectionalLight(色, 光の強さ)
@@ -162,10 +194,10 @@ export default class Post extends Webgl {
         const spotLight = new SpotLight('#ffffff', 3.0);
         this.three.spotLight = spotLight;
         this.three.spotLight.castShadow = true;
-        this.three.spotLight.intensity = 3.0;
+        this.three.spotLight.intensity = 8.0;
         const posX = this.isMobile ? 1.5 : 0;
-        this.three.spotLight.position.set(posX, -3, 990);
-        this.three.spotLight.angle = radians(45);
+        this.three.spotLight.position.set(posX, 2, 88);
+        this.three.spotLight.angle = radians(-90);
         const scale = this.isMobile ? 1 : 2;
         this.three.spotLight.scale.set(scale, scale, scale);
         this.three.spotLightHelper = new SpotLightHelper(this.three.spotLight);
@@ -188,11 +220,11 @@ export default class Post extends Webgl {
                 model.castShadow = true;
                 model.receiveShadow = true;
             });
-            const scale = this.isMobile ? 0.7 : 1.3;
+            const scale = this.isMobile ? 0.7 : 1.02;
             this.isMobile ? obj.scene.scale.set(scale, scale, scale) : obj.scene.scale.set(scale, scale, scale);
             this.three.object.add(obj.scene);
-            const posY = this.isMobile ? -2 : -3;
-            this.three.object.position.set(0, posY, 985);
+            const posY = this.isMobile ? -2 : -1.5;
+            this.three.object.position.set(0, posY, 82);
             // atan2：点 (0, 0) から点 (x, y) までの半直線と、正の x 軸の間の平面上での角度 (ラジアン単位) を返す
             // const angle = Math.atan2(this.three.object.position.y, this.three.object.position.x);
             const angleX = this.isMobile ? radians(8) : radians(10);
@@ -248,16 +280,18 @@ export default class Post extends Webgl {
     handleResize(): void {
         this.setSize();
         this.initViewport();
+        const width = this.canvas.closest('div').clientWidth;
+        const height = this.canvas.closest('div').clientHeight;
         if (this.three.camera) {
-            const posY = this.isMobile ? -2 : -3;
-            this.three.object.position.set(0, posY, 985);
+            const posY = this.isMobile ? -2 : -1.5;
+            this.three.object.position.set(0, posY, 82);
             // カメラのアスペクト比を正す
-            this.three.camera.aspect = this.winSize.width / this.winSize.height;
+            this.three.camera.aspect = width / height;
             this.three.camera.updateProjectionMatrix();
         }
         if (this.three.renderer) {
             this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+            this.three.renderer.setSize(width, height);
         }
         // this.three.object.position.set(0, posY, 985);
         this.render();

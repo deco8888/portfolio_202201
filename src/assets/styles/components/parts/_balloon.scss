@@ -1,0 +1,87 @@
+@use '../../global/index' as g;
+
+.p-index-balloon {
+    position: fixed;
+    top: 0;
+    left: g.get_vw(-200);
+    @include g.scroll-fade-in-before;
+    &.is-active {
+        @include g.scroll-fade-in-after(0, 0, 0.8s);
+        z-index: 1000;
+        animation: move 40s g.ease(OutSine) 0s infinite forwards;
+    }
+    $size: g.get_vw(-200);
+    @keyframes move {
+        0% {
+            top: 100vh;
+            left: 0vw;
+            transform: translate(#{$size}, 0);
+        }
+        100% {
+            top: 0;
+            left: 100vw;
+            transform: translate(0, #{$size});
+        }
+    }
+    @include g.media('>phone') {
+        width: g.get_vw(250);
+        height: g.get_vw(250);
+    }
+    @include g.media('<=phone') {
+        width: g.get_vw(150);
+        height: g.get_vw(150);
+    }
+    &__inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        z-index: 1001;
+        // background-color: g.$color-white;
+    }
+    &__canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        animation: bounce 3s g.ease(OutSine) 0s infinite;
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+            25% {
+                transform: translateY(-10px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            75% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    }
+    & canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    a {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        cursor: none;
+    }
+    img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+}

@@ -30,10 +30,12 @@ export default Vue.extend({
     },
     mounted() {
         // DOM更新をする非同期関数を全て実行した後に、第1引数として渡された関数を実行
-        this.$nextTick(() => {
-            removeClass(document.body, hasClass.active);
+        // this.$nextTick(() => {
+        //     removeClass(document.body, hasClass.active);
+        //     this.start();
+        // });
+        removeClass(document.body, hasClass.active);
             this.start();
-        });
     },
     methods: {
         start(): void {

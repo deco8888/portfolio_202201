@@ -39,7 +39,7 @@ interface UniformOptions {
 }
 
 export default class Photo extends Webgl {
-    three: {
+    declare three: {
         camera: PerspectiveCamera | null;
         scene: Scene;
         mesh: Mesh;
@@ -63,9 +63,7 @@ export default class Photo extends Webgl {
         x: number;
         y: number;
     };
-    winSize: ThreeNumber;
     time: ThreeNumber;
-    viewport!: ThreeNumber;
     rectList: DOMRect[];
     flg: {
         [key: string]: boolean;
@@ -170,7 +168,7 @@ export default class Photo extends Webgl {
     }
     async texture(index: string, imageName: string): Promise<Texture> {
         return new Promise((resolve) => {
-            const imageSrc = `/textures/${imageName}`;
+            const imageSrc = `/portfolio/textures/${imageName}`;
             const textureLoader = new TextureLoader();
             textureLoader.load(imageSrc, async (texture) => {
                 this.three.textureList.push(texture);
@@ -336,6 +334,7 @@ export default class Photo extends Webgl {
         // meshの位置更新
         mesh.position.x = -(viewportW / 2) + mesh.scale.x / 2 + (rect.left / winSizeW) * viewportW;
         mesh.position.y = viewportH / 2 - mesh.scale.y / 2 - (rect.top / winSizeH) * viewportH;
+        mesh.position.z = 1;
         const material = this.getMaterial(this.meshList[index]);
         material.uniforms.uResolution.value = new Vector2(rect.width, rect.height);
     }
@@ -436,8 +435,8 @@ export default class Photo extends Webgl {
 
         const studyList = this.elms.horizontalList;
         const scrollArea = this.isMobile
-            ? studyList.clientHeight - (window.innerHeight + 10)
-            : studyList.clientWidth - (window.innerWidth + 10);
+            ? studyList.clientHeight - window.innerHeight
+            : studyList.clientWidth - window.innerWidth * 0.5;
         this.isLast = targetY > scrollArea ? true : false;
 
         for (const [index, mesh] of Object.entries(this.meshList)) {
@@ -447,16 +446,13 @@ export default class Photo extends Webgl {
             const posX = this.getPosX(i);
             const posY = this.getPosY(i);
 
-            // scroll.current = this.isMobile ? posY : posX;
-
-            if (this.isMobile) scroll.current = this.isMobile ? posY : posX;
+            if (targetY >= 0) scroll.current = this.isMobile ? posY : posX;
 
             const tl = gsap.timeline({
                 paused: true,
             });
-            // console.log(mesh.position);
             if (targetY > 0 && !this.isLast) {
-                scroll.previous = lerp(scroll.previous, scroll.current, 0.08);
+                scroll.previous = lerp(scroll.previous, scroll.current, 0.09);
                 const material = this.getMaterial(mesh);
                 material.uniforms.uTime.value = scroll.current - scroll.previous;
                 const timeline = tl.to(
@@ -486,9 +482,6 @@ export default class Photo extends Webgl {
             } else {
                 const material = this.getMaterial(mesh);
                 material.uniforms.uTime.value = 0;
-                // if (this.isMobile) {
-                // const posX = this.getPosX(i);
-                // const posY = this.getPosY(i);
                 scroll.previous = this.isMobile ? posY : posX;
                 if (mesh.position.y !== scroll.previous) {
                     const timeline = tl.to(mesh.position, {
@@ -512,31 +505,6 @@ export default class Photo extends Webgl {
                     }
                     timeline.play();
                 }
-                // }
-                // else {
-                //     const posX = this.getPosX(i);
-                //     scroll.previous = posX;
-                //     if (mesh.position.x !== scroll.previous) {
-                //         const timeline = tl.to(mesh.position, {
-                //             duration: 1,
-                //             x: posX,
-                //         });
-                //         for (const [index, bgMesh] of Object.entries(this.bgMeshList[i])) {
-                //             const diff = parseInt(index) > 0 ? -10 : 10;
-                //             const bgMaterial = this.getMaterial(bgMesh);
-                //             bgMaterial.uniforms.uTime.value = 0;
-                //             timeline.to(
-                //                 bgMesh.position,
-                //                 {
-                //                     duration: 1,
-                //                     x: posX + diff,
-                //                 },
-                //                 '<'
-                //             );
-                //         }
-                //         timeline.play();
-                //     }
-                // }
             }
         }
     }
@@ -559,10 +527,6 @@ export default class Photo extends Webgl {
         this.flg.isScroll = true;
         this.flg.isMove = false;
         const targetY = window.scrollY - this.elms.mv.clientHeight;
-        const studyList = this.elms.horizontalList;
-        const scrollArea = this.isMobile
-            ? studyList.clientHeight - (window.innerHeight + 10)
-            : studyList.clientWidth - (window.innerWidth + 10);
         for (const [index, _] of Object.entries(this.rectList)) {
             const i = parseInt(index);
             // スクロール情報（current/previous/ease）
@@ -576,16 +540,7 @@ export default class Photo extends Webgl {
                 const diff = j > 0 ? -10 : 10;
                 bgMesh.position.y = moveY + diff;
             }
-            if (this.isMobile) {
-                // 画像表示位置
-                const imagePos = this.getPosY(i);
-                if (targetY >= 0) scroll.current = imagePos;
-            } else {
-                // 画像表示位置
-                const imagePos = this.getPosX(i);
-                if (targetY >= 0) scroll.current = imagePos;
-            }
-            this.isLast = targetY > scrollArea ? true : false;
+            if (targetY >= 0) scroll.current = this.isMobile ? moveY : moveX;
         }
         this.targetY = targetY;
     }

@@ -48,7 +48,7 @@ export default class Webgl {
             45, // 画角
             this.winSize.width / this.winSize.height, // 縦横比
             0.1, // 視点から最も近い面までの距離
-            10000 // 視点から最も遠い面までの距離
+            3000 // 視点から最も遠い面までの距離
         );
         camera.position.set(0, 0, 1000);
         // どの位置からでも指定した座標に強制的に向かせることができる命令

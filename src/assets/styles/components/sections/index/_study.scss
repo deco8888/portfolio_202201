@@ -38,7 +38,7 @@
         user-select: none;
         @include g.media('>phone') {
             top: 50%;
-            padding: 0 g.get_vw(600) 0 150vw;
+            padding: 0 g.get_vw(600) 0 180vw;
             transform: translate(0, -50%);
         }
         @include g.media('<=phone') {
@@ -117,13 +117,13 @@
         position: fixed;
         z-index: -1;
         @include g.media('>phone') {
-            @include g.scroll-fadein-before(20px, 0);
+            @include g.scroll-fade-in-before(20px, 0);
         }
         @include g.media('<=phone') {
-            @include g.scroll-fadein-before();
+            @include g.scroll-fade-in-before();
         }
         &.is-active {
-            @include g.scroll-fadein-after(0, 0, 0s);
+            @include g.scroll-fade-in-after(0, 0, 0s);
             z-index: 1002;
         }
         @include g.media('>phone') {

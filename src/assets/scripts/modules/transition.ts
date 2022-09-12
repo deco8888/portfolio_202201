@@ -25,7 +25,7 @@ interface ThreeNumber {
 }
 
 export default class Transition extends Webgl {
-    three: {
+    declare three: {
         camera: PerspectiveCamera | null;
         scene: Scene;
         mesh: Mesh[] | null;
@@ -46,7 +46,6 @@ export default class Transition extends Webgl {
         ratio: number;
         direction: number;
     };
-    viewport!: ThreeNumber;
     constructor() {
         super();
         this.three = {
@@ -304,6 +303,6 @@ export default class Transition extends Webgl {
         this.three.renderer.clear();
         this.three.renderer.dispose();
         this.three.renderer.domElement.remove();
-            this.three.renderer = null;
+        this.three.renderer = null;
     }
 }

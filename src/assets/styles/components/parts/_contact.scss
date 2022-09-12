@@ -5,7 +5,7 @@
  * parts contact
  *
  ***********************/
-.p-contact {
+.p-index-contact {
     $parent: &;
     position: absolute;
     top: 0;
@@ -61,26 +61,38 @@
     }
     &__post {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        transform: scale(0);
-        transition: transform 1s g.ease(OutSine);
-        will-change: transform;
-        &.is-active {
-            transition-delay: 0s;
-            transform: scale(1);
-            animation: floating 6s g.ease(linear) 0s alternate infinite;
-            @keyframes floating {
-                0% {
-                    top: 0;
-                }
-                50% {
-                    top: 20px;
-                }
-                100% {
-                    top: 0;
+        top: 60%;
+        left: 50%;
+        // bottom: 0;
+        // margin: auto;
+        padding-top: 35%;
+        width: 60%;
+        height: 0;
+        transform: translate(-50%, -50%);
+        // background-color: rebeccapurple;
+        &-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: scale(0);
+            transition: transform 1s g.ease(OutSine);
+            will-change: transform;
+            &.is-active {
+                transition-delay: 0s;
+                transform: scale(1);
+                animation: floating 6s g.ease(linear) 0s alternate infinite;
+                @keyframes floating {
+                    0% {
+                        top: 0;
+                    }
+                    50% {
+                        top: 20px;
+                    }
+                    100% {
+                        top: 0;
+                    }
                 }
             }
         }
@@ -187,5 +199,15 @@
                 }
             }
         }
+    }
+    &__following {
+        position: fixed;
+        width: 50px;
+        height: 50px;
+        transition: transform 0.2s g.ease(OutSine);
+        will-change: transform;
+        z-index: 1004;
+        cursor: none !important;
+        pointer-events: none !important;
     }
 }

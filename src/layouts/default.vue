@@ -12,13 +12,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-// import gsap, { Power4 } from 'gsap';
 import EventBus from '~/utils/event-bus';
-// import Loading from '~/components/Loading.vue';
-// import TheCursor from '~/components/parts/TheCursor.vue';
-// import { loadingStore } from '~/store';
-// import { addClass, removeClass } from '~/assets/scripts/utils/classList';
-// import { hasClass } from '~/assets/scripts/utils/hasClass';
 
 export default Vue.extend({
     // components: {

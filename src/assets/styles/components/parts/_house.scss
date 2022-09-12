@@ -1,12 +1,12 @@
 @use '../../global/index' as g;
 
-.p-house {
+.p-about-house {
     position: fixed;
     top: g.get_vw(30);
     right: g.get_vw(50);
-    @include g.scroll-fadein-before;
+    @include g.scroll-fade-in-before;
     &.is-active {
-        @include g.scroll-fadein-after(0, 0, 0.8s);
+        @include g.scroll-fade-in-after(0, 0, 0.8s);
         z-index: 1001;
     }
     // &.is-hover {

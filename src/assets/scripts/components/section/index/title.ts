@@ -10,14 +10,10 @@ interface PointsListType {
 }
 
 export default class Title extends Letter {
-    animFrame?: number;
     scroll: {
         y: number;
     };
     vertical: number;
-    horizontal: number;
-    particleX: number[];
-    text: string;
     elms: {
         study: HTMLElement;
     };
@@ -42,7 +38,6 @@ export default class Title extends Letter {
         };
     };
     pointsIndex: number;
-    isMobile: boolean;
     constructor() {
         super();
         this.isMobile = isMobile();
@@ -83,7 +78,7 @@ export default class Title extends Letter {
         this.font = {
             wight: 900,
             size: this.getFontSize(),
-            family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
             threshold: this.isMobile ? 0.18 : 0.12,
         };
         this.vertical = 0;
@@ -239,7 +234,7 @@ export default class Title extends Letter {
                 this.font = {
                     wight: 900,
                     size: this.getFontSize(),
-                    family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+                    family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
                     threshold: this.isMobile ? 0.18 : 0.12,
                 };
                 this.color = {
@@ -264,8 +259,8 @@ export default class Title extends Letter {
                     this.horizontal = current > 0 ? winSizeW * -0.3 : -0;
                     this.vertical = current > winSizeH ? winSizeH * 0.3 : 0;
                 } else if (scrollY < this.scroll.y) {
-                    this.horizontal = current < winSizeH * 0.3 ? winSizeW * 0.3 : 0;
-                    this.vertical = current < winSizeW ? winSizeH * -0.3 : 0;
+                    this.horizontal = current < winSizeH * 0.5 ? winSizeW * 0.3 : 0;
+                    this.vertical = current < studyList - winSizeW ? winSizeH * -0.3 : 0;
                 }
                 this.object.current.x = this.three.object.position.x + this.horizontal;
                 this.object.current.y = this.three.object.position.y + this.vertical;
@@ -288,7 +283,7 @@ export default class Title extends Letter {
                 this.font = {
                     wight: 900,
                     size: this.getFontSize(),
-                    family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+                    family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
                     threshold: this.isMobile ? 0.18 : 0.12,
                 };
                 this.color = {

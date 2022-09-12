@@ -40,7 +40,7 @@ const nuxtConfig: NuxtConfig = {
             { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
             {
                 rel: 'stylesheet',
-                href: 'https://api.fontshare.com/css?f[]=nippo@700&f[]=kola@400&display=swap',
+                href: 'https://api.fontshare.com/v2/css?f[]=nippo@700&display=swap',
             },
             {
                 rel: 'stylesheet',
@@ -65,9 +65,9 @@ const nuxtConfig: NuxtConfig = {
 
     router: {
         base: process.env.BASE_URL || '',
-        scrollBehavior: function (_to, _from, _savedPosition) {
-            return { x: 0, y: 0 };
-        },
+        // scrollBehavior: function (_to, _from, _savedPosition) {
+        //     return { x: 0, y: 0 };
+        // },
     },
 
     publicRuntimeConfig: {

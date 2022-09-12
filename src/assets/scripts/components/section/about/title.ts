@@ -5,44 +5,10 @@ import { radians } from '../../../utils/helper';
 import { PerspectiveCamera } from 'three';
 
 export default class Title extends Letter {
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
-    borderColor: string;
-    textImage: {
-        canvas: HTMLCanvasElement;
-        ctx: CanvasRenderingContext2D;
-        data: ImageData;
-    };
-    layers: number;
-    gap: number;
-    size: number;
-    target: {
-        rotation: {
-            x: number;
-            y: number;
-        };
-    };
-    rotation: {
-        x: number;
-        y: number;
-    };
     speed: number;
-    animFrame?: number;
-    vector3: {
-        x: number;
-        y: number;
-        z: number;
-    };
     scroll: {
         y: number;
     };
-    color: {
-        front: string;
-        back: string;
-    };
-    horizontal: number;
-    particleX: number[];
-    text: string;
     elms: {
         study: HTMLElement;
     };
@@ -85,7 +51,7 @@ export default class Title extends Letter {
         this.font = {
             wight: 900,
             size: this.getFontSize(),
-            family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
             threshold: this.isMobile ? 0.18 : 0.12,
         };
         this.text = 'ABOUT';
@@ -123,7 +89,7 @@ export default class Title extends Letter {
             45, // 画角
             this.winSize.width / this.winSize.height, // 縦横比
             0.1, // 視点から最も近い面までの距離
-            10000 // 視点から最も遠い面までの距離
+            3000 // 視点から最も遠い面までの距離
         );
         const posY = this.isMobile ? this.winSize.height / 2 : 0;
         camera.position.set(0, posY, 1000);

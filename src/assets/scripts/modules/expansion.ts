@@ -16,7 +16,7 @@ interface UniformOptions {
 }
 
 export default class Expansion extends Webgl {
-    three: {
+    declare three: {
         camera: THREE.PerspectiveCamera | null;
         scene: THREE.Scene;
         mesh: THREE.Mesh | null;
@@ -30,6 +30,7 @@ export default class Expansion extends Webgl {
         expansion: HTMLElement;
         wrapper: HTMLElement;
         title: HTMLCanvasElement;
+        post: HTMLElement;
         contact: HTMLCanvasElement;
         contactWrap: HTMLElement;
         study: HTMLCanvasElement;
@@ -46,7 +47,6 @@ export default class Expansion extends Webgl {
         ratio: number;
         direction: number;
     };
-    viewport!: ThreeNumber;
     state: string;
     flg: {
         isOpen: boolean;
@@ -69,8 +69,9 @@ export default class Expansion extends Webgl {
             expansion: document.querySelector('[data-expansion="expansion"]'),
             wrapper: document.querySelector('[data-expansion="wrapper"]'),
             title: document.querySelector('[data-canvas="title"]'),
+            post: document.querySelector('[data-post]'),
             contact: document.querySelector('[data-canvas="contact"]'),
-            contactWrap: document.querySelector('.p-contact'),
+            contactWrap: document.querySelector('.p-index-contact'),
             study: document.querySelector('.p-index-study'),
             // envelope: document.querySelector('[data-envelope]'),
             envelopeOpener: document.querySelector('[data-envelope-opener]'),
@@ -306,6 +307,7 @@ export default class Expansion extends Webgl {
                     onStart: () => {
                         addClass(document.body, hasClass.hidden);
                         // addClass(this.elms.expansion, hasClass.active);
+                        // addClass(this.elms.post, hasClass.active);
                         addClass(this.elms.canvas, hasClass.active);
                         this.displayContent();
                         setTimeout(() => {
@@ -405,6 +407,7 @@ export default class Expansion extends Webgl {
                     this.elms.contactWrap.style.visibility = 'hidden';
                     removeClass(document.body, hasClass.hidden);
                     removeClass(this.elms.expansion, hasClass.active);
+                    // removeClass(this.elms.post, hasClass.active);
                     removeClass(this.elms.canvas, hasClass.active);
                 },
             },
@@ -512,6 +515,6 @@ export default class Expansion extends Webgl {
         this.three.renderer.clear();
         this.three.renderer.dispose();
         this.three.renderer.domElement.remove();
-            this.three.renderer = null;
+        this.three.renderer = null;
     }
 }

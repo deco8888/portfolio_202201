@@ -1,20 +1,37 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    // どのバージョンのJS向けに出力するか
+    "target": "ESNext",
+    // 出力されるJSがどのようにモジュールを読み込むか指定
     "module": "ESNext",
-    "moduleResolution": "Node",
+    // 「import React from "react";」のようなインポートが可能になる
+    "allowSyntheticDefaultImports": true,
+    // モジュール解決の方法を’node’（Node.js）または’classic’（TypeScript pre-1.6）から設定
+    "moduleResolution": "node",
+    // jsonファイルをimportして型解決した状態で値を取得できる
+    "resolveJsonModule": true,
+    // 使いたいtargetには使いたい機能がない場合に、以下で指定
     "lib": ["ESNext", "ESNext.AsyncIterable", "DOM"],
-    // "jsx": "preserve",
+    // *.d.ts に対して型チェックしない
+    // プロパティ数が多い場合でも全ての型情報を確認
+    "noErrorTruncation": true,
+    // CommonJSモジュールを実行可能とする
     "esModuleInterop": true,
+    // .ts、.tsxファイルだけでなく、JSファイルをプロジェクトへインポートできるようにする
     "allowJs": true,
+    // ソースマップファイルの生成を有効化
     "sourceMap": true,
     "strict": false,
-    "noEmit": true,
+    // 暗黙的にanyになる値をエラーにする
     "noImplicitAny": true,
+    // 使われているthisの型が暗黙的にanyになる場合にエラーにする
     "noImplicitThis": true,
+    // デコレータの実験的なサポートを有効にする
     "experimentalDecorators": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
+    // TypeScriptの型を実行時に保持する
+    "emitDecoratorMetadata": true,
+    // import時にファイルパスの文字列で大文字小文字を区別するかどうかを指定
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],

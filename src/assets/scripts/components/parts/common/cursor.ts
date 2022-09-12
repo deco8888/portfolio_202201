@@ -1,23 +1,7 @@
-import {
-    PerspectiveCamera,
-    Scene,
-    BufferGeometry,
-    Mesh,
-    Points,
-    Object3D,
-    WebGLRenderer,
-    Clock,
-    Color,
-    PointLight,
-    PlaneGeometry,
-    ShadowMaterial,
-} from 'three';
 import gsap from 'gsap';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
-import { debounce } from '~/assets/scripts/utils/debounce';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { throttle } from '~/assets/scripts/utils/throttle';
-import Webgl from '../../../modules/webgl';
 
 interface CursorOption {
     cursorSelector: string;
@@ -35,20 +19,8 @@ const defaults: CursorOption = {
     pankuzuSelector: '#pankuzu',
 };
 
-export class Cursor extends Webgl {
+export class Cursor {
     params: CursorOption;
-    three: {
-        camera: PerspectiveCamera | null;
-        scene: Scene;
-        geometry: BufferGeometry | null;
-        mesh: Mesh | Mesh[] | null;
-        floor: THREE.Mesh | null;
-        points: Points | null;
-        object: Object3D | null;
-        renderer: WebGLRenderer | null;
-        clock: Clock | null;
-        pointLight: PointLight | null;
-    };
     elms: {
         cursor: HTMLElement;
         cursorBg: HTMLElement;
@@ -73,19 +45,6 @@ export class Cursor extends Webgl {
     };
     animFrame: number;
     constructor(props: Partial<CursorOption> = {}) {
-        super();
-        this.three = {
-            camera: null,
-            scene: new Scene(),
-            geometry: null,
-            mesh: null,
-            floor: null,
-            points: null,
-            object: null,
-            renderer: null,
-            clock: null,
-            pointLight: null,
-        };
         this.params = { ...defaults, ...props };
         this.elms = {
             cursor: document.querySelector(this.params.cursorSelector),
@@ -128,28 +87,8 @@ export class Cursor extends Webgl {
     }
     init(): void {
         if (this.elms.cursor) {
-            // this.handleResize();
             this.getRect();
             this.event();
-            this.initFloor();
-            // this.render();
-            window.addEventListener(
-                'resize',
-                debounce(() => {
-                    // this.handleResize();
-                }, 30),
-                false
-            );
-            window.addEventListener(
-                'scroll',
-                throttle(() => {
-                    // this.handelScroll();
-                }, 30),
-                {
-                    capture: false,
-                    passive: true,
-                }
-            );
             window.addEventListener(
                 'mousemove',
                 throttle(() => {
@@ -232,23 +171,6 @@ export class Cursor extends Webgl {
         removeClass(this.elms.cursor, hasClass.active);
         removeClass(target, 'is-hover');
         this.flg.isScaleUp = false;
-    }
-    initFloor(): void {
-        const geometry = new PlaneGeometry(window.innerWidth, window.innerHeight);
-        const material = new ShadowMaterial({
-            opacity: 0.3,
-            color: new Color('#ffffff'),
-        });
-        const floor = new Mesh(geometry, material);
-        floor.position.z = 0;
-        // floor.rotateY(radians(-180));
-        // 影を受け付ける
-        // https://ics.media/tutorial-three/light_shadowmap/
-        // floor.receiveShadow = true;
-        // Math.PI / 2 = 1/2π = 90度
-        // floor.rotateY(radians(-90));
-        this.three.floor = floor;
-        this.three.scene.add(this.three.floor);
     }
     setText(text: string): void {
         const target = document.querySelector('[data-cursor-bg]');

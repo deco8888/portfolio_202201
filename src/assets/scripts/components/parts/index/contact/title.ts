@@ -5,11 +5,6 @@ import { BufferGeometry, ShaderMaterial } from 'three';
 
 export default class Title extends Letter {
     speed: number;
-    vector3: {
-        x: number;
-        y: number;
-        z: number;
-    };
     scroll: {
         y: number;
     };
@@ -51,7 +46,7 @@ export default class Title extends Letter {
         this.font = {
             wight: 900,
             size: this.getFontSize(),
-            family: "'Gill Sans', sans-serif", //"'Red Hat Display', sans-serif", //"Arial", //"'Nippo', sans-serif",
+            family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
             threshold: this.isMobile ? 0.18 : 0.12,
         };
         this.text = 'CONTACT';

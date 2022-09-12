@@ -1,12 +1,12 @@
 @use '../settings/easing' as e;
 
-@mixin scroll-fadein-before($x: 0, $y: 15px) {
+@mixin scroll-fade-in-before($x: 0, $y: 15px) {
     opacity: 0;
     transform: translate($x, $y);
     transition: opacity 0.65s e.ease(OutSine), transform 0.65s e.ease(OutSine);
 }
 
-@mixin scroll-fadein-after($x: 0, $y: 0, $delay: 0.3s) {
+@mixin scroll-fade-in-after($x: 0, $y: 0, $delay: 0.3s) {
     opacity: 1;
     transform: translate($x, $y);
     transition-delay: $delay;

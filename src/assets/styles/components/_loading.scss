@@ -6,22 +6,6 @@
     height: 100vh;
     background-color: #ebeefa;
     overflow: hidden;
-    // &::after {
-    //     content: '';
-    //     position: absolute;
-    //     top: 0;
-    //     left: 0;
-    //     width: 100%;
-    //     height: 100%;
-    //     background-image: linear-gradient(45deg, transparent 50%, #c6cff8e0 50%),
-    //         linear-gradient(45deg, transparent 50%, #c6cff8e0 50%);
-    //     background-position: center center;
-    //     background-repeat: repeat;
-    //     background-size: g.get-vw(300) g.get-vw(300);
-    //     background-attachment: fixed;
-    //     // z-index: 1;
-    //     // animation: test 3s g.ease(OutSine) infinite;
-    // }
     &__block {
         position: absolute;
         top: 0;
@@ -29,10 +13,16 @@
         right: 0;
         bottom: 0;
         margin: auto;
-        padding-top: 10.4%;
-        width: g.get-vw(200);
         height: 0;
         z-index: 1;
+        @include g.media('>phone') {
+            padding-top: 10.4%;
+            width: g.get-vw(200);
+        }
+        @include g.media('<=phone') {
+            padding-top: 26.67%;
+            width: g.get-vw(200);
+        }
         &-inner {
             position: absolute;
             top: 0;
