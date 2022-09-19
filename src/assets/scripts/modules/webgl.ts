@@ -7,20 +7,70 @@ import {
     Object3D,
     sRGBEncoding,
     ACESFilmicToneMapping,
+    BufferGeometry,
+    Points,
+    Clock,
+    DirectionalLight,
+    DirectionalLightHelper,
+    SpotLight,
+    SpotLightHelper,
+    ShaderMaterial,
+    Vector3,
+    Texture,
+    WebGLRendererParameters,
 } from 'three';
 
 interface ThreeNumber {
     [key: string]: number;
 }
 
+interface CameraOption {
+    width: number;
+    height: number;
+    near: number;
+    far: number;
+    position: Partial<Vector3>;
+}
+
+const defaultsCamera: CameraOption = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    near: 0.1,
+    far: 3000,
+    position: { x: 0, y: 0, z: 1000 },
+};
+
+interface RendererOption {
+    canvas: HTMLCanvasElement;
+    width: number;
+    height: number;
+}
+
+const defaultsRenderer: RendererOption = {
+    canvas: null,
+    width: window.innerWidth,
+    height: window.innerHeight,
+};
+
 export default class Webgl {
     three: {
         camera: PerspectiveCamera | null;
         scene: Scene;
+        geometry: BufferGeometry | null;
         mesh: Mesh | Mesh[] | null;
-        object?: Object3D | null;
+        bgMesh?: Mesh[];
+        textureList?: Texture[];
+        floor?: THREE.Mesh | null;
+        points?: Points | null;
+        object: Object3D | null;
         renderer: WebGLRenderer | null;
+        clock: Clock | null;
         pointLight?: PointLight | null;
+        ambientLight?: THREE.AmbientLight | null;
+        directionalLight?: DirectionalLight | null;
+        directionalLightHelper?: DirectionalLightHelper | null;
+        spotLight?: SpotLight | null;
+        spotLightHelper?: SpotLightHelper | null;
     };
     winSize: ThreeNumber;
     viewport!: ThreeNumber;
@@ -28,10 +78,21 @@ export default class Webgl {
         this.three = {
             camera: null,
             scene: new Scene(),
+            geometry: null,
             mesh: null,
+            bgMesh: null,
+            textureList: [],
+            floor: null,
+            points: null,
             object: new Object3D(),
             renderer: null,
+            clock: null,
             pointLight: null,
+            ambientLight: null,
+            directionalLight: null,
+            directionalLightHelper: null,
+            spotLight: null,
+            spotLightHelper: null,
         };
         this.winSize = {
             width: 0,
@@ -42,25 +103,29 @@ export default class Webgl {
             height: 0,
         };
     }
-    initCamera(): PerspectiveCamera {
+    initCamera(props: Partial<CameraOption> = {}): PerspectiveCamera {
+        const params = { ...defaultsCamera, ...props };
         if (this.three.camera) return;
         const camera = new PerspectiveCamera(
             45, // 画角
-            this.winSize.width / this.winSize.height, // 縦横比
-            0.1, // 視点から最も近い面までの距離
-            3000 // 視点から最も遠い面までの距離
+            params.width / params.height, // 縦横比
+            params.near, // 視点から最も近い面までの距離
+            params.far // 視点から最も遠い面までの距離
         );
-        camera.position.set(0, 0, 1000);
+        camera.position.set(params.position.x, params.position.y, params.position.z);
         // どの位置からでも指定した座標に強制的に向かせることができる命令
         // camera.lookAt(this.three.scene.position);
         camera.updateProjectionMatrix();
         return camera;
     }
-    initRenderer(): WebGLRenderer {
-        const renderer = new WebGLRenderer({
+    initRenderer(props: Partial<RendererOption> = {}): WebGLRenderer {
+        const params = { ...defaultsRenderer, ...props };
+        const webglParams: WebGLRendererParameters = {
             alpha: true,
             antialias: true, // 物体の輪郭を滑らかにする
-        });
+        };
+        if (params.canvas) webglParams['canvas'] = params.canvas;
+        const renderer = new WebGLRenderer(webglParams);
         /**
          * デスクトップでは、メインディスプレイ・サブディスプレイでPixelRatioの異なる可能性がある。
          * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
@@ -68,7 +133,7 @@ export default class Webgl {
          */
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setClearColor(0xeaf2f5, 0);
-        renderer.setSize(this.winSize.width, this.winSize.height);
+        renderer.setSize(params.width, params.height);
         renderer.physicallyCorrectLights = true;
         renderer.outputEncoding = sRGBEncoding; // 出力エンコーディングを指定
         renderer.toneMapping = ACESFilmicToneMapping;
@@ -96,5 +161,8 @@ export default class Webgl {
             width: window.innerWidth,
             height: window.innerHeight,
         };
+    }
+    getMaterial(mesh: Mesh): ShaderMaterial {
+        return <ShaderMaterial>mesh.material;
     }
 }

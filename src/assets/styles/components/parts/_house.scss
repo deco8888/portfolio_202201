@@ -2,37 +2,25 @@
 
 .p-about-house {
     position: fixed;
-    top: g.get_vw(30);
-    right: g.get_vw(50);
     @include g.scroll-fade-in-before;
     &.is-active {
         @include g.scroll-fade-in-after(0, 0, 0.8s);
         z-index: 1001;
+        @include g.media('>phone') {
+            z-index: 1001;
+        }
+        @include g.media('<=phone') {
+            z-index: 1004;
+        }
     }
-    // &.is-hover {
-    //     &::before {
-    //         content: '';
-    //         position: absolute;
-    //         top: 0;
-    //         left: 0;
-    //         right: 0;
-    //         bottom: 0;
-    //         width: 30%;
-    //         height: 30%;
-    //         border-top: 2px solid #000000;
-    //         border-left: 2px solid #000000;
-    //     }
-    //     &::after {
-    //         content: '';
-    //         position: absolute;
-    //         right: 0;
-    //         bottom: 0;
-    //         width: 30%;
-    //         height: 30%;
-    //         border-right: 2px solid #000000;
-    //         border-bottom: 2px solid #000000;
-    //     }
-    // }
+    @include g.media('>phone') {
+        top: g.get_vw(20);
+        right: g.get_vw(30);
+    }
+    @include g.media('<=phone') {
+        top: 3rem;
+        right: 3rem;
+    }
     @include g.hover-only {
         animation: bound 1s g.ease(OutSine);
         @keyframes bound {
@@ -54,12 +42,12 @@
         }
     }
     @include g.media('>phone') {
-        width: g.get_vw(200);
-        height: g.get_vw(200);
+        width: g.get_vw(180);
+        height: g.get_vw(180);
     }
     @include g.media('<=phone') {
-        width: g.get_vw(150);
-        height: g.get_vw(150);
+        width: 11rem;
+        height: 11rem;
     }
     &__inner {
         position: relative;

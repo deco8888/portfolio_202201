@@ -39,18 +39,6 @@ interface UniformOptions {
 }
 
 export default class Photo extends Webgl {
-    declare three: {
-        camera: PerspectiveCamera | null;
-        scene: Scene;
-        mesh: Mesh;
-        bgMesh: Mesh[];
-        textureList: Texture[];
-        renderer: WebGLRenderer;
-        object: Object3D;
-        // control: OrbitControls | null;
-        clock: Clock;
-        pointLight: PointLight | null;
-    };
     elms: {
         canvas: HTMLCanvasElement;
         link: NodeListOf<HTMLImageElement>;
@@ -83,18 +71,6 @@ export default class Photo extends Webgl {
     isMobile: boolean;
     constructor() {
         super();
-        this.three = {
-            camera: null,
-            scene: new Scene(),
-            mesh: null,
-            bgMesh: null,
-            textureList: [],
-            renderer: null,
-            object: null,
-            // control: null,
-            clock: new Clock(),
-            pointLight: null,
-        };
         this.rectList = [];
         this.elms = {
             canvas: document.querySelector('[data-study="canvas"]'),

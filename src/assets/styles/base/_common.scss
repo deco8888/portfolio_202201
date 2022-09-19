@@ -113,68 +113,38 @@ a {
     opacity: 0;
 }
 
-.p-index-mv__canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1003;
-    pointer-events: none !important;
-    border: solid 10px;
-    border-image: linear-gradient(180deg, g.$color-dark-pastel-purple 50%, g.$color-mellow-apricot 50%);
-    border-image-slice: 1;
-    @include g.mq(mobile) {
-        border: solid 1rem;
-    }
-    &[data-title='mv'] {
-        border-image: linear-gradient(180deg, g.$color-dark-pastel-purple 50%, g.$color-mellow-apricot 50%);
-        border-image-slice: 1;
-    }
-    &[data-title='study'] {
-        border-image: linear-gradient(180deg, g.$color-light-green 50%, g.$color-light-pink 50%);
-        border-image-slice: 1;
-    }
-}
-
-.p-index-study {
-    &__expansion {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        background: transparent;
-    }
-    &__content {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        visibility: hidden;
-        opacity: 0;
-    }
-    &__expansion-canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        // border-image
-        transition: border 0s g.ease(OutSine) 0.8s;
-        z-index: 1004;
-        // &.is-active {
-        //     border: solid 10px;
-        //     border-image: linear-gradient(180deg, #facb04 50%, #7caed4 50%);
-        //     border-image-slice: 1;
-        // }
-    }
-}
+// .p-index-study {
+//     &__expansion {
+//         position: fixed;
+//         top: 0;
+//         left: 0;
+//         width: 100%;
+//         height: 100%;
+//         z-index: -1;
+//         background: transparent;
+//     }
+//     &__content {
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         position: absolute;
+//         top: 0;
+//         left: 0;
+//         width: 100%;
+//         height: 100%;
+//         visibility: hidden;
+//         opacity: 0;
+//     }
+//     &__expansion-canvas {
+//         position: fixed;
+//         top: 0;
+//         left: 0;
+//         width: 100%;
+//         height: 100%;
+//         transition: border 0s g.ease(OutSine) 0.8s;
+//         z-index: 1004;
+//     }
+// }
 
 .dg.ac {
     top: 0;

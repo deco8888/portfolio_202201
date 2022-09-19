@@ -3,7 +3,9 @@
         <div class="p-page">
             <TheTransition ref="transition" />
             <TheAboutTransition />
-            <div class="p-page__canvas" data-canvas="title" ref="canvas"></div>
+            <div class="p-page__title">
+                <div class="p-page__title-canvas" data-canvas="title"></div>
+            </div>
             <TheAboutIntro />
             <TheAboutHouse :isShow="this.show" />
         </div>

@@ -1,25 +1,10 @@
-import {
-    PerspectiveCamera,
-    Scene,
-    BufferGeometry,
-    Mesh,
-    Points,
-    Object3D,
-    WebGLRenderer,
-    Clock,
-    ShaderMaterial,
-    Float32BufferAttribute,
-    Color,
-    Raycaster,
-    Vector2,
-    PointLight,
-} from 'three';
+import { BufferGeometry, Points, Object3D, ShaderMaterial, Float32BufferAttribute, Color, Vector2 } from 'three';
 import gsap, { Sine, Back } from 'gsap';
 import letterVertexShader from '../glsl/letter/vertexshader.vert';
 import letterFragmentShader from '../glsl/letter/fragmentShader.frag';
 import { lerp } from '../utils/math';
 import Webgl from './webgl';
-import { distance3d, radians } from '../utils/helper';
+import { distance3d } from '../utils/helper';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 interface ThreeNumber {
@@ -35,19 +20,6 @@ interface elemInfoOptions {
 }
 
 export default class Letter extends Webgl {
-    declare three: {
-        camera: PerspectiveCamera | null;
-        scene: Scene;
-        geometry: BufferGeometry | null;
-        mesh: Mesh | Mesh[] | null;
-        floor: THREE.Mesh | null;
-        points: Points | null;
-        object: Object3D | null;
-        renderer: WebGLRenderer | null;
-        clock: Clock | null;
-        pointLight: PointLight | null;
-    };
-    raycaster: Raycaster;
     attributes: {
         position: {
             [key: string]: number[];
@@ -69,7 +41,7 @@ export default class Letter extends Webgl {
         isMove: boolean;
     };
     elemInfo: elemInfoOptions;
-    canvas: HTMLCanvasElement;
+    canvas: HTMLElement;
     ctx: CanvasRenderingContext2D;
     borderColor: string;
     textImage: {
@@ -110,6 +82,10 @@ export default class Letter extends Webgl {
         family: string;
         threshold: number;
     };
+    scroll: {
+        y: number;
+    };
+    previousY: number;
     horizontal: number;
     particleX: number[];
     text: string;
@@ -129,21 +105,10 @@ export default class Letter extends Webgl {
     particleSize: number;
     interval: number;
     isMobile: boolean;
+    particleSizeList: number[];
+    currentScale: number;
     constructor() {
         super();
-        this.three = {
-            camera: null,
-            scene: new Scene(),
-            geometry: null,
-            mesh: null,
-            floor: null,
-            points: null,
-            object: null,
-            renderer: null,
-            clock: null,
-            pointLight: null,
-        };
-        this.raycaster = new Raycaster();
         this.attributes = {
             position: {
                 first: [],
@@ -216,6 +181,7 @@ export default class Letter extends Webgl {
             family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
             threshold: 0.12,
         };
+        this.previousY = 0;
         this.horizontal = 0;
         this.particleX = [];
         this.text = 'CONTACT';
@@ -233,6 +199,8 @@ export default class Letter extends Webgl {
         this.interval = this.isMobile ? 4.0 : 6.0;
         // パーティクルサイズ
         this.particleSize = (this.isMobile ? 2 : 5) * window.devicePixelRatio;
+        this.particleSizeList = [];
+        this.currentScale = 1;
     }
     async prepare(): Promise<void> {
         this.setSize();
@@ -257,6 +225,7 @@ export default class Letter extends Webgl {
             await this.getTitleInfo();
         }
         this.createObject();
+        this.setParticleSize();
     }
     createObject(): void {
         // メッシュを作成
@@ -332,7 +301,7 @@ export default class Letter extends Webgl {
             paused: true,
         });
         tl.to(pointsMaterial.uniforms.uRatio, {
-            value: 0.7,
+            value: 0.8,
             duration: 1,
             delay: 0,
             ease: Sine.easeInOut,
@@ -359,6 +328,8 @@ export default class Letter extends Webgl {
         this.three.geometry.setAttribute(name, new Float32BufferAttribute(array, itemSize));
     }
     async getTitleInfo(): Promise<void> {
+        console.log(window.innerWidth * 0.5);
+        console.log(this.textImage.canvas);
         const width = this.textImage.canvas.width;
         const height = this.textImage.canvas.height;
         const data = this.textImage.data.data;
@@ -432,15 +403,13 @@ export default class Letter extends Webgl {
             height: window.innerHeight,
         };
     }
-    // handleEvent(): void {
-    //     window.addEventListener(
-    //         'resize',
-    //         throttle(() => {
-    //             this.handleResize();
-    //         }, 100),
-    //         false
-    //     );
-    // }
+    setParticleSize(): void {
+        const geometry = <BufferGeometry>this.three.points.geometry;
+        const geometrySize = geometry.attributes.size;
+        for (let i = 0; i < geometrySize.array.length; i++) {
+            this.particleSizeList.push(geometrySize.array[i]);
+        }
+    }
     onResize(): void {
         this.setSize();
         if (this.three.renderer) {
@@ -453,8 +422,17 @@ export default class Letter extends Webgl {
             this.three.camera.updateProjectionMatrix();
         }
         if (this.three.object) {
+            this.currentScale = this.winSize.width / this.firstWinSize.width;
+            this.three.object.scale.set(this.currentScale, this.currentScale, this.currentScale);
+        }
+        if (this.three.points) {
+            const geometry = <BufferGeometry>this.three.points.geometry;
+            const geometrySize = geometry.attributes.size;
             const scale = this.winSize.width / this.firstWinSize.width;
-            this.three.object.scale.set(scale, scale, scale);
+            for (let i = 0; i < geometrySize.array.length; i++) {
+                geometrySize.array[i] = this.particleSizeList[i] * scale;
+            }
+            geometrySize.needsUpdate = true;
         }
     }
     async getImageDataFirst(): Promise<ImageData> {
@@ -582,39 +560,15 @@ export default class Letter extends Webgl {
         return new Promise((resolve) => {
             cancelAnimationFrame(this.animFrame);
             this.three.scene.clear();
-            // this.three.scene.remove(this.three.object);
-            // this.three.object = null;
 
             if (this.three.points) {
                 const material = <ShaderMaterial>this.three.points.material;
                 material.dispose();
                 this.three.points.geometry.dispose();
-                // this.three.points = null;
             }
-            // this.three.renderer.forceContextLoss();
-            // const gl = this.three.renderer.getContext();
-            // console.log('-----');
-            // console.log(gl);
-            // gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            // gl.clear(gl.COLOR_BUFFER_BIT);
-            // console.log(gl);
-            // this.three.renderer.domElement.remove()
-            // this.three.renderer.clear();
             this.three.renderer.dispose();
             this.three.renderer.domElement.remove();
             this.three.renderer = null;
-            // this.three.renderer = null;
-            // console.log(this.three.renderer.domElement);
-            // console.log(this.three.renderer.getContext());
-            // if (gl) {
-            //     gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            //     gl.clear(gl.COLOR_BUFFER_BIT);
-            //     this.three.renderer.domElement = null;
-            //     console.log(this.three.renderer.forceContextLoss());
-            //     this.three.renderer = null;
-            // }
-            // // this.three.renderer.context = null;
-            // // this.three.renderer.domElement = null;
             resolve();
         });
     }
@@ -628,22 +582,18 @@ export default class Letter extends Webgl {
         pointsMaterial.uniforms.uTime.value = timeValue;
     }
     raycast(): void {
-        this.raycaster.setFromCamera(this.mouse, this.three.camera);
-        this.raycaster.params.Points.threshold = 5;
         const geometry = <BufferGeometry>this.three.points.geometry;
         const position = geometry.attributes.position;
         const size = geometry.attributes.size;
-        // const intersects = this.raycaster.intersectObject(this.three.points);
 
         const rotateY = this.three.object.rotation.y;
         const degree = (rotateY * 180) / Math.PI;
         const remainder = Math.floor(degree / 90) % 4;
-        const isRotate = remainder === 0 || remainder === 3;
-        const imageHalfWidth = this.textImage.canvas.width / 2;
+        const scrollY = window.scrollY;
+        const isRotate = remainder === 0 || remainder === 3 || scrollY === 0;
 
         const mouseX = isRotate ? this.mouse.x : -this.mouse.x;
         const mouseY = this.mouse.y;
-        const targetZ = isRotate ? 0 : imageHalfWidth;
         if (this.mouse.x !== 0) {
             for (let i = 0; i < position.array.length / 3; i++) {
                 // 交際位置からグリッド要素までの距離を計算
@@ -665,5 +615,6 @@ export default class Letter extends Webgl {
         }
         position.needsUpdate = true;
         size.needsUpdate = true;
+        this.previousY = scrollY;
     }
 }

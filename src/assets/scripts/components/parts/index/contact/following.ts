@@ -1,8 +1,7 @@
 import gsap from 'gsap';
 import { lerp } from '~/assets/scripts/utils/math';
-import { addClass, removeClass } from '~/assets/scripts/utils/classList';
+import { addClass, isContains, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
-import { throttle } from '~/assets/scripts/utils/throttle';
 
 interface FollowingOption {
     followingSelector: string;
@@ -96,30 +95,15 @@ export default class Following {
     }
     render(): void {
         if (this.rect) {
-            this.styles.transX.current = this.mouse.x - this.rect.width * 0.5;
-            this.styles.transY.current = this.mouse.y - this.rect.height * 0.5;
+            this.styles.transX.current = this.mouse.x - this.rect.width * 0.25;
+            this.styles.transY.current = this.mouse.y - this.rect.height - 25;
             for (const styles of Object.values(this.styles)) {
                 styles.previous = lerp(styles.previous, styles.current, styles.amt);
             }
-
             gsap.to(this.elms.following, {
                 left: this.styles.transX.previous,
                 top: this.styles.transY.previous,
             });
-            // if (this.flg.isRaycaster) {
-            //     gsap.to(this.elms.following, {
-            //         duration: 0,
-            //         left: this.styles.transX.previous,
-            //         top: this.styles.transY.previous,
-            //     });
-            // } else {
-            //     this.styles.scale.current = this.flg.isScaleUp ? 1 : 0.3;
-            //     gsap.to(this.elms.following, {
-            //         duration: 0,
-            //         left: this.styles.transX.previous,
-            //         top: this.styles.transY.previous,
-            //     });
-            // }
         }
         this.animFrame = requestAnimationFrame(this.render.bind(this));
     }
@@ -131,30 +115,34 @@ export default class Following {
         //     target.addEventListener('mouseleave', () => this.leave(target));
         // });
     }
-    mouseover(flg: boolean): void {
-        if (flg) {
-            addClass(this.elms.following, hasClass.active);
-            this.styles.scale.current = 1;
-            this.flg.isRaycaster = true;
-        } else {
-            removeClass(this.elms.following, hasClass.active);
-            this.styles.scale.current = 0.3;
-            this.flg.isRaycaster = false;
-        }
-    }
     getTarget(): void {
         this.elms.targets = document.querySelectorAll(this.params.targetSelector);
     }
-    handleResize(): void {}
-    enter(target: HTMLElement): void {
-        addClass(this.elms.following, hasClass.active);
-        addClass(target, 'is-hover');
-        this.flg.isScaleUp = true;
+    enter(): void {
+        if (!this.flg.isScaleUp && !isContains(this.elms.following, hasClass.active)) {
+            gsap.set(this.elms.following, {
+                visibility: 'visible',
+            });
+            gsap.to(this.elms.following, {
+                scale: 1,
+                onComplete: () => {
+                    addClass(this.elms.following, hasClass.active);
+                    this.flg.isScaleUp = true;
+                },
+            });
+        }
     }
-    leave(target: HTMLElement): void {
-        removeClass(this.elms.following, hasClass.active);
-        removeClass(target, 'is-hover');
-        this.flg.isScaleUp = false;
+    leave(): void {
+        if (this.flg.isScaleUp && isContains(this.elms.following, hasClass.active)) {
+            gsap.to(this.elms.following, {
+                scale: 0,
+                onComplete: () => {
+                    this.elms.following.style.visibility = 'hidden';
+                    removeClass(this.elms.following, hasClass.active);
+                    this.flg.isScaleUp = false;
+                },
+            });
+        }
     }
     setText(text: string): void {
         const target = document.querySelector('[data-following-bg]');

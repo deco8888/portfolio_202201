@@ -1,23 +1,4 @@
-import {
-    PerspectiveCamera,
-    Scene,
-    BufferGeometry,
-    Mesh,
-    Points,
-    Object3D,
-    WebGLRenderer,
-    Clock,
-    Raycaster,
-    Vector2,
-    PointLight,
-    AmbientLight,
-    DirectionalLight,
-    DirectionalLightHelper,
-    SpotLight,
-    SpotLightHelper,
-    sRGBEncoding,
-    ACESFilmicToneMapping,
-} from 'three';
+import { Vector2, PointLight, AmbientLight, DirectionalLight, SpotLight, SpotLightHelper } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { radians } from '~/assets/scripts/utils/helper';
@@ -32,24 +13,6 @@ interface ThreeNumber {
 }
 
 export default class House extends Webgl {
-    declare three: {
-        camera: PerspectiveCamera | null;
-        scene: Scene;
-        geometry: BufferGeometry | null;
-        mesh: Mesh | Mesh[] | null;
-        floor: THREE.Mesh | null;
-        points: Points | null;
-        object: Object3D | null;
-        renderer: WebGLRenderer | null;
-        clock: Clock | null;
-        pointLight: PointLight | null;
-        ambientLight: THREE.AmbientLight | null;
-        directionalLight: DirectionalLight | null;
-        directionalLightHelper: DirectionalLightHelper | null;
-        spotLight: SpotLight | null;
-        spotLightHelper: SpotLightHelper | null;
-    };
-    raycaster: Raycaster;
     time: ThreeNumber;
     flg: {
         isMove: boolean;
@@ -62,24 +25,6 @@ export default class House extends Webgl {
     isMobile: boolean;
     constructor() {
         super();
-        this.three = {
-            camera: null,
-            scene: new Scene(),
-            geometry: null,
-            mesh: null,
-            floor: null,
-            points: null,
-            object: new Object3D(),
-            renderer: null,
-            clock: null,
-            pointLight: null,
-            ambientLight: null,
-            directionalLight: null,
-            directionalLightHelper: null,
-            spotLight: null,
-            spotLightHelper: null,
-        };
-        this.raycaster = new Raycaster();
         this.winSize = {
             width: 0,
             height: 0,
@@ -102,11 +47,19 @@ export default class House extends Webgl {
         // 画面サイズを取得
         this.setSize();
         // カメラを作成
-        this.three.camera = this.initCamera();
+        const el = this.canvas.closest('div');
+        this.three.camera = this.initCamera({
+            width: el.clientWidth,
+            height: el.clientHeight,
+        });
         // カメラをシーンに追加
         this.three.scene.add(this.three.camera);
         // レンダラーを作成
-        this.three.renderer = this.initRenderer();
+        this.three.renderer = this.initRenderer({
+            canvas: this.canvas,
+            width: el.clientWidth,
+            height: el.clientHeight,
+        });
         this.three.renderer.shadowMap.enabled = true;
         // HTMLに追加
         // this.canvas.appendChild(this.three.renderer.domElement);
@@ -119,43 +72,40 @@ export default class House extends Webgl {
         // this.initPointLight();
         // this.initSpotLight();
 
-        this.three.clock = new Clock();
-        this.three.clock.start();
-
         // this.initGui();
     }
-    initCamera(): PerspectiveCamera {
-        const camera = new PerspectiveCamera(
-            45, // 画角
-            this.canvas.closest('div').clientWidth / this.canvas.closest('div').clientHeight, // 縦横比
-            0.1, // 視点から最も近い面までの距離
-            3000 // 視点から最も遠い面までの距離
-        );
-        camera.position.set(0, 0, 1000);
-        // どの位置からでも指定した座標に強制的に向かせることができる命令
-        // camera.lookAt(this.three.scene.position);
-        camera.updateProjectionMatrix();
-        return camera;
-    }
-    initRenderer(): WebGLRenderer {
-        const renderer = new WebGLRenderer({
-            canvas: this.canvas,
-            alpha: true,
-            antialias: true, // 物体の輪郭を滑らかにする
-        });
-        /**
-         * デスクトップでは、メインディスプレイ・サブディスプレイでPixelRatioの異なる可能性がある。
-         * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
-         * https://ics.media/tutorial-three/renderer_resize/
-         */
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.setClearColor(0xeaf2f5, 0);
-        renderer.setSize(this.canvas.closest('div').clientWidth, this.canvas.closest('div').clientHeight);
-        renderer.physicallyCorrectLights = true;
-        renderer.outputEncoding = sRGBEncoding; // 出力エンコーディングを指定
-        renderer.toneMapping = ACESFilmicToneMapping;
-        return renderer;
-    }
+    // initCamerat(): PerspectiveCamera {
+    //     const camera = new PerspectiveCamera(
+    //         45, // 画角
+    //         this.canvas.closest('div').clientWidth / this.canvas.closest('div').clientHeight, // 縦横比
+    //         0.1, // 視点から最も近い面までの距離
+    //         3000 // 視点から最も遠い面までの距離
+    //     );
+    //     camera.position.set(0, 0, 1000);
+    //     // どの位置からでも指定した座標に強制的に向かせることができる命令
+    //     // camera.lookAt(this.three.scene.position);
+    //     camera.updateProjectionMatrix();
+    //     return camera;
+    // }
+    // initRendererr(): WebGLRenderer {
+    //     const renderer = new WebGLRenderer({
+    //         canvas: this.canvas,
+    //         alpha: true,
+    //         antialias: true, // 物体の輪郭を滑らかにする
+    //     });
+    //     /**
+    //      * デスクトップでは、メインディスプレイ・サブディスプレイでPixelRatioの異なる可能性がある。
+    //      * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
+    //      * https://ics.media/tutorial-three/renderer_resize/
+    //      */
+    //     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    //     renderer.setClearColor(0xeaf2f5, 0);
+    //     renderer.setSize(this.canvas.closest('div').clientWidth, this.canvas.closest('div').clientHeight);
+    //     renderer.physicallyCorrectLights = true;
+    //     renderer.outputEncoding = sRGBEncoding; // 出力エンコーディングを指定
+    //     renderer.toneMapping = ACESFilmicToneMapping;
+    //     return renderer;
+    // }
     initAmbientLight(): void {
         // ■AmbientLight(色, 光の強さ)
         // 環境光源を実現する。3D空間全体に均等に光を当てる。一律に明るくしたいときに使う。
@@ -209,7 +159,7 @@ export default class House extends Webgl {
                 model.castShadow = true;
                 model.receiveShadow = true;
             });
-            const scale = this.isMobile ? 0.7 : 1.5;
+            const scale = this.isMobile ? 1.5 : 1.5;
             this.isMobile ? obj.scene.scale.set(scale, scale, scale) : obj.scene.scale.set(scale, scale, scale);
             this.three.object.add(obj.scene);
             const posY = this.isMobile ? -2 : -3;

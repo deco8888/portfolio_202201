@@ -1,14 +1,8 @@
-import * as THREE from 'three';
 import { lerp } from '../../../utils/math';
 import Letter from '~/assets/scripts/modules/letter';
-import { radians } from '../../../utils/helper';
-import { PerspectiveCamera } from 'three';
 
 export default class Title extends Letter {
     speed: number;
-    scroll: {
-        y: number;
-    };
     elms: {
         study: HTMLElement;
     };
@@ -54,10 +48,11 @@ export default class Title extends Letter {
             family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
             threshold: this.isMobile ? 0.18 : 0.12,
         };
-        this.text = 'ABOUT';
+        this.interval = this.isMobile ? 15.0 : 6.0;
+        this.text = 'ABOUT¥nME';
     }
     getFontSize(): number {
-        return this.isMobile ? this.viewport.width * 0.15 : this.viewport.width * 0.1;
+        return this.isMobile ? this.viewport.width * 0.15 : this.viewport.width * 0.18;
     }
     init(): void {
         this.canvas = document.querySelector('[data-canvas="title"]');
@@ -68,60 +63,48 @@ export default class Title extends Letter {
         this.setBorderStyle('about');
         // 描写する
         this.render();
-        this.three.clock = new THREE.Clock();
-        this.three.clock.start();
     }
     async prepare(): Promise<void> {
         this.setSize();
+        this.firstWinSize = {
+            width: this.canvas.clientWidth,
+            height: this.canvas.clientHeight,
+        };
         // カメラを作成
-        this.three.camera = this.initCamera();
+        this.three.camera = this.initCamera({
+            width: this.canvas.clientWidth,
+            height: this.canvas.clientHeight,
+            position: {
+                x: 0,
+                y: 0,
+                z: 1000,
+            },
+        });
         // カメラをシーンに追加
         this.three.scene.add(this.three.camera);
         // レンダラーを作成
-        this.three.renderer = this.initRenderer();
+        this.three.renderer = this.initRenderer({
+            width: this.canvas.clientWidth,
+            height: this.canvas.clientHeight,
+        });
+        console.log({
+            width: this.canvas.clientWidth,
+            height: this.canvas.clientHeight,
+        });
         // HTMLに追加
         this.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
     }
-    initCamera(): PerspectiveCamera {
-        const camera = new PerspectiveCamera(
-            45, // 画角
-            this.winSize.width / this.winSize.height, // 縦横比
-            0.1, // 視点から最も近い面までの距離
-            3000 // 視点から最も遠い面までの距離
-        );
-        const posY = this.isMobile ? this.winSize.height / 2 : 0;
-        camera.position.set(0, posY, 1000);
-        // どの位置からでも指定した座標に強制的に向かせることができる命令
-        camera.lookAt(this.three.scene.position);
-        camera.updateProjectionMatrix();
-        return camera;
-    }
     render(): void {
-        requestAnimationFrame(this.render.bind(this));
-        if (this.three.clock) {
-            // delta: 変化量
-            this.time.delta = this.three.clock.getDelta();
-            this.time.total += this.time.delta;
-        }
         if (this.three.object) this.three.object.rotation.y += 0.01;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
-        if (this.three.points) this.update();
-        // this.three.object.rotateX
-        if (this.three.object && this.three.object.position.x === 0) {
-            if (this.isMobile) {
-                this.three.object.position.y = this.winSize.height * 0.48;
-            } else {
-                const slope = radians(0);
-                const diff = Math.cos(slope) * this.textImage.canvas.width;
-                const space = (this.viewport.width * 0.5 - diff) / 2;
-                this.three.object.rotation.y = slope;
-                this.three.object.position.x = -space - this.textImage.canvas.width / 2;
-                this.three.object.position.z = -this.textImage.canvas.width / 4;
-            }
+        if (this.three.points) {
+            this.update();
+            if (!this.isMobile) this.raycast();
         }
+        this.animFrame = requestAnimationFrame(this.render.bind(this));
     }
     update(): void {
         const geometry = <THREE.BufferGeometry>this.three.points.geometry;
@@ -142,11 +125,18 @@ export default class Title extends Letter {
     }
     handleResize(): void {
         this.setSize();
+        if (this.three.renderer) {
+            this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.three.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+        }
         if (this.three.camera) {
             // カメラのアスペクト比を正す
-            this.three.camera.aspect = this.winSize.width / this.winSize.height;
+            this.three.camera.aspect = this.canvas.clientWidth / this.canvas.clientHeight;
             this.three.camera.updateProjectionMatrix();
-            if (this.three.renderer) this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+        }
+        if (this.three.object) {
+            const scale = this.canvas.clientWidth / this.firstWinSize.width;
+            this.three.object.scale.set(scale, scale, scale);
         }
     }
 }

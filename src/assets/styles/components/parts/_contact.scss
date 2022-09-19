@@ -30,6 +30,7 @@
         border-image-slice: 1;
         opacity: 0;
         transition: border 0.3s g.ease(linear) 0s;
+        z-index: 1003;
         #{$parent}.is-active & {
             border: solid 10px;
             border-image: linear-gradient(180deg, #facb04 50%, #7caed4 50%);
@@ -60,16 +61,30 @@
         // display: none;
     }
     &__post {
+        $post: &;
         position: fixed;
-        top: 60%;
         left: 50%;
-        // bottom: 0;
-        // margin: auto;
-        padding-top: 35%;
-        width: 60%;
         height: 0;
         transform: translate(-50%, -50%);
-        // background-color: rebeccapurple;
+        z-index: 1004;
+        // background-color: #7cadd3;
+        @include g.media('>phone') {
+            top: 60%;
+            height: calc(100vw * 0.6 * 0.67);
+            max-height: calc(100vh * 0.6 * 1.5 * 0.67);
+            width: 60%;
+            max-width: calc(100vh * 0.6 * 1.5);
+        }
+        @include g.media('<=phone') {
+            top: 50%;
+            padding-top: 60%;
+            width: 100%;
+        }
+        @include g.hover-only {
+            #{$post}-canvas {
+                filter: drop-shadow(0px 2px 10px rgb(0 0 0/ 50%));
+            }
+        }
         &-canvas {
             position: absolute;
             top: 0;
@@ -77,12 +92,13 @@
             width: 100%;
             height: 100%;
             transform: scale(0);
-            transition: transform 1s g.ease(OutSine);
+            transition: transform 1s g.ease(OutSine), filter 0.3s g.ease(OutSine);
             will-change: transform;
             &.is-active {
                 transition-delay: 0s;
                 transform: scale(1);
                 animation: floating 6s g.ease(linear) 0s alternate infinite;
+
                 @keyframes floating {
                     0% {
                         top: 0;
@@ -201,13 +217,85 @@
         }
     }
     &__following {
+        display: inline-block;
         position: fixed;
-        width: 50px;
-        height: 50px;
-        transition: transform 0.2s g.ease(OutSine);
+        top: 0;
+        left: 0;
+        width: 120px;
+        // height: 319px;
+        // transition: transform 0.2s g.ease(OutSine);
         will-change: transform;
-        z-index: 1004;
+        transform: scale(0);
+        visibility: hidden;
+        z-index: 1005;
         cursor: none !important;
         pointer-events: none !important;
+        & p {
+            padding: 1rem;
+            background-color: rgb(124 174 212 / 26%);
+            border: solid 3px #facb04;
+            color: #7caed4;
+            font-family: 'Gill Sans', 'Segoe UI', sans-serif;
+            font-weight: bold;
+        }
+    }
+    &__cloud {
+        position: absolute;
+        left: 0;
+        transform: translate(-100%, -50%);
+        transition: filter 1s g.ease(OutSine) 0.3s, opacity 0.3s g.ease(OutSine) 0.3s;
+        filter: blur(30px);
+        opacity: 0;
+        &.is-open {
+            filter: blur(0);
+            opacity: 1;
+        }
+        &--cloud1 {
+            top: 15%;
+            width: g.get-per(700);
+            &.is-open {
+                animation: drift 50s g.ease(linear) 0s infinite;
+            }
+        }
+        &--cloud2 {
+            top: 40%;
+            width: g.get-per(900);
+            &.is-open {
+                animation: drift 50s -20s g.ease(linear) infinite;
+            }
+        }
+        &--cloud3 {
+            top: 60%;
+            width: g.get-per(700);
+            &.is-open {
+                animation: drift 50s -5s g.ease(linear) infinite;
+            }
+        }
+        &--cloud4 {
+            top: 30%;
+            width: g.get-per(500);
+            &.is-open {
+                animation: drift 50s -30s g.ease(linear) infinite;
+            }
+        }
+        &--cloud5 {
+            top: 80%;
+            width: g.get-per(800);
+            &.is-open {
+                animation: drift 50s -10s g.ease(linear) infinite;
+            }
+        }
+        @keyframes drift {
+            0% {
+                transform: translate(-100%, -50%);
+                left: 0;
+            }
+            100% {
+                transform: translate(100%, -50%);
+                left: 100%;
+            }
+        }
     }
 }
+
+// #facb04 50%, #7caed4 50%);

@@ -1,3 +1,5 @@
+@use '../global/index' as g;
+
 .p-page {
     position: fixed;
     top: 0;
@@ -7,18 +9,6 @@
     width: 100%;
     height: 100vh;
     overflow: hidden;
-    &__canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1003;
-        pointer-events: none !important;
-        border: solid 10px;
-        border-image: linear-gradient(180deg, #51a2f7 50%, #e96747 50%);
-        border-image-slice: 1;
-    }
     &__transition {
         position: fixed;
         top: 0;
@@ -78,6 +68,38 @@
             height: 100vh;
             background-color: #eaeefa;
             transform: scale(0);
+        }
+    }
+    &__title {
+        z-index: 1003;
+        // pointer-events: none !important;
+        @include g.media('>phone') {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+        }
+        @include g.media('<=phone') {
+            position: relative;
+            width: 100%;
+            margin: calc(7rem + 10px) 0 0;
+            padding-top: 45%;
+        }
+        &-canvas {
+            @include g.media('>phone') {
+                position: relative;
+                margin: 0 auto;
+                width: 90%;
+                height: 100%;
+            }
+            @include g.media('<=phone') {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
         }
     }
 }

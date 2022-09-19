@@ -6,7 +6,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #c6cff8f1;
+    background: rgb(198 207 248 / 95%);
     overflow: hidden;
     @include g.media('>phone') {
         padding: 0 0 g.get_per(500);

@@ -1,19 +1,4 @@
-import {
-    PerspectiveCamera,
-    Scene,
-    PlaneBufferGeometry,
-    Mesh,
-    Points,
-    Vector3,
-    WebGLRenderer,
-    Clock,
-    ShaderMaterial,
-    DoubleSide,
-    Color,
-    Vector2,
-    PointLight,
-    Object3D,
-} from 'three';
+import { PlaneBufferGeometry, Mesh, Vector3, ShaderMaterial, DoubleSide, Color, Vector2 } from 'three';
 import gsap, { Power2 } from 'gsap';
 import Webgl from './webgl';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
@@ -25,16 +10,6 @@ interface ThreeNumber {
 }
 
 export default class Transition extends Webgl {
-    declare three: {
-        camera: PerspectiveCamera | null;
-        scene: Scene;
-        mesh: Mesh[] | null;
-        object: Object3D | null;
-        stars: Points | null;
-        renderer: WebGLRenderer | null;
-        clock: Clock | null;
-        pointLight: PointLight | null;
-    };
     elms: {
         wrapper: HTMLElement | null;
         canvas: HTMLCanvasElement | null;
@@ -48,16 +23,6 @@ export default class Transition extends Webgl {
     };
     constructor() {
         super();
-        this.three = {
-            camera: null,
-            scene: new Scene(),
-            mesh: [],
-            object: null,
-            stars: null,
-            renderer: null,
-            clock: null,
-            pointLight: null,
-        };
         this.elms = {
             wrapper: document.querySelector('[data-transition="wrapper"]'),
             canvas: document.querySelector('[data-transition="canvas"]'),
@@ -153,59 +118,63 @@ export default class Transition extends Webgl {
         return mesh;
     }
     update(): void {
-        if (this.elms.canvas) {
-            const rect = this.elms.canvas.getBoundingClientRect();
-            const winSizeW = this.winSize.width;
-            const winSizeH = this.winSize.height;
-            const viewportW = this.viewport.width;
-            const viewportH = this.viewport.height;
+        // if (this.elms.canvas) {
+        this.setSize();
+        console.log(window.innerWidth);
+        this.initViewport();
+        const rect = this.elms.canvas.getBoundingClientRect();
+        const winSizeW = window.innerWidth;
+        const winSizeH = window.innerWidth;
+        const viewportW = this.viewport.width;
+        const viewportH = this.viewport.height;
 
-            // ピクセル単位をカメラの視野単位にマッピングする
-            const widthViewUnit = (rect.width * viewportW) / winSizeW;
-            const heightViewUnit = (rect.height * viewportH) / winSizeH;
-            let xViewUnit = (rect.left * viewportW) / winSizeW;
-            let yViewUnit = (rect.top * viewportH) / winSizeH;
+        // ピクセル単位をカメラの視野単位にマッピングする
+        const widthViewUnit = (rect.width * viewportW) / winSizeW;
+        const heightViewUnit = (rect.height * viewportH) / winSizeH;
+        let xViewUnit = (rect.left * viewportW) / winSizeW;
+        let yViewUnit = (rect.top * viewportH) / winSizeH;
 
-            // 単位の基準を左上ではなく中央にする
-            xViewUnit = xViewUnit - viewportW / 2;
-            yViewUnit = yViewUnit - viewportH / 2;
+        // 単位の基準を左上ではなく中央にする
+        xViewUnit = xViewUnit - viewportW / 2;
+        yViewUnit = yViewUnit - viewportH / 2;
 
-            // 位置の原点は左上ではなく平面の中心にする
-            let x = xViewUnit + widthViewUnit / 2;
-            let y = -yViewUnit - heightViewUnit / 2;
+        // 位置の原点は左上ではなく平面の中心にする
+        let x = xViewUnit + widthViewUnit / 2;
+        let y = -yViewUnit - heightViewUnit / 2;
 
-            if (this.three.mesh) {
-                for (const [index, mesh] of Object.entries(this.three.mesh)) {
-                    const i = parseInt(index) + 1;
-                    // 上記、新しい値を使用し、メッシュを拡大縮小して配置する
-                    mesh.scale.x = widthViewUnit;
-                    mesh.scale.y = heightViewUnit;
-                    mesh.position.x = x;
-                    mesh.position.y = y;
-                    mesh.position.z = i;
-                    // Shaderパラメータ更新
-                    const material = <ShaderMaterial>mesh.material;
-                    material.uniforms.uScale.value.x = widthViewUnit;
-                    material.uniforms.uScale.value.y = heightViewUnit;
-                    material.uniforms.uPosition.value.x = x / widthViewUnit;
-                    material.uniforms.uPosition.value.y = y / heightViewUnit;
+        if (this.three.mesh) {
+            for (const [index, mesh] of Object.entries(this.three.mesh)) {
+                const i = parseInt(index) + 1;
+                // 上記、新しい値を使用し、メッシュを拡大縮小して配置する
+                mesh.scale.x = widthViewUnit;
+                mesh.scale.y = heightViewUnit;
+                mesh.position.x = x;
+                mesh.position.y = y;
+                mesh.position.z = i;
+                // Shaderパラメータ更新
+                const material = <ShaderMaterial>mesh.material;
+                material.uniforms.uScale.value.x = widthViewUnit;
+                material.uniforms.uScale.value.y = heightViewUnit;
+                material.uniforms.uPosition.value.x = x / widthViewUnit;
+                material.uniforms.uPosition.value.y = y / heightViewUnit;
 
-                    if (i > 1) {
-                        const color = new Color('#51a2f6');
-                        material.uniforms.uColor.value = new Vector3(color.r, color.g, color.b);
-                    }
+                if (i > 1) {
+                    const color = new Color('#51a2f6');
+                    material.uniforms.uColor.value = new Vector3(color.r, color.g, color.b);
                 }
             }
         }
+        // }
     }
     render(): void {
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
     }
     async start(): Promise<void> {
-        if (this.three.mesh?.length) {
-            const material1 = this.getMaterial(this.three.mesh[0]);
-            const material2 = this.getMaterial(this.three.mesh[1]);
+        const meshList = this.three.mesh as Mesh[];
+        if (meshList.length) {
+            const material1 = this.getMaterial(meshList[0]);
+            const material2 = this.getMaterial(meshList[1]);
 
             const tl = gsap.timeline({
                 paused: true,
@@ -304,5 +273,20 @@ export default class Transition extends Webgl {
         this.three.renderer.dispose();
         this.three.renderer.domElement.remove();
         this.three.renderer = null;
+    }
+    handleResize(): void {
+        this.setSize();
+        this.initViewport();
+        if (this.three.renderer) {
+            this.three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            this.three.renderer.setSize(this.winSize.width, this.winSize.height);
+        }
+        if (this.three.camera) {
+            // カメラのアスペクト比を正す
+            this.three.camera.aspect = this.winSize.width / this.winSize.height;
+            this.three.camera.updateProjectionMatrix();
+        }
+        this.update();
+        this.render();
     }
 }

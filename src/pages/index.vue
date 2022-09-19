@@ -3,10 +3,10 @@
         <Loading ref="loading" @is-start="startLoading" />
         <div class="p-page" ref="wrapper">
             <TheTransition ref="transition" />
-            <div class="p-index-mv__canvas" data-canvas="title" data-title="mv"></div>
+            <div class="p-page__canvas" data-canvas="title" data-title="mv"></div>
             <div class="p-page__inner">
-                <div class="p-index-study__expansion" data-expansion="canvas">
-                    <div class="p-index-study__expansion-canvas expansion" data-expansion="expansion"></div>
+                <div class="p-page__expansion" data-expansion="canvas">
+                    <div class="p-page__expansion-canvas expansion" data-expansion="expansion"></div>
                     <TheIndexContact :isShow="this.contact.show" @is-close="closeContact" />
                 </div>
                 <TheIndexMv :isActive="this.mv.active" />

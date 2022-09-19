@@ -71,7 +71,8 @@
                 </div>
             </div>
         </div>
-        <TheIndexBalloon :isShow="isActive" />
+        <TheIndexBalloon :isShow="isActive" :color="'purple'" />
+        <TheIndexBalloon :isShow="isActive" :color="'orange'" />
         <!-- <div class="p-index-mv__watch">
             <BaseImage :pcImg="'watch.png'" :alt="''" :width="2000" :height="2000" :decodingAsync="true" />
         </div> -->

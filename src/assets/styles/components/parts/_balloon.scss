@@ -2,34 +2,59 @@
 
 .p-index-balloon {
     position: fixed;
-    top: 0;
-    left: g.get_vw(-200);
     @include g.scroll-fade-in-before;
     &.is-active {
         @include g.scroll-fade-in-after(0, 0, 0.8s);
         z-index: 1000;
-        animation: move 40s g.ease(OutSine) 0s infinite forwards;
+        // animation: move 40s g.ease(OutSine) 0s infinite forwards;
+    }
+    &--orange {
+        top: 100vh;
+        left: g.get_vw(-200);
+        &.is-active {
+            animation: move 40s g.ease(linear) 0s infinite alternate;
+        }
+    }
+    &--purple {
+        top: g.get_vw(-200);
+        right: g.get_vw(-200);
+        &.is-active {
+            @include g.scroll-fade-in-after(0, 0, 0.8s);
+            animation: move-to-left 40s g.ease(linear) 0s infinite alternate;
+        }
     }
     $size: g.get_vw(-200);
     @keyframes move {
         0% {
             top: 100vh;
-            left: 0vw;
-            transform: translate(#{$size}, 0);
+            left: g.get_vw(-200);
+            transform: translate(0, 0);
         }
         100% {
-            top: 0;
-            left: 100vw;
-            transform: translate(0, #{$size});
+            top: g.get_vw(-200);
+            left: 100%;
+            transform: translate(0, 0);
+        }
+    }
+    @keyframes move-to-left {
+        0% {
+            top: g.get_vw(-200);
+            right: g.get_vw(-200);
+            transform: translate(0, 0);
+        }
+        100% {
+            top: 100vh;
+            right: 100%;
+            transform: translate(0, 0);
         }
     }
     @include g.media('>phone') {
-        width: g.get_vw(250);
-        height: g.get_vw(250);
+        width: g.get_vw(300);
+        height: g.get_vw(300);
     }
     @include g.media('<=phone') {
-        width: g.get_vw(150);
-        height: g.get_vw(150);
+        width: 25rem;
+        height: 25rem;
     }
     &__inner {
         position: relative;

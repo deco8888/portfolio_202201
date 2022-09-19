@@ -31,6 +31,8 @@ export default class Particles {
     mouse: {
         [key: string]: number;
     };
+    isMobile: boolean;
+    radius: number;
     total: number;
     particles: ParticleOption[];
     diff: number;
@@ -49,10 +51,15 @@ export default class Particles {
             y: 0,
             radius: 100,
         };
-        this.total = 40;
+        this.isMobile = isMobile();
+        this.radius = this.isMobile ? 40 : 70;
+        this.total = this.isMobile ? 30 : 40;
         this.particles = [];
-        this.diff = isMobile ? 10 : 10;
+        this.diff = this.isMobile ? 10 : 10;
         this.isStart = true;
+        this.prepare();
+    }
+    prepare(): void {
         this.init();
         for (let i = 0; i < this.particles.length; i++) {
             this.create(this.particles[i]);
@@ -69,7 +76,7 @@ export default class Particles {
         const firstY = canvasPos === 'top' ? this.canvas.el.height : 0;
         this.handleEvent();
         for (let i = 0; i < this.total; i++) {
-            const radius = Math.floor(Math.random() * 60);
+            const radius = Math.floor(Math.random() * this.radius);
             let secondX = Math.random() * this.canvas.el.clientWidth;
             secondX = Math.max(secondX, radius * 2 + this.diff);
             secondX = Math.min(secondX, this.canvas.el.width - radius * 2 - this.diff * 2);
@@ -167,7 +174,7 @@ export default class Particles {
         const canvasW = this.canvas.el.width;
         const canvasH = this.canvas.el.height;
         const maxX = canvasW - particle.radius - this.diff * 2;
-        const maxY = canvasH - particle.radius * 2 - this.diff * 2;
+        const maxY = canvasH - particle.radius;
         const min = particle.radius + this.diff;
         if (
             (particle.second.x >= maxX && particle.second.x < canvasW) ||
@@ -222,10 +229,18 @@ export default class Particles {
         // ctx.rect(particle.second.x, particle.second.y, particle.radius, particle.radius);
     }
     handleResize(): void {
+        this.cancel();
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.canvas.el.width = window.innerWidth;
         this.canvas.el.height = window.innerHeight / 2;
+        this.isMobile = isMobile();
+        this.radius = this.isMobile ? 40 : 60;
+        this.total = this.isMobile ? 30 : 40;
+        this.particles = [];
+        this.diff = this.isMobile ? 10 : 10;
+        this.isStart = true;
+        this.prepare();
     }
     cancel(): void {
         cancelAnimationFrame(this.animFrame);

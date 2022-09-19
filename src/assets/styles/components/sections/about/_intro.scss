@@ -12,9 +12,12 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background-color: #d8e8f8;
     overflow: hidden;
+    border: solid 10px;
+    border-image: linear-gradient(180deg, #51a2f7 50%, #e96747 50%);
+    border-image-slice: 1;
     &::after {
         content: '';
         position: absolute;
@@ -32,26 +35,41 @@
         // animation: test 3s g.ease(OutSine) infinite;
     }
     &__inner {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         overflow-y: auto;
         @include g.media('>phone') {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: g.get_per(50) g.get_per(100) g.get_per(50) 0;
+            margin: g.get_per(50) g.get_per(80) g.get_per(50) 0;
+            padding: 0 1rem 0 0;
             width: 50%;
-            height: 100%;
+            max-width: 800px;
+            // height: 100%;
         }
         @include g.media('<=phone') {
-            display: block;
-            margin: 25rem 0 0;
-            padding: 0 5rem;
+            margin: calc(100vw * 0.45 + 7rem) 2rem 5rem;
+            padding: 0 3rem 5rem;
             width: 100%;
+        }
+        &::-webkit-scrollbar {
+            width: 1rem;
+            -webkit-appearance: none;
+        }
+        &::-webkit-scrollbar-thumb {
+            border-radius: 1rem;
+            background: #51a2f6;
+            box-shadow: none;
+        }
+        &::-webkit-scrollbar-track {
+            background: #d8e8f8;
+            border: none;
+            border-radius: 1rem;
         }
     }
     &__name {
         display: inline-block;
         color: #51a2f6;
-        font-family: 'BIZ UDPGothic', sans-serif;
+        // font-family: 'BIZ UDPGothic', sans-serif;
         font-family: 'Red Hat Display', sans-serif;
         font-weight: bold;
         letter-spacing: 0.2rem;
@@ -66,12 +84,25 @@
             font-size: 5rem;
         }
     }
+    &__note {
+        display: inline-block;
+        color: #51a2f6;
+        line-height: 1.2;
+        // font-family: 'BIZ UDPGothic', sans-serif;
+        font-family: 'Red Hat Display', sans-serif;
+        @include g.media('>phone') {
+            @include g.fluid-type(font-size, 8.8px, 22px);
+        }
+        @include g.media('<=phone') {
+            font-size: 1rem;
+        }
+    }
     &__desc {
         display: inline-block;
         color: #51a2f6;
-        line-height: 1.7;
+        line-height: 1.8;
         letter-spacing: 0.1rem;
-        font-family: 'BIZ UDPGothic', sans-serif;
+        // font-family: 'BIZ UDPGothic', sans-serif;
         font-family: 'Red Hat Display', sans-serif;
         font-weight: bold;
         text-decoration: underline;
@@ -85,7 +116,7 @@
         word-break: break-word;
         @include g.media('>phone') {
             margin: 1rem 0 0;
-            @include g.fluid-type(font-size, 10px, 25px);
+            @include g.fluid-type(font-size, 10.8px, 27px);
         }
         @include g.media('<=phone') {
             margin: 1rem 0 0;
@@ -116,40 +147,74 @@
         }
     }
     &__skill {
+        $skill: &;
         display: inline-block;
-        position: relative;
         background-color: #eef1f4;
-        border: solid 0.25rem;
-        color: #51a2f6;
+        width: 100%;
         letter-spacing: 0.1rem;
-        font-family: 'BIZ UDPGothic', sans-serif;
+        // font-family: 'BIZ UDPGothic', sans-serif;
         font-family: 'Red Hat Display', sans-serif;
         font-weight: bold;
         text-align: center;
         white-space: nowrap;
-        filter: drop-shadow(0.4rem 0.4rem 0px rgba(235, 89, 52, 0.9));
+        backface-visibility: hidden;
+        transition: transform 0.3s g.ease(OutSine);
         @include g.media('>phone') {
-            padding: 1rem;
-            width: 20%;
-            line-height: 1.5;
-            @include g.fluid-type(font-size, 10px, 20px);
-            &:not(:nth-of-type(4n)) {
-                margin: 0 3% 0 0;
-            }
-            &:nth-of-type(n + 5) {
-                margin: 3% 0 0;
-            }
-            &:nth-of-type(n + 5):not(:nth-of-type(4n)) {
-                margin: 3% 3% 0 0;
-            }
+            padding: 2rem 1rem;
         }
         @include g.media('<=phone') {
             padding: 2rem;
-            width: 31%;
-            line-height: 1;
-            font-size: 2.4rem;
-            &:nth-of-type(n + 4) {
-                margin: 3.5% 0 0;
+        }
+        &--front {
+            position: relative;
+            border: solid 0.3rem #51a2f6;
+            color: #51a2f6;
+            z-index: 2;
+            filter: drop-shadow(0.3rem 0.3rem 0px rgb(235 89 52/ 90%));
+        }
+        &--back {
+            position: absolute;
+            top: 0.3rem;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: solid 0.3rem #e96747;
+            color: #e96747;
+            transform: rotateY(180deg);
+            z-index: 1;
+            filter: drop-shadow(0.3rem -0.3rem 0px rgb(81 162 246/ 90%));
+        }
+        &-card {
+            position: relative;
+            @include g.media('>phone') {
+                width: 22%;
+                line-height: 1.5;
+                @include g.fluid-type(font-size, 9.6px, 24px);
+                &:not(:nth-of-type(4n)) {
+                    margin: 0 3% 0 0;
+                }
+                &:nth-of-type(n + 5) {
+                    margin: 3% 0 0;
+                }
+                &:nth-of-type(n + 5):not(:nth-of-type(4n)) {
+                    margin: 3% 3% 0 0;
+                }
+            }
+            @include g.media('<=phone') {
+                width: 31%;
+                line-height: 1;
+                font-size: 2.4rem;
+                &:nth-of-type(n + 4) {
+                    margin: 3.5% 0 0;
+                }
+            }
+            @include g.hover-only {
+                #{$skill}--front {
+                    transform: rotateY(180deg);
+                }
+                #{$skill}--back {
+                    transform: rotateY(360deg);
+                }
             }
         }
     }

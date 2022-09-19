@@ -12,11 +12,34 @@
                 <span></span>
                 <span></span>
             </div>
-            <div class="p-index-contact__following" data-following>
-                <p>Send</p>
+            <div :class="['p-index-contact__cloud', 'p-index-contact__cloud--cloud1', { 'is-open': isOpen }]">
+                <BaseImage :pcImg="'cloud1.png'" :alt="''" :width="1419" :height="1020" :decodingAsync="true" />
             </div>
-            <div class="p-index-contact__post" data-post data-following-target>
-                <canvas class="p-index-contact__post-canvas" data-canvas="contact"></canvas>
+            <div :class="['p-index-contact__cloud', 'p-index-contact__cloud--cloud2', { 'is-open': isOpen }]">
+                <BaseImage :pcImg="'cloud2.png'" :alt="''" :width="1530" :height="960" :decodingAsync="true" />
+            </div>
+            <div :class="['p-index-contact__cloud', 'p-index-contact__cloud--cloud3', { 'is-open': isOpen }]">
+                <BaseImage :pcImg="'cloud3.png'" :alt="''" :width="1467" :height="1068" :decodingAsync="true" />
+            </div>
+            <div :class="['p-index-contact__cloud', 'p-index-contact__cloud--cloud4', { 'is-open': isOpen }]">
+                <BaseImage :pcImg="'cloud1.png'" :alt="''" :width="1467" :height="1068" :decodingAsync="true" />
+            </div>
+            <div :class="['p-index-contact__cloud', 'p-index-contact__cloud--cloud5', { 'is-open': isOpen }]">
+                <BaseImage :pcImg="'cloud2.png'" :alt="''" :width="1530" :height="960" :decodingAsync="true" />
+            </div>
+            <div class="p-index-contact__following" data-following>
+                <BaseImage :pcImg="'message.png'" :alt="''" :width="984" :height="638" :decodingAsync="true" />
+            </div>
+            <div
+                class="p-index-contact__post"
+                @mouseenter="mouseenter()"
+                @mouseleave="mouseleave()"
+                data-post
+                data-following-target
+            >
+                <a href="mailto:ayaka.nakamura0805@gmail.com">
+                    <canvas class="p-index-contact__post-canvas" data-canvas="contact" ref="canvas"></canvas>
+                </a>
             </div>
         </div>
     </div>
@@ -24,6 +47,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import BaseImage from '~/components/common/BaseImage.vue';
 import Expansion from '~/assets/scripts/modules/expansion';
 import Post from '~/assets/scripts/components/parts/index/contact/post';
 import Title from '~/assets/scripts/components/parts/index/contact/title';
@@ -33,6 +57,9 @@ import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { contactStore } from '~/store';
 
 export default Vue.extend({
+    components: {
+        BaseImage,
+    },
     props: {
         isShow: {
             type: Boolean,
@@ -46,7 +73,7 @@ export default Vue.extend({
         post: Post;
         following: Following;
         isOpen: boolean;
-        canvas: HTMLElement;
+        canvas: HTMLCanvasElement;
     } {
         return {
             expansion: null,
@@ -58,10 +85,10 @@ export default Vue.extend({
         };
     },
     async mounted() {
-        this.canvas = document.querySelector('[data-canvas="contact"]');
         this.title = new Title();
         // this.title.isFirst = true;
         this.post = new Post();
+        this.canvas = this.$refs.canvas as HTMLCanvasElement;
         await this.post.init(this.canvas);
         this.post.setModels();
         this.following = new Following();
@@ -98,6 +125,7 @@ export default Vue.extend({
                 'mousemove',
                 (e: MouseEvent) => {
                     if (this.title) this.title.handleMove(e);
+                    if (this.post && this.isOpen) this.post.handleMove(e);
                     if (this.following) this.following.handleMove(e);
                 },
                 false
@@ -115,7 +143,6 @@ export default Vue.extend({
         close(): void {
             window.scrollTo({
                 top: document.documentElement.scrollHeight,
-                behavior: 'smooth',
             });
             setTimeout(() => {
                 removeClass(this.canvas, hasClass.active);
@@ -124,7 +151,13 @@ export default Vue.extend({
                 this.isOpen = false;
                 this.$emit('is-close', true);
                 contactStore.setContactData({ isShow: false });
-            }, 500);
+            }, 1000);
+        },
+        mouseenter(): void {
+            if (this.following) this.following.enter();
+        },
+        mouseleave(): void {
+            if (this.following) this.following.leave();
         },
     },
 });

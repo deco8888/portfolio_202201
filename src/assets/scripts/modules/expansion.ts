@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Color, DoubleSide, Mesh, PlaneBufferGeometry, ShaderMaterial, Vector2 } from 'three';
 import gsap, { Power2 } from 'gsap';
 import Webgl from '~/assets/scripts/modules/webgl';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
@@ -7,23 +7,11 @@ import expansionFragmentShader from '../glsl/expansion/fragmentShader.frag';
 import { addClass, removeClass } from '../utils/classList';
 import { hasClass } from '../utils/hasClass';
 
-interface ThreeNumber {
-    [key: string]: number;
-}
-
 interface UniformOptions {
     [uniform: string]: THREE.IUniform;
 }
 
 export default class Expansion extends Webgl {
-    declare three: {
-        camera: THREE.PerspectiveCamera | null;
-        scene: THREE.Scene;
-        mesh: THREE.Mesh | null;
-        object: THREE.Object3D | null;
-        renderer: THREE.WebGLRenderer | null;
-        pointLight: THREE.PointLight | null;
-    };
     elms: {
         item: HTMLElement;
         canvas: HTMLCanvasElement;
@@ -55,14 +43,6 @@ export default class Expansion extends Webgl {
     uniforms: UniformOptions;
     constructor() {
         super();
-        this.three = {
-            camera: null,
-            scene: new THREE.Scene(),
-            object: null,
-            mesh: null,
-            renderer: null,
-            pointLight: null,
-        };
         this.elms = {
             item: document.querySelector('[data-expansion="item"]'),
             canvas: document.querySelector('[data-expansion="canvas"]'),
@@ -115,13 +95,13 @@ export default class Expansion extends Webgl {
         this.leave();
     }
     initMesh(): THREE.Mesh {
-        const color1 = new THREE.Color(this.param.color1);
+        const color1 = new Color(this.param.color1);
         this.uniforms = {
             uColor1: {
-                value: new THREE.Color('#70d872'),
+                value: new Color('#70d872'),
             },
             uColor2: {
-                value: new THREE.Color(this.param.color1),
+                value: new Color(this.param.color1),
             },
             uColor1R: {
                 value: color1.r,
@@ -142,36 +122,36 @@ export default class Expansion extends Webgl {
                 value: color1.b,
             },
             uScale: {
-                value: new THREE.Vector2(1, 1),
+                value: new Vector2(1, 1),
             },
             uPosition: {
-                value: new THREE.Vector2(0, 0),
+                value: new Vector2(0, 0),
             },
             uProgress: {
                 value: 0.0,
             },
             // 解像度
             uResolution: {
-                value: new THREE.Vector2(this.viewport.width, this.viewport.height),
+                value: new Vector2(this.viewport.width, this.viewport.height),
             },
         };
         // 分割数
         const segments = 128;
         // 形状データを作成
-        const geometry = new THREE.PlaneBufferGeometry(1, 1, segments, segments);
+        const geometry = new PlaneBufferGeometry(1, 1, segments, segments);
         // 質感を作成
-        const material = new THREE.ShaderMaterial({
+        const material = new ShaderMaterial({
             uniforms: this.uniforms,
             vertexShader: expansionVertexShader,
             fragmentShader: expansionFragmentShader,
             // 両面を描画
-            side: THREE.DoubleSide,
+            side: DoubleSide,
             // 拡張機能
             // extensions: {
             //     derivatives: true,
             // },
         });
-        const mesh = new THREE.Mesh(geometry, material);
+        const mesh = new Mesh(geometry, material);
         // mesh.frustumCulled = false;
         return mesh;
     }
@@ -197,7 +177,7 @@ export default class Expansion extends Webgl {
         let y = -yViewUnit - heightViewUnit / 2;
 
         // 上記、新しい値を使用し、メッシュを拡大縮小して配置する
-        const mesh = this.three.mesh;
+        const mesh = this.three.mesh as Mesh;
         mesh.scale.x = widthViewUnit;
         mesh.scale.y = heightViewUnit;
         mesh.position.x = x;
@@ -209,7 +189,7 @@ export default class Expansion extends Webgl {
         material.uniforms.uScale.value.y = heightViewUnit;
         material.uniforms.uPosition.value.x = x / widthViewUnit;
         material.uniforms.uPosition.value.y = y / heightViewUnit;
-        material.uniforms.uResolution.value = new THREE.Vector2(this.viewport.width, this.viewport.height);
+        material.uniforms.uResolution.value = new Vector2(this.viewport.width, this.viewport.height);
         material.needsUpdate = true;
     }
     render(): void {
@@ -217,9 +197,9 @@ export default class Expansion extends Webgl {
         this.three.renderer.render(this.three.scene, this.three.camera);
     }
     resetUniforms() {
-        this.uniforms.uScale.value = new THREE.Vector2(1, 1);
-        this.uniforms.uPosition.value = new THREE.Vector2(0, 0);
-        this.uniforms.uResolution.value = new THREE.Vector2(1, 1);
+        this.uniforms.uScale.value = new Vector2(1, 1);
+        this.uniforms.uPosition.value = new Vector2(0, 0);
+        this.uniforms.uResolution.value = new Vector2(1, 1);
     }
     async start(): Promise<void> {
         await this.openLetter();
@@ -293,7 +273,7 @@ export default class Expansion extends Webgl {
                     ease: Power2.easeOut,
                 },
             });
-            const material = <THREE.ShaderMaterial>this.three.mesh.material;
+            const material = this.getMaterial(<Mesh>this.three.mesh);
             this.elms.contact.setAttribute('data-title', 'contact');
             tl.set(this.elms.canvas, {
                 zIndex: 1004,
@@ -305,7 +285,7 @@ export default class Expansion extends Webgl {
                     value: 1,
                     onUpdate: this.render.bind(this),
                     onStart: () => {
-                        addClass(document.body, hasClass.hidden);
+                        removeClass(document.body, hasClass.active);
                         // addClass(this.elms.expansion, hasClass.active);
                         // addClass(this.elms.post, hasClass.active);
                         addClass(this.elms.canvas, hasClass.active);
@@ -366,7 +346,7 @@ export default class Expansion extends Webgl {
                 ease: Power2.easeInOut,
             },
         });
-        const material = <THREE.ShaderMaterial>this.three.mesh.material;
+        const material = this.getMaterial(<Mesh>this.three.mesh);
         this.hiddenContent();
         tl.to(
             material.uniforms.uProgress,
@@ -405,7 +385,7 @@ export default class Expansion extends Webgl {
                 opacity: 0,
                 onComplete: () => {
                     this.elms.contactWrap.style.visibility = 'hidden';
-                    removeClass(document.body, hasClass.hidden);
+                    addClass(document.body, hasClass.active);
                     removeClass(this.elms.expansion, hasClass.active);
                     // removeClass(this.elms.post, hasClass.active);
                     removeClass(this.elms.canvas, hasClass.active);
@@ -423,9 +403,9 @@ export default class Expansion extends Webgl {
         tl.play();
     }
     changeColor(tl: gsap.core.Timeline, color1: string, color2: string): void {
-        const material = <THREE.ShaderMaterial>this.three.mesh.material;
-        const changeColor1 = new THREE.Color(color1);
-        const changeColor2 = new THREE.Color(color2);
+        const material = this.getMaterial(<Mesh>this.three.mesh);
+        const changeColor1 = new Color(color1);
+        const changeColor2 = new Color(color2);
         tl.to(
             material.uniforms.uColor1R,
             {

@@ -5,9 +5,7 @@ import { BufferGeometry, ShaderMaterial } from 'three';
 
 export default class Title extends Letter {
     speed: number;
-    scroll: {
-        y: number;
-    };
+
     constructor() {
         super();
         this.borderColor = 'rgb(101 141 172)'; //'rgb(81 162 247)';
@@ -88,10 +86,11 @@ export default class Title extends Letter {
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
         if (this.three.points) {
             this.update();
-            if (this.raycaster && !this.isMobile && this.three.points.geometry) this.raycast();
+            if (!this.isMobile && this.three.points.geometry) this.raycast();
         }
         if (this.three.object && this.three.object.position.y === 0) {
-            this.three.object.position.y = this.viewport.height * 0.3;
+            const diff = this.isMobile ? 0.25 : 0.3;
+            this.three.object.position.y = this.viewport.height * diff;
         }
     }
     update(): void {

@@ -20,6 +20,7 @@ export default Vue.extend({
         this.transition = new Transition();
         this.transition.init();
         this.transition.start();
+        this.handleEvent();
         // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
             if (this.transition) {
@@ -29,11 +30,17 @@ export default Vue.extend({
             next();
         });
     },
-    // beforeRouteLeave(_to, _from, next) {
-    //     console.log('about');
-    //     if (this.transition) this.transition.dispose();
-    //     next();
-    // },
+    methods: {
+        handleEvent(): void {
+            window.addEventListener(
+                'resize',
+                () => {
+                    if (this.transition) this.transition.handleResize();
+                },
+                false
+            );
+        },
+    },
 });
 </script>
 

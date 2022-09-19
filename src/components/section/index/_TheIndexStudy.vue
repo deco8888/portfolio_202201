@@ -201,13 +201,6 @@ export default Vue.extend({
                 },
                 false
             );
-            // window.addEventListener(
-            //     'mousemove',
-            //     (e: MouseEvent) => {
-            //         this.photo.handleMouse(e);
-            //     },
-            //     false
-            // );
             window.addEventListener(
                 'scroll',
                 () => {

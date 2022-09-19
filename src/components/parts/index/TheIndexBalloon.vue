@@ -1,8 +1,6 @@
 <template>
-    <div :class="['p-index-balloon', { 'is-active': isShow }]" data-balloon>
-        <!-- <div class="p-index-balloon__wrap"> -->
-        <canvas class="p-index-balloon__canvas" data-canvas="balloon" ref="balloon"></canvas>
-        <!-- </div> -->
+    <div :class="['p-index-balloon', `p-index-balloon--${color}`, { 'is-active': isShow }]" data-balloon>
+        <canvas class="p-index-balloon__canvas" data-canvas="balloon" :data-balloon="color" ref="balloon"></canvas>
     </div>
 </template>
 
@@ -16,6 +14,11 @@ export default Vue.extend({
             type: Boolean,
             required: false,
             default: false,
+        },
+        color: {
+            type: String,
+            required: true,
+            default: '',
         },
     },
     data(): {
@@ -32,6 +35,9 @@ export default Vue.extend({
     watch: {
         isShow(val: boolean): void {
             if (val) this.init();
+        },
+        color(val: string) {
+            console.log(val);
         },
     },
     async mounted() {

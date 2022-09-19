@@ -1,4 +1,4 @@
-import { BufferGeometry, Clock, Vector3 } from 'three';
+import { BufferGeometry, Vector3 } from 'three';
 import { addClass, isContains, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { lerp } from '~/assets/scripts/utils/math';
@@ -10,9 +10,6 @@ interface PointsListType {
 }
 
 export default class Title extends Letter {
-    scroll: {
-        y: number;
-    };
     vertical: number;
     elms: {
         study: HTMLElement;
@@ -77,9 +74,9 @@ export default class Title extends Letter {
         };
         this.font = {
             wight: 900,
+            threshold: this.isMobile ? 0.18 : 0.14,
             size: this.getFontSize(),
             family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
-            threshold: this.isMobile ? 0.18 : 0.12,
         };
         this.vertical = 0;
         this.horizontal = 0;
@@ -131,16 +128,9 @@ export default class Title extends Letter {
         if (this.flg) this.setDiffusion();
         // 描写する
         this.render();
-        this.three.clock = new Clock();
-        this.three.clock.start();
     }
     render(): void {
         this.animFrame = requestAnimationFrame(this.render.bind(this));
-        if (this.three.clock) {
-            // delta: 変化量
-            this.time.delta = this.three.clock.getDelta();
-            this.time.total += this.time.delta;
-        }
         // if (this.three.object) this.three.object.rotation.y += 0.005;
         // 画面に描画する
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
@@ -152,7 +142,7 @@ export default class Title extends Letter {
             // this.draw();
             this.update();
             this.addTime();
-            if (this.raycaster && !this.isMobile) this.raycast();
+            if (!this.isMobile) this.raycast();
         }
     }
     update(): void {
@@ -173,7 +163,10 @@ export default class Title extends Letter {
         }
     }
     moveInStudyArea(): void {
-        const horizontal = this.isMobile ? -this.viewport.width : -this.viewport.width * 0.22;
+        const diff = this.isMobile ? 20 : 40;
+        const horizontal = this.isMobile
+            ? -this.viewport.width
+            : -(this.viewport.width * 0.5 - this.textImage.data.width * 0.5 * this.currentScale - diff);
         const amp = this.isMobile ? 0.05 : 0.08;
         const previous = this.object.previous;
         const current = this.object.current;
@@ -189,7 +182,14 @@ export default class Title extends Letter {
         previous.y = this.three.object.position.y;
     }
     getCurrentX(amp: number) {
-        const horizontal = this.isMobile ? -this.viewport.width : -this.viewport.width * 0.22;
+        this.setSize();
+        this.initViewport();
+        const diff = this.isMobile ? 20 : 40;
+        // const horizontal = this.isMobile ? -this.viewport.width : -this.viewport.width * 0.22;
+        const horizontal = this.isMobile
+            ? -this.viewport.width
+            : -(this.viewport.width * 0.5 - this.textImage.data.width * 0.5 * this.currentScale - diff);
+
         let currentX = lerp(this.object.previous.x, this.object.current.x, amp);
         currentX = Math.min(0, currentX);
         currentX = Math.max(horizontal, currentX);
@@ -233,9 +233,9 @@ export default class Title extends Letter {
                 this.text = 'STUDY';
                 this.font = {
                     wight: 900,
+                    threshold: this.isMobile ? 0.18 : 0.12,
                     size: this.getFontSize(),
                     family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
-                    threshold: this.isMobile ? 0.18 : 0.12,
                 };
                 this.color = {
                     front: '#00be08',
@@ -254,6 +254,8 @@ export default class Title extends Letter {
         const winSizeW = window.innerWidth;
         const winSizeH = window.innerHeight;
         if (isContains(this.elms.study, hasClass.active)) {
+            this.rotation.y = 0;
+            this.three.object.rotation.y = 0;
             if (scrollY > study * mvThreshold && !this.isMobile) {
                 if (scrollY > this.scroll.y) {
                     this.horizontal = current > 0 ? winSizeW * -0.3 : -0;
@@ -282,9 +284,9 @@ export default class Title extends Letter {
                 this.text = this.isMobile ? 'PORT¥nFOLIO' : 'THANKS!';
                 this.font = {
                     wight: 900,
+                    threshold: this.isMobile ? 0.18 : 0.14,
                     size: this.getFontSize(),
                     family: "'Gill Sans', 'Segoe UI', sans-serif", // "'Gill Sans', sans-serif", "'Red Hat Display', sans-serif", "'Nippo', sans-serif" "Arial", //"'Nippo', sans-serif",
-                    threshold: this.isMobile ? 0.18 : 0.12,
                 };
                 this.color = {
                     front: '#906cd1',
