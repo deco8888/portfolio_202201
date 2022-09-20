@@ -2,7 +2,7 @@ import { Vector2, PointLight, AmbientLight, DirectionalLight, SpotLight, SpotLig
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { radians } from '~/assets/scripts/utils/helper';
-import { GUI } from 'dat.gui';
+// import { GUI } from 'dat.gui';
 import { removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import Webgl from '~/assets/scripts/modules/webgl';
@@ -21,7 +21,7 @@ export default class House extends Webgl {
     ctx: CanvasRenderingContext2D;
     animFrame?: number;
     mouse: THREE.Vector2;
-    gui: GUI;
+    // gui: GUI;
     isMobile: boolean;
     constructor() {
         super();
@@ -68,44 +68,7 @@ export default class House extends Webgl {
         this.createModels();
         this.initAmbientLight();
         this.initDirectionalLight();
-        // // ポイントライトを作成
-        // this.initPointLight();
-        // this.initSpotLight();
-
-        // this.initGui();
     }
-    // initCamerat(): PerspectiveCamera {
-    //     const camera = new PerspectiveCamera(
-    //         45, // 画角
-    //         this.canvas.closest('div').clientWidth / this.canvas.closest('div').clientHeight, // 縦横比
-    //         0.1, // 視点から最も近い面までの距離
-    //         3000 // 視点から最も遠い面までの距離
-    //     );
-    //     camera.position.set(0, 0, 1000);
-    //     // どの位置からでも指定した座標に強制的に向かせることができる命令
-    //     // camera.lookAt(this.three.scene.position);
-    //     camera.updateProjectionMatrix();
-    //     return camera;
-    // }
-    // initRendererr(): WebGLRenderer {
-    //     const renderer = new WebGLRenderer({
-    //         canvas: this.canvas,
-    //         alpha: true,
-    //         antialias: true, // 物体の輪郭を滑らかにする
-    //     });
-    //     /**
-    //      * デスクトップでは、メインディスプレイ・サブディスプレイでPixelRatioの異なる可能性がある。
-    //      * ➡ リサイズイベントでsetPixelRatioメソッドでを使って更新
-    //      * https://ics.media/tutorial-three/renderer_resize/
-    //      */
-    //     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    //     renderer.setClearColor(0xeaf2f5, 0);
-    //     renderer.setSize(this.canvas.closest('div').clientWidth, this.canvas.closest('div').clientHeight);
-    //     renderer.physicallyCorrectLights = true;
-    //     renderer.outputEncoding = sRGBEncoding; // 出力エンコーディングを指定
-    //     renderer.toneMapping = ACESFilmicToneMapping;
-    //     return renderer;
-    // }
     initAmbientLight(): void {
         // ■AmbientLight(色, 光の強さ)
         // 環境光源を実現する。3D空間全体に均等に光を当てる。一律に明るくしたいときに使う。
@@ -150,10 +113,10 @@ export default class House extends Webgl {
     }
     createModels(): void {
         const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('/draco/');
+        dracoLoader.setDecoderPath('/portfolio/draco/');
         const gltfLoader = new GLTFLoader();
         gltfLoader.setDRACOLoader(dracoLoader);
-        const objSrc = '/draco/objs/house_d.glb';
+        const objSrc = '/portfolio/draco/objs/house_d.glb';
         gltfLoader.load(objSrc, (obj) => {
             obj.scene.traverse((model) => {
                 model.castShadow = true;

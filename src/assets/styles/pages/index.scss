@@ -1,34 +1,49 @@
 @use '../global/index' as g;
 
 .p-page {
-    display: block;
+    display: flex;
+    flex-flow: column;
     position: relative;
     width: 100%;
+    height: 100vh;
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
+    // overflow-y: auto;
+    // display: block;
+    // position: fixed;
+    // top: 0;
+    // left: 0;
+    // width: 100%;
+    // height: 100%;
+    // contain: content;
+    // overflow: hidden;
     opacity: 0;
+    // &__inner {
+    //     display: flex;
+    //     flex-flow: column;
+    //     position: relative;
+    //     // top: 0;
+    //     // left: 0;
+    //     // margin-bottom: 0.1px;
+    //     width: 100%;
+    //     // height: 100%;
+    //     // overflow-y: auto;
+    //     // height: 1000%;
+    // }
     &__transition {
+        display: none;
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100vh;
+        height: 100%;
         overflow: hidden;
         background-color: transparent;
         z-index: -1;
-        @include g.media('>phone') {
-            width: 100%;
-            height: 100vh;
-        }
-        @include g.media('<=phone') {
-            width: 100%;
-            height: 100vh;
-        }
         &-wrap {
             position: absolute;
             top: 50%;
             left: 50%;
-            // right: 0;
-            // bottom: 0;
-            // margin: auto;
             transform: translate(-50%, -50%);
             @include g.media('>phone') {
                 padding-top: 100%;
@@ -48,24 +63,40 @@
             bottom: 0;
             margin: auto;
             border-style: solid;
-            border-width: 10px;
+            // border-width: 10px;
             box-sizing: border-box;
             &--before {
                 width: 100%;
                 height: 100%;
                 border-style: solid;
-                border-width: 10px;
-                border-image: linear-gradient(180deg, #9a7ad1 50%, #f9b97c 50%);
-                border-image-slice: 1;
+                @include g.media('>phone') {
+                    border-width: 10px;
+                    border-image: linear-gradient(180deg, #9a7ad1 50%, #f9b97c 50%);
+                    border-image-slice: 1;
+                }
+                @include g.media('<=phone') {
+                    border-width: 8px;
+                    border-image: linear-gradient(180deg, g.$color-dark-pastel-purple 50%, g.$color-mellow-apricot 50%);
+                    border-image-slice: 1;
+                }
             }
             &--after {
                 left: -10px;
-                width: calc(100% + 20px);
-                height: calc(100% + 20px);
                 border-style: solid;
-                border-width: 10px;
-                border-image: linear-gradient(180deg, #eaeefa 50%, #eaeefa 50%);
-                border-image-slice: 1;
+                @include g.media('>phone') {
+                    width: calc(100% + 20px);
+                    height: calc(100% + 20px);
+                    border-width: 10px;
+                    border-image: linear-gradient(180deg, g.$color-light-blue-gray 50%, g.$color-light-blue-gray 50%);
+                    border-image-slice: 1;
+                }
+                @include g.media('<=phone') {
+                    width: calc(100% + 16px);
+                    height: calc(100% + 16px);
+                    border-width: 10px;
+                    border-image: linear-gradient(180deg, g.$color-light-blue-gray 50%, g.$color-light-blue-gray 50%);
+                    border-image-slice: 1;
+                }
             }
         }
         &-box {
@@ -89,11 +120,15 @@
         height: 100%;
         z-index: 1003;
         pointer-events: none !important;
-        border: solid 10px;
-        border-image: linear-gradient(180deg, g.$color-dark-pastel-purple 50%, g.$color-mellow-apricot 50%);
-        border-image-slice: 1;
-        @include g.mq(mobile) {
-            border: solid 1rem;
+        @include g.media('>phone') {
+            border: solid 10px;
+            border-image: linear-gradient(180deg, g.$color-dark-pastel-purple 50%, g.$color-mellow-apricot 50%);
+            border-image-slice: 1;
+        }
+        @include g.media('<=phone') {
+            border: solid 8px;
+            border-image: linear-gradient(180deg, g.$color-dark-pastel-purple 50%, g.$color-mellow-apricot 50%);
+            border-image-slice: 1;
         }
         &[data-title='mv'] {
             border-image: linear-gradient(180deg, g.$color-dark-pastel-purple 50%, g.$color-mellow-apricot 50%);
@@ -135,3 +170,11 @@
         opacity: 0;
     }
 }
+// .address {
+//     position: fixed;
+//     bottom: 0;
+//     width: 100%;
+//     height: calc(100vh - 100%);
+//     z-index: 100000;
+//     background: rebeccapurple;
+// }

@@ -5,10 +5,6 @@ import { isMobile } from '~/assets/scripts/modules/isMobile';
 import transitionVertexShader from '~/assets/scripts/glsl/transition/vertexshader.vert';
 import transitionFragmentShader from '~/assets/scripts/glsl/transition/fragmentShader.frag';
 
-interface ThreeNumber {
-    [key: string]: number;
-}
-
 export default class Transition extends Webgl {
     elms: {
         wrapper: HTMLElement | null;
@@ -120,7 +116,6 @@ export default class Transition extends Webgl {
     update(): void {
         // if (this.elms.canvas) {
         this.setSize();
-        console.log(window.innerWidth);
         this.initViewport();
         const rect = this.elms.canvas.getBoundingClientRect();
         const winSizeW = window.innerWidth;

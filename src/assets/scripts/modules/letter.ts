@@ -328,8 +328,6 @@ export default class Letter extends Webgl {
         this.three.geometry.setAttribute(name, new Float32BufferAttribute(array, itemSize));
     }
     async getTitleInfo(): Promise<void> {
-        console.log(window.innerWidth * 0.5);
-        console.log(this.textImage.canvas);
         const width = this.textImage.canvas.width;
         const height = this.textImage.canvas.height;
         const data = this.textImage.data.data;

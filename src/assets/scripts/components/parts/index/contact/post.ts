@@ -114,10 +114,10 @@ export default class Post extends Webgl {
     }
     createModels(): void {
         const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('/draco/');
+        dracoLoader.setDecoderPath('/portfolio/draco/');
         const gltfLoader = new GLTFLoader();
         gltfLoader.setDRACOLoader(dracoLoader);
-        const objSrc = '/draco/objs/post_d.glb';
+        const objSrc = '/portfolio/draco/objs/post_d.glb';
         gltfLoader.load(objSrc, (obj) => {
             const children = [...obj.scene.children];
             for (const child of children) {

@@ -1,5 +1,7 @@
 import { lerp } from '../../../utils/math';
 import Letter from '~/assets/scripts/modules/letter';
+import { BufferGeometry } from 'three';
+import { distance3d } from '~/assets/scripts/utils/helper';
 
 export default class Title extends Letter {
     speed: number;
@@ -87,10 +89,6 @@ export default class Title extends Letter {
             width: this.canvas.clientWidth,
             height: this.canvas.clientHeight,
         });
-        console.log({
-            width: this.canvas.clientWidth,
-            height: this.canvas.clientHeight,
-        });
         // HTMLに追加
         this.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
@@ -138,5 +136,42 @@ export default class Title extends Letter {
             const scale = this.canvas.clientWidth / this.firstWinSize.width;
             this.three.object.scale.set(scale, scale, scale);
         }
+    }
+    raycast(): void {
+        const geometry = <BufferGeometry>this.three.points.geometry;
+        const position = geometry.attributes.position;
+        const size = geometry.attributes.size;
+
+        const rotateY = this.three.object.rotation.y;
+        const degree = (rotateY * 180) / Math.PI;
+        const remainder = Math.floor(degree / 90) % 4;
+
+        const scrollY = window.scrollY;
+        const isRotate = remainder === 0 || remainder === 3;
+        const adjust = isRotate ? -this.textImage.canvas.width : this.textImage.canvas.width;
+        const mouseX = isRotate ? this.mouse.x : -this.mouse.x;
+        const mouseY = this.mouse.y;
+        if (this.mouse.x !== 0) {
+            for (let i = 0; i < position.array.length / 3; i++) {
+                // 交際位置からグリッド要素までの距離を計算
+                const x2 = position.array[i * 3] + this.three.object.position.x + adjust;
+                const y2 = position.array[i * 3 + 1] + this.three.object.position.y;
+                const z2 = position.array[i * 3 + 2] + this.three.object.position.z;
+                const mouseDistance = distance3d(mouseX, mouseY, 0, x2, y2, z2);
+                const upSize = 10 * window.devicePixelRatio;
+
+                if (mouseDistance < 100 && size.array[i] !== upSize) {
+                    size.array[i] = lerp(size.array[i], upSize, 0.1);
+                }
+            }
+        }
+        for (let i = 0; i < position.array.length / 3; i++) {
+            if (size.array[i] !== this.particleSize) {
+                size.array[i] = lerp(size.array[i], this.particleSize, 0.1);
+            }
+        }
+        position.needsUpdate = true;
+        size.needsUpdate = true;
+        this.previousY = scrollY;
     }
 }

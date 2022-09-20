@@ -72,7 +72,6 @@ export default class Balloon extends Webgl {
         // ビューポート計算
         this.viewport = this.initViewport();
         const color = canvas.getAttribute('data-balloon');
-        console.log({color})
         this.createModels(color);
         this.initAmbientLight();
         // // ポイントライトを作成
@@ -114,12 +113,11 @@ export default class Balloon extends Webgl {
     }
     async createModels(color: string): Promise<void> {
         const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('/draco/');
+        dracoLoader.setDecoderPath('/portfolio/draco/');
         this.gltfLoader = new GLTFLoader();
         this.gltfLoader.setDRACOLoader(dracoLoader);
-        const objSrc = `/draco/objs/balloon_${color}_d.glb`;
+        const objSrc = `/portfolio/draco/objs/balloon_${color}_d.glb`;
         await this.loadModel(objSrc);
-        console.log('終わった！');
         this.render();
     }
     async loadModel(objSrc: string): Promise<void> {
@@ -136,7 +134,6 @@ export default class Balloon extends Webgl {
                 this.three.object.position.set(0, 0, 0);
                 const angleX = this.isMobile ? radians(8) : radians(20);
                 this.three.object.rotation.set(0, radians(90), 0);
-                console.log('終わらん');
                 resolve();
             });
         });

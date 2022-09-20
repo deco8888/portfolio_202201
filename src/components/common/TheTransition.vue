@@ -38,6 +38,7 @@ const Transition = Vue.extend({
                 const winWidth = window.innerWidth;
                 const winHeight = window.innerHeight;
                 const paddingTop = this.isMobile ? `${(winHeight / winWidth) * 100}%` : '100%';
+                const width = this.isMobile ? winHeight : '100%';
                 const borderWidth = winWidth > winHeight ? winWidth * 0.5 : winHeight * 0.5;
                 const tl = gsap.timeline({
                     paused: true,
@@ -48,6 +49,7 @@ const Transition = Vue.extend({
                 });
                 tl.set('[data-transition-wrap]', {
                     paddingTop,
+                    width,
                 });
                 tl.to('[data-transition-block="before"]', {
                     duration: 0.7,
@@ -64,27 +66,6 @@ const Transition = Vue.extend({
                     },
                     '<'
                 );
-                // tl.set(
-                //     '[data-transition-block="after"]',
-                //     {
-                //         borderWidth: borderWidth + 20,
-                //         onComplete: () => {
-                //             resolve();
-                //         },
-                //     },
-                //     '>'
-                // );
-                // tl.to(
-                //     '[data-transition-box]',
-                //     {
-                //         duration: 1,
-                //         scale: 1,
-                //         onComplete: () => {
-                //             resolve('やっほ');
-                //         },
-                //     },
-                //     '>'
-                // );
                 tl.play();
             });
         },

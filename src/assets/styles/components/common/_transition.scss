@@ -6,17 +6,17 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     overflow: hidden;
     background-color: transparent;
     z-index: -1;
     @include g.media('>phone') {
         width: 100%;
-        height: 100vh;
+        height: 100%;
     }
     @include g.media('<=phone') {
         width: 100%;
-        height: 100vh;
+        height: 100%;
     }
     &__wrap {
         position: absolute;
@@ -84,7 +84,7 @@
         bottom: 0;
         margin: auto;
         width: 100vw;
-        height: 100vh;
+        height: 100%;
         background-color: #50a2f7;
         transform: scale(0);
     }

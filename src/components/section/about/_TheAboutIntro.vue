@@ -1,5 +1,5 @@
 <template>
-    <section id="about" class="p-about-intro">
+    <section id="about" class="p-about-intro" ref="intro">
         <div class="p-about-intro__inner">
             <div></div>
             <div>
@@ -109,11 +109,17 @@ export default Vue.extend({
         };
     },
     mounted() {
+        if (this.isMobile) this.setHeight();
         window.addEventListener('resize', () => {
             this.isMobile = isMobile();
+            if (this.isMobile) this.setHeight();
         });
     },
     methods: {
+        setHeight(): void {
+            const introWrap = this.$refs.intro as HTMLElement;
+            introWrap.style.height = `${window.innerHeight}px`;
+        },
         flip(e: Event): void {
             if (!this.isMobile) return;
             const target = e.target as HTMLElement;

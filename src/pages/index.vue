@@ -16,6 +16,7 @@
             </div>
         </div>
         <TheCursor />
+        <div class="address"></div>
     </div>
 </template>
 
@@ -121,6 +122,9 @@ export default Vue.extend({
                 next();
             }
         });
+        // const diff = window.innerHeight - document.documentElement.clientHeight;
+        // console.log({ diff });
+        // document.querySelector<HTMLElement>('.address').style.height = `${diff}px`;
     },
     methods: {
         start(): void {
@@ -174,6 +178,9 @@ export default Vue.extend({
                 'resize',
                 () => {
                     if (this.title) this.title.handleResize();
+                    // const diff = window.innerHeight - document.documentElement.clientHeight;
+                    // console.log({ diff });
+                    // document.querySelector<HTMLElement>('.address').style.height = `${diff}px`;
                 },
                 false
             );

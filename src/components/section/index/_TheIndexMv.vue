@@ -73,9 +73,6 @@
         </div>
         <TheIndexBalloon :isShow="isActive" :color="'purple'" />
         <TheIndexBalloon :isShow="isActive" :color="'orange'" />
-        <!-- <div class="p-index-mv__watch">
-            <BaseImage :pcImg="'watch.png'" :alt="''" :width="2000" :height="2000" :decodingAsync="true" />
-        </div> -->
     </section>
 </template>
 
@@ -166,12 +163,18 @@ export default Vue.extend({
             const horizontalLine = gsap.utils.toArray<HTMLElement>("[data-horizontal='bg-line']");
             horizontalLine.forEach((line) => {
                 const pinWrap = line.querySelector("[data-horizontal='pin']");
-                const animWrap = pinWrap.querySelector("[data-horizontal='anim']");
+                const animWrap = pinWrap.querySelector<HTMLElement>("[data-horizontal='anim']");
                 const circle = document.querySelector('[data-circle]');
                 const box = document.querySelector('.p-index-box');
-                const xStart = (): number => (animWrap.classList.contains('to-right') ? -window.innerWidth : 0);
+                animWrap.style.height = `${window.innerHeight * 0.5}px`;
+                const xStart = (): number =>
+                    pinWrap.querySelector("[data-horizontal='anim']").classList.contains('to-right')
+                        ? - document.querySelector<HTMLElement>('.p-page').clientWidth //window.innerWidth
+                        : 0;
                 const xEnd = (): number =>
-                    animWrap.classList.contains('to-right') ? -animWrap.scrollWidth : window.innerWidth;
+                    animWrap.classList.contains('to-right')
+                        ? -pinWrap.querySelector("[data-horizontal='anim']").scrollWidth
+                        : window.innerWidth;
                 gsap.fromTo(
                     animWrap,
                     {
@@ -184,7 +187,10 @@ export default Vue.extend({
                             trigger: '.js-trigger',
                             start: 'top top',
                             end: () => {
-                                return '+=' + (animWrap.scrollWidth - window.innerWidth);
+                                return (
+                                    '+=' +
+                                    (pinWrap.querySelector("[data-horizontal='anim']").scrollWidth - window.innerWidth)
+                                );
                             },
                             onUpdate: () => {
                                 if (window.scrollY >= window.innerWidth / 2.5) {
@@ -206,6 +212,12 @@ export default Vue.extend({
             });
         },
         handleResize(): void {
+            const horizontalLine = gsap.utils.toArray<HTMLElement>("[data-horizontal='bg-line']");
+            horizontalLine.forEach((line) => {
+                const pinWrap = line.querySelector("[data-horizontal='pin']");
+                const animWrap = pinWrap.querySelector<HTMLElement>("[data-horizontal='anim']");
+                animWrap.style.height = `${window.innerHeight * 0.5}px`;
+            });
             this.particles.forEach((particle) => {
                 particle.handleResize();
             });

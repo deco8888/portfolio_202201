@@ -36,9 +36,6 @@ export default Vue.extend({
         isShow(val: boolean): void {
             if (val) this.init();
         },
-        color(val: string) {
-            console.log(val);
-        },
     },
     async mounted() {
         this.canvas = this.$refs.balloon as HTMLCanvasElement;

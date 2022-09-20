@@ -1,16 +1,10 @@
 import {
-    PerspectiveCamera,
-    Scene,
     Mesh,
-    Object3D,
-    WebGLRenderer,
-    Clock,
     ShaderMaterial,
     Color,
     Vector2,
     IUniform,
     Texture,
-    PointLight,
     TextureLoader,
     PlaneBufferGeometry,
     Vector3,
@@ -436,7 +430,7 @@ export default class Photo extends Webgl {
                     {
                         duration: duration,
                         x: this.isMobile ? posX : scroll.previous,
-                        y: this.isMobile ? scroll.previous : posY,
+                        y: this.isMobile ? posY : posY,
                     },
                     0
                 );
@@ -449,7 +443,7 @@ export default class Photo extends Webgl {
                         {
                             duration: duration,
                             x: this.isMobile ? posX + diff : scroll.previous + diff,
-                            y: this.isMobile ? scroll.previous + diff : posY + diff,
+                            y: this.isMobile ? posY + diff : posY + diff,
                         },
                         '<'
                     );
