@@ -401,7 +401,7 @@ export default class Photo extends Webgl {
     // スクロールに合わせて画像を動かす
     moveImages(): void {
         const targetY = window.scrollY - this.elms.mv.clientHeight;
-        let duration = 0.1;
+        let duration = this.isMobile ? 0 : 0.1;
 
         const studyList = this.elms.horizontalList;
         const scrollArea = this.isMobile

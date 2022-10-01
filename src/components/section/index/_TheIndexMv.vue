@@ -86,6 +86,7 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { loadingStore } from '~/store';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 interface MvOptions {
     mvAnim: {
@@ -96,6 +97,7 @@ interface MvOptions {
     string: {
         [key: string]: string;
     };
+    isMobile: boolean;
 }
 export default Vue.extend({
     components: {
@@ -124,6 +126,7 @@ export default Vue.extend({
                 front: 'FRONT-END',
                 rear: 'ENGINEER',
             },
+            isMobile: isMobile()
         };
     },
     watch: {

@@ -1,22 +1,9 @@
 @use '../global/index' as g;
 
 .p-page {
-    display: flex;
-    flex-flow: column;
+    display: block;
     position: relative;
     width: 100%;
-    height: 100vh;
-    overflow: scroll;
-    -webkit-overflow-scrolling: touch;
-    // overflow-y: auto;
-    // display: block;
-    // position: fixed;
-    // top: 0;
-    // left: 0;
-    // width: 100%;
-    // height: 100%;
-    // contain: content;
-    // overflow: hidden;
     opacity: 0;
     // &__inner {
     //     display: flex;
