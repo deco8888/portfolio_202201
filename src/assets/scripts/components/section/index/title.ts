@@ -206,14 +206,24 @@ export default class Title extends Letter {
         this.onResize();
     }
     rotate() {
-        this.three.object.rotation.y =
-            scrollY === 0
-                ? lerp(this.three.object.rotation.y, 0, 0.1)
-                : lerp(this.three.object.rotation.y, this.rotation.y, 0.1);
+        if (this.isMobile) {
+            this.three.object.rotation.y =
+                document.querySelector('.p-index-mv').getBoundingClientRect().top === 0
+                    ? lerp(this.three.object.rotation.y, 0, 0.1)
+                    : lerp(this.three.object.rotation.y, this.rotation.y, 0.1);
+        } else {
+            this.three.object.rotation.y =
+                window.scrollY === 0
+                    ? lerp(this.three.object.rotation.y, 0, 0.1)
+                    : lerp(this.three.object.rotation.y, this.rotation.y, 0.1);
+        }
     }
     async handleScroll(): Promise<void> {
-        const scrollY = window.scrollY;
+        const scrollY = this.isMobile
+            ? Math.abs(document.querySelector('.p-index-mv').getBoundingClientRect().top)
+            : window.scrollY;
         const study = document.querySelector('.p-index-study').getBoundingClientRect().top + scrollY;
+        // const study = Math.abs(document.querySelector('.p-index-study').getBoundingClientRect().top);
         const studyList = document.querySelector('[data-horizontal="list"]').clientWidth - window.innerWidth;
         const mvThreshold = this.isMobile ? 0.65 : 0.85;
         if (!isContains(this.elms.study, hasClass.active)) {

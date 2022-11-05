@@ -7,7 +7,7 @@
                 <div class="p-page__title-canvas" data-canvas="title"></div>
             </div>
             <TheAboutIntro />
-            <TheAboutHouse :isShow="this.show" />
+            <TheAboutHouse :isShow="show" />
         </div>
         <TheCursor />
     </div>

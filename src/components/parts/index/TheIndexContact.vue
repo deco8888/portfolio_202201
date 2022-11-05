@@ -55,6 +55,7 @@ import Following from '~/assets/scripts/components/parts/index/contact/following
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { contactStore } from '~/store';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 export default Vue.extend({
     components: {
@@ -74,6 +75,7 @@ export default Vue.extend({
         following: Following;
         isOpen: boolean;
         canvas: HTMLCanvasElement;
+        isMobile: boolean;
     } {
         return {
             expansion: null,
@@ -82,6 +84,7 @@ export default Vue.extend({
             following: null,
             isOpen: false,
             canvas: null,
+            isMobile: isMobile(),
         };
     },
     async mounted() {
@@ -91,7 +94,7 @@ export default Vue.extend({
         this.canvas = this.$refs.canvas as HTMLCanvasElement;
         await this.post.init(this.canvas);
         this.post.setModels();
-        this.following = new Following();
+        if (!this.isMobile) this.following = new Following();
         this.handleEvent();
         // 画面遷移時に「cancelAnimationFrame」を実行
         this.$router.beforeEach(async (_to, _from, next) => {
@@ -135,7 +138,7 @@ export default Vue.extend({
             this.isOpen = true;
             this.title.draw();
             this.title.render();
-            this.following.render();
+            if (!this.isMobile) this.following.render();
             setTimeout(() => {
                 addClass(this.canvas, hasClass.active);
             }, 300);
@@ -147,7 +150,7 @@ export default Vue.extend({
             setTimeout(() => {
                 removeClass(this.canvas, hasClass.active);
                 this.title.removeTitle();
-                this.following.cancel();
+                if (!this.isMobile) this.following.cancel();
                 this.isOpen = false;
                 this.$emit('is-close', true);
                 contactStore.setContactData({ isShow: false });

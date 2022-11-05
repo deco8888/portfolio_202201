@@ -74,7 +74,6 @@
   },
   "browserslist": [
     "defaults",
-    "not ie < 11",
     "not dead"
   ]
 }

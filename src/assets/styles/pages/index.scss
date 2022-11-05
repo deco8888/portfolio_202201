@@ -5,18 +5,26 @@
     position: relative;
     width: 100%;
     opacity: 0;
-    // &__inner {
-    //     display: flex;
-    //     flex-flow: column;
-    //     position: relative;
-    //     // top: 0;
-    //     // left: 0;
-    //     // margin-bottom: 0.1px;
-    //     width: 100%;
-    //     // height: 100%;
-    //     // overflow-y: auto;
-    //     // height: 1000%;
-    // }
+    @include g.media('<=phone') {
+        height: 100vh;
+        overflow: hidden;
+    }
+    &__inner {
+        @include g.media('<=phone') {
+            display: flex;
+            flex-flow: column;
+            position: relative;
+            // top: 0;
+            // left: 0;
+            // margin-bottom: 0.1px;
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            // overflow-y: auto;
+            // height: 1000%;
+        }
+    }
     &__transition {
         display: none;
         position: fixed;

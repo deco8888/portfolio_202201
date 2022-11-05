@@ -52,7 +52,7 @@ export default class Title extends Letter {
         this.init();
     }
     getFontSize(): number {
-        return this.isMobile ? this.viewport.width * 0.15 : this.viewport.width * 0.1;
+        return this.isMobile ? this.viewport.width * 0.12 : this.viewport.width * 0.1;
     }
     init(): void {
         this.handleMove({ clientX: 0, clientY: 0 });

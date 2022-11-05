@@ -283,16 +283,19 @@ export default class Expansion extends Webgl {
                 {
                     duration: 1,
                     value: 1,
-                    onUpdate: this.render.bind(this),
+                    onUpdate: () => {
+                        // console.log(console.log("start");)
+                        this.render();
+                    },
                     onStart: () => {
                         removeClass(document.body, hasClass.active);
                         // addClass(this.elms.expansion, hasClass.active);
                         // addClass(this.elms.post, hasClass.active);
                         addClass(this.elms.canvas, hasClass.active);
                         this.displayContent();
-                        setTimeout(() => {
-                            resolve();
-                        }, 600);
+                        // setTimeout(() => {
+                        //     resolve();
+                        // }, 600);
                     },
                     onComplete: () => {
                         // this.changeColor(tl, this.param.color2, this.param.color3);
@@ -300,6 +303,7 @@ export default class Expansion extends Webgl {
                         // this.elms.study.style.display = 'none';
                         this.flg.isAnimating = false;
                         this.state = 'full';
+                        resolve();
                     },
                 },
                 0
@@ -352,7 +356,9 @@ export default class Expansion extends Webgl {
             material.uniforms.uProgress,
             {
                 value: 0,
-                onUpdate: () => this.render(),
+                onUpdate: () => {
+                    this.render()
+                },
                 onStart: () => {
                     removeClass(this.elms.contactWrap, hasClass.active);
                     this.elms.study.style.visibility = 'visible';

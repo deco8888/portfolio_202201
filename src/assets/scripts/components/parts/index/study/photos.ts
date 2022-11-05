@@ -400,7 +400,9 @@ export default class Photo extends Webgl {
     }
     // スクロールに合わせて画像を動かす
     moveImages(): void {
+        // console.log(document.querySelector('.p-index-study').getBoundingClientRect().top);
         const targetY = window.scrollY - this.elms.mv.clientHeight;
+        // const targetY = Math.abs(document.querySelector('.p-index-study').getBoundingClientRect().top);
         let duration = this.isMobile ? 0 : 0.1;
 
         const studyList = this.elms.horizontalList;
@@ -496,7 +498,8 @@ export default class Photo extends Webgl {
     handleScroll(): void {
         this.flg.isScroll = true;
         this.flg.isMove = false;
-        const targetY = window.scrollY - this.elms.mv.clientHeight;
+        const targetY = Math.abs(document.querySelector('.p-index-study').getBoundingClientRect().top);
+        // const targetY = window.scrollY - this.elms.mv.clientHeight;
         for (const [index, _] of Object.entries(this.rectList)) {
             const i = parseInt(index);
             // スクロール情報（current/previous/ease）

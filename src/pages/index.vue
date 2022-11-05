@@ -4,15 +4,15 @@
         <div class="p-page" ref="wrapper">
             <TheTransition ref="transition" />
             <div class="p-page__canvas" data-canvas="title" data-title="mv"></div>
+            <div class="p-page__expansion" data-expansion="canvas">
+                <div class="p-page__expansion-canvas expansion" data-expansion="expansion"></div>
+                <TheIndexContact :isShow="contact.show" @is-close="closeContact" />
+            </div>
             <div class="p-page__inner">
-                <div class="p-page__expansion" data-expansion="canvas">
-                    <div class="p-page__expansion-canvas expansion" data-expansion="expansion"></div>
-                    <TheIndexContact :isShow="this.contact.show" @is-close="closeContact" />
-                </div>
-                <TheIndexMv :isActive="this.mv.active" />
+                <TheIndexMv :isActive="mv.active" />
                 <TheCircle />
                 <TheIndexBox />
-                <TheIndexStudy @is-show="showContact" :isClose="this.contact.close" />
+                <TheIndexStudy @is-show="showContact" :isClose="contact.close" />
             </div>
         </div>
         <TheCursor />
@@ -38,7 +38,6 @@ import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { loadingStore } from '~/store';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
-import { nextTick } from 'process';
 
 export default Vue.extend({
     head: {
@@ -162,6 +161,10 @@ export default Vue.extend({
         },
         handleEvent(): void {
             const path = this.$route.name;
+            document.querySelector('.p-page__inner').addEventListener('scroll', () => {
+                console.log('scroll');
+                if (this.title) this.title.handleScroll();
+            });
             window.addEventListener(
                 'scroll',
                 () => {

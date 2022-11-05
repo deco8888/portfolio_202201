@@ -6,19 +6,19 @@
     top: 0;
     right: 0;
     width: 100%;
-    height: 100%;
+    // height: 100%;
     background-color: #c2f3c6;
     // background-color: #c2f3c6;
-    // @include g.media('>phone') {
-    //     padding: g.get_vw(300) 0 0;
-    // }
     background-image: linear-gradient(0deg, transparent calc(100% - 1px), #9bf0a2 calc(100% - 1px)),
         linear-gradient(90deg, transparent calc(100% - 1px), #9bf0a2 calc(100% - 1px));
     background-position: top center;
     background-repeat: repeat;
     background-size: g.get_vw(50) g.get_vw(50);
     background-attachment: fixed;
-    overflow: hidden;
+    @include g.media('>phone') {
+        height: 100%;
+        overflow: hidden;
+    }
     z-index: 1000;
     &__inner {
         display: flex;
@@ -29,14 +29,16 @@
     &__wrap {
         position: relative;
         width: 100%;
-        height: 100vh;
+        @include g.media('>phone') {
+            height: 100vh;
+        }
     }
     &__list {
         display: flex;
-        position: absolute;
         left: 0;
         user-select: none;
         @include g.media('>phone') {
+            position: absolute;
             top: 50%;
             padding: 0 g.get_vw(600) 0 180vw;
             transform: translate(0, -50%);
@@ -44,7 +46,8 @@
         @include g.media('<=phone') {
             flex-flow: column;
             align-items: center;
-            padding: 100vh 0 60vh;
+            position: relative;
+            padding: 100vh 0 30vh;
             width: 100%;
         }
     }
@@ -54,16 +57,21 @@
         left: 0;
         width: 100%;
         height: auto;
-        visibility: hidden;
+        @include g.media('>phone') {
+            visibility: hidden;
+        }
+        @include g.media('<=phone') {
+            background-color: #64c466;
+        }
         &-wrap {
             display: block;
             position: relative;
             // max-width: 40vh;
-            height: 0;
             overflow: hidden;
             @include g.media('>phone') {
                 padding-top: 18%;
                 width: g.get-size-pc(200px, 500px);
+                height: 0;
             }
             @include g.media('<=phone') {
                 padding-top: 55.4%;
@@ -74,9 +82,9 @@
                     top: 0;
                     margin: 0 g.get-size-pc(120px, 300px) 0 0;
                 }
-                // @include g.media('<=phone') {
-                //     margin: 20rem 0 0;
-                // }
+                @include g.media('<=phone') {
+                    margin: 20rem 0 0;
+                }
             }
             &--image2 {
                 @include g.media('>phone') {
@@ -114,30 +122,27 @@
     &-expansion {
         $expansion: &;
         display: block;
-        position: fixed;
-        z-index: -1;
         @include g.media('>phone') {
-            @include g.scroll-fade-in-before(20px, 0);
-        }
-        @include g.media('<=phone') {
-            @include g.scroll-fade-in-before();
-        }
-        &.is-active {
-            @include g.scroll-fade-in-after(0, 0, 0s);
-            z-index: 1002;
-        }
-        @include g.media('>phone') {
+            position: fixed;
             right: 0;
             bottom: g.get-size-pc(40px, 100px);
             margin: 0 g.get-size-pc(40px, 100px) 0 0;
             width: g.get-size-pc(120px, 300px);
+            z-index: -1;
+            @include g.scroll-fade-in-before(20px, 0);
         }
         @include g.media('<=phone') {
-            left: 0;
-            right: 0;
-            bottom: 25rem;
-            margin: 0 auto;
+            position: relative;
+            // margin: 0 auto 30rem;
             width: 40rem;
+            z-index: 1002;
+            // @include g.scroll-fade-in-before();
+        }
+        &.is-active {
+            @include g.media('>phone') {
+                @include g.scroll-fade-in-after(0, 0, 0s);
+            }
+            z-index: 1002;
         }
         &__inner {
             display: grid;

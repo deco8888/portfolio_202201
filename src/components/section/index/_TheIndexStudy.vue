@@ -1,5 +1,5 @@
 <template>
-    <section id="study" class="p-index-study" data-study>
+    <section id="study" class="p-index-study" data-study data-scroll>
         <div class="p-index-study__inner js-study-trigger">
             <div class="p-index-study__canvas" data-study="canvas"></div>
             <div class="p-index-study__wrap" data-horizontal="wrapper" ref="horizontalWrapper">
@@ -57,7 +57,6 @@
                                 :class="['p-index-study-expansion__envelope-wrapper']"
                                 data-envelope
                                 data-cursor-target
-                                @click="clickItem"
                             >
                                 <div class="p-index-study-expansion__envelope-bg"></div>
                                 <div class="p-index-study-expansion__envelope"></div>
@@ -187,12 +186,13 @@ export default Vue.extend({
     methods: {
         init(): void {
             // スクロールトリガー
-            // gsap.registerPlugin(ScrollTrigger);
+            // if (!this.isMobile) gsap.registerPlugin(ScrollTrigger);
             setTimeout(() => {
                 this.handleResize();
                 this.moveHorizontally();
             }, 1000);
-            this.photo = new Photo();
+            // if (!this.isMobile) this.photo = new Photo();
+            if (!this.isMobile) this.photo = new Photo();
 
             window.addEventListener(
                 'resize',
@@ -232,7 +232,6 @@ export default Vue.extend({
                     ease: 'none',
                     scrollTrigger: {
                         trigger: '.js-study-trigger',
-                        // markers: true,
                         start: 'top top',
                         end: () => '+=' + scrollHeight,
                         onUpdate: () => {
@@ -287,7 +286,6 @@ export default Vue.extend({
             addClass(document.body, hasClass.active);
             await this.expansion.start();
             this.$emit('is-show', true);
-            contactStore.setContactData({ isShow: true });
         },
         close(): void {
             this.expansion.close();
