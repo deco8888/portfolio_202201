@@ -8,7 +8,7 @@
                 <div class="p-page__expansion-canvas expansion" data-expansion="expansion"></div>
                 <TheIndexContact :isShow="contact.show" @is-close="closeContact" />
             </div>
-            <div class="p-page__inner">
+            <div ref="inner" class="p-page__inner">
                 <TheIndexMv :isActive="mv.active" />
                 <TheCircle />
                 <TheIndexBox />
@@ -162,7 +162,6 @@ export default Vue.extend({
         handleEvent(): void {
             const path = this.$route.name;
             document.querySelector('.p-page__inner').addEventListener('scroll', () => {
-                console.log('scroll');
                 if (this.title) this.title.handleScroll();
             });
             window.addEventListener(

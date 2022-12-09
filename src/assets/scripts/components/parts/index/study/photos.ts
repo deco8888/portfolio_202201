@@ -112,13 +112,25 @@ export default class Photo extends Webgl {
         }
         this.setSize();
         // カメラを作成
-        this.three.camera = this.initCamera();
+        // this.three.camera = this.initCamera();
+        this.elms.canvas.width = this.elms.canvas.clientWidth * 0.5;
+        this.elms.canvas.height = this.elms.canvas.clientHeight * 0.5;
+
+        this.three.camera = this.initCamera({
+            width: this.elms.canvas.clientWidth * 2,
+            height: this.elms.canvas.clientHeight * 2,
+        });
         // カメラをシーンに追加
         this.three.scene.add(this.three.camera);
         // レンダラーを作成
-        this.three.renderer = this.initRenderer();
+        // this.three.renderer = this.initRenderer();
         // HTMLに追加
-        this.elms.canvas.appendChild(this.three.renderer.domElement);
+        this.three.renderer = this.initRenderer({
+            canvas: this.elms.canvas,
+            width: this.elms.canvas.clientWidth * 2,
+            height: this.elms.canvas.clientHeight * 2,
+        });
+        // this.elms.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
         // 画像を読み込むs
@@ -292,8 +304,8 @@ export default class Photo extends Webgl {
         }
     }
     updateMesh(index: number): void {
-        const winSizeW = this.winSize.width;
-        const winSizeH = this.winSize.height;
+        const winSizeW = this.elms.canvas.width;
+        const winSizeH = this.elms.canvas.height;
         const mesh = this.meshList[index];
         const rect = this.rectList[index];
         const viewportW = this.viewport.width;
@@ -309,8 +321,8 @@ export default class Photo extends Webgl {
         material.uniforms.uResolution.value = new Vector2(rect.width, rect.height);
     }
     updateBgMesh(index: number): void {
-        const winSizeW = this.winSize.width;
-        const winSizeH = this.winSize.height;
+        const winSizeW = this.elms.canvas.width;
+        const winSizeH = this.elms.canvas.height;
         const bgMeshes = this.bgMeshList[index];
         const rect = this.rectList[index];
         const viewportW = this.viewport.width;

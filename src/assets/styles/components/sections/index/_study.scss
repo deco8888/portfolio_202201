@@ -14,9 +14,9 @@
     background-position: top center;
     background-repeat: repeat;
     background-size: g.get_vw(50) g.get_vw(50);
-    background-attachment: fixed;
     @include g.media('>phone') {
         height: 100%;
+        background-attachment: fixed;
         overflow: hidden;
     }
     z-index: 1000;
@@ -31,6 +31,9 @@
         width: 100%;
         @include g.media('>phone') {
             height: 100vh;
+        }
+        @include g.media('<=phone') {
+            margin: 100vh 0 g.get-per(100);
         }
     }
     &__list {
@@ -47,7 +50,8 @@
             flex-flow: column;
             align-items: center;
             position: relative;
-            padding: 100vh 0 30vh;
+            // margin: 0 0 g.get-per(100);
+            // padding: 50vh 0;
             width: 100%;
         }
     }

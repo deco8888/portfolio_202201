@@ -1,4 +1,4 @@
-import { BufferGeometry, Vector3 } from 'three';
+import { BufferGeometry, Vector3, ShaderMaterial } from 'three';
 import { addClass, isContains, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { lerp } from '~/assets/scripts/utils/math';
@@ -123,6 +123,8 @@ export default class Title extends Letter {
         await this.prepare();
         this.font.size = this.viewport.width * this.font.threshold;
         await this.createTextImage();
+        if (this.isMobile)
+            document.querySelector<HTMLElement>('.p-page__inner').style.height = `${window.innerHeight}px`;
     }
     startAnim(): void {
         if (this.flg) this.setDiffusion();
@@ -257,6 +259,11 @@ export default class Title extends Letter {
                 this.textImage.data = await this.getImageData();
                 await this.getTitleInfo();
                 this.isStudyArea = true;
+                // if (this.flg) {
+                //     const pointsMaterial = <ShaderMaterial>this.three.points.material;
+                //     pointsMaterial.uniforms.uRatio.value = 0.0;
+                //     this.setDiffusion();
+                // }
                 this.change();
             }
         }
@@ -291,7 +298,7 @@ export default class Title extends Letter {
                 this.three.object.position.y = 0;
                 this.horizontal = 0;
                 await this.initValue();
-                this.text = this.isMobile ? 'PORT¥nFOLIO' : 'THANKS!';
+                this.text = this.isMobile ? 'PORT¥nFOLIO' : 'PORT¥nFOLIO';
                 this.font = {
                     wight: 900,
                     threshold: this.isMobile ? 0.18 : 0.14,
@@ -307,12 +314,22 @@ export default class Title extends Letter {
                 this.setTextImage();
                 this.textImage.data = await this.getImageData();
                 await this.getTitleInfo();
+                // if (this.flg) {
+                //     const pointsMaterial = <ShaderMaterial>this.three.points.material;
+                //     pointsMaterial.uniforms.uRatio.value = 0.0;
+                //     this.setDiffusion();
+                // }
                 this.change();
             }
         }
         this.scroll.y = scrollY;
     }
     change(): void {
+        if (this.flg) {
+            const pointsMaterial = <ShaderMaterial>this.three.points.material;
+            pointsMaterial.uniforms.uRatio.value = 0.0;
+            this.setDiffusion();
+        }
         const geometry = <BufferGeometry>this.three.points.geometry;
         const geometryPosition = geometry.attributes.position;
         for (const [attribute, list] of Object.entries(this.title.firstList)) {

@@ -1,5 +1,5 @@
 <template>
-    <div :class="['p-index-circle', { 'is-active': isShow }]" data-circle>
+    <div :class="['p-index-circle']" data-circle>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" class="p-index-circle__svg">
             <desc>SCROLL</desc>
             <path
@@ -77,6 +77,7 @@
 <script lang="ts" scoped>
 import Vue from 'vue';
 import Circle from '~/assets/scripts/components/parts/circle';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 export default Vue.extend({
     props: {
@@ -88,9 +89,11 @@ export default Vue.extend({
     },
     data(): {
         circle: Circle;
+        mobile: boolean;
     } {
         return {
             circle: null,
+            mobile: isMobile(),
         };
     },
     watch: {

@@ -6,7 +6,7 @@
     width: 100%;
     opacity: 0;
     @include g.media('<=phone') {
-        height: 100vh;
+        height: 100%;
         overflow: hidden;
     }
     &__inner {
@@ -19,6 +19,7 @@
             // margin-bottom: 0.1px;
             width: 100%;
             height: 100%;
+            overflow-x: hidden;
             overflow-y: scroll;
             -webkit-overflow-scrolling: touch;
             // overflow-y: auto;
@@ -102,7 +103,7 @@
             bottom: 0;
             margin: auto;
             width: 100vw;
-            height: 100vh;
+            height: 100%;
             background-color: #50a2f7;
             transform: scale(0);
         }

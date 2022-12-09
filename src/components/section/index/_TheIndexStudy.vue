@@ -1,9 +1,10 @@
 <template>
     <section id="study" class="p-index-study" data-study data-scroll>
         <div class="p-index-study__inner js-study-trigger">
-            <div class="p-index-study__canvas" data-study="canvas"></div>
+            <!-- <canvas ref="canvas" class="p-index-study__canvas" data-study="canvas"></canvas> -->
             <div class="p-index-study__wrap" data-horizontal="wrapper" ref="horizontalWrapper">
                 <div class="p-index-study__list" data-horizontal="list" ref="horizontalList">
+                    <canvas ref="canvas" class="p-index-study__canvas" data-study="canvas"></canvas>
                     <a
                         class="p-index-study__image-wrap p-index-study__image-wrap--image1"
                         href="https://hatarakigai.info/project/"
@@ -94,7 +95,7 @@ import Title from '~/assets/scripts/components/parts/index/contact/title';
 import Photo from '~/assets/scripts/components/parts/index/study/photos';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
-import { contactStore, loadingStore } from '~/store';
+import { loadingStore } from '~/store';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
 import EventBus from '~/utils/event-bus';
 
@@ -185,14 +186,15 @@ export default Vue.extend({
     },
     methods: {
         init(): void {
+            // console.log(document.querySelector('[data-study="canvas"]'));
             // スクロールトリガー
             // if (!this.isMobile) gsap.registerPlugin(ScrollTrigger);
             setTimeout(() => {
                 this.handleResize();
                 this.moveHorizontally();
             }, 1000);
+            this.photo = new Photo();
             // if (!this.isMobile) this.photo = new Photo();
-            if (!this.isMobile) this.photo = new Photo();
 
             window.addEventListener(
                 'resize',
@@ -225,29 +227,7 @@ export default Vue.extend({
         moveHorizontally(): void {
             this.elms.horizontalList = document.querySelector("[data-horizontal='list']");
             const mvHeight = this.elms.mv.clientHeight;
-            if (this.isMobile) {
-                const scrollHeight = this.elms.horizontalList.clientHeight - this.elms.horizontalWrapper.clientHeight;
-                this.scrollTrigger = gsap.to(this.elms.horizontalList, {
-                    y: () => -scrollHeight,
-                    ease: 'none',
-                    scrollTrigger: {
-                        trigger: '.js-study-trigger',
-                        start: 'top top',
-                        end: () => '+=' + scrollHeight,
-                        onUpdate: () => {
-                            if (scrollHeight < window.scrollY - mvHeight + 50) {
-                                addClass(this.elms.box, hasClass.active);
-                            } else {
-                                removeClass(this.elms.box, hasClass.active);
-                            }
-                        },
-                        pin: true,
-                        anticipatePin: 1, // 素早くスクロールしたときにピン留めが少し遅れ、ガタつくのを防ぐ。
-                        invalidateOnRefresh: true, // リサイズに関係する
-                        scrub: true, // アニメーションをスクロール位置にリンクさせる
-                    },
-                });
-            } else {
+            if (!this.isMobile) {
                 this.scrollTrigger = gsap.to(this.elms.horizontalList, {
                     x: () =>
                         -(
@@ -292,12 +272,14 @@ export default Vue.extend({
         },
         handleResize(): void {
             this.expansion.handleResize();
-            this.elms = {
-                horizontalWrapper: document.querySelector("[data-horizontal='wrapper']"),
-                horizontalLis: document.querySelector("[data-horizontal='list']"),
-                box: document.querySelector('[data-expansion="wrapper"]'),
-                mv: document.querySelector('[data-mv]'),
-            };
+            if (!this.isMobile) {
+                this.elms = {
+                    horizontalWrapper: document.querySelector("[data-horizontal='wrapper']"),
+                    horizontalLis: document.querySelector("[data-horizontal='list']"),
+                    box: document.querySelector('[data-expansion="wrapper"]'),
+                    mv: document.querySelector('[data-mv]'),
+                };
+            }
         },
         splitText() {
             const charList = document.querySelectorAll<HTMLElement>('[data-split-char="contact"]');

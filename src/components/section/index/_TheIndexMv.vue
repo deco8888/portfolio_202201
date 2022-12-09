@@ -153,7 +153,7 @@ export default Vue.extend({
     methods: {
         init(): void {
             // スクロールトリガー
-            gsap.registerPlugin(ScrollTrigger);
+            if (!this.isMobile) gsap.registerPlugin(ScrollTrigger);
             // 上下のライン・左右にスクロール
             this.moveLine();
             // パーティクル用Canvas
@@ -176,7 +176,14 @@ export default Vue.extend({
         moveLine(): void {
             const horizontalLine = gsap.utils.toArray<HTMLElement>("[data-horizontal='bg-line']");
             const pageInner = document.querySelector('.p-page__inner');
+            const circle = document.querySelector('[data-circle]');
+            const box = document.querySelector('.p-index-box');
             if (this.isMobile) {
+                const bg = this.$refs.bg as HTMLElement;
+                bg.style.height = `${window.innerHeight}px`;
+                document.querySelectorAll<HTMLElement>('.p-index-mv__bg-line').forEach((line) => {
+                    line.style.height = `${window.innerHeight * 0.5}px`;
+                });
                 pageInner.addEventListener('touchstart', (e: TouchEvent) => {
                     this.swipe.previous = e.touches[0].pageY;
                 });
@@ -184,10 +191,10 @@ export default Vue.extend({
                     this.swipe.current = e.touches[0].pageY;
                     this.swipe.diff = this.swipe.previous > this.swipe.current;
                     const mv = this.$refs.mv as HTMLElement;
-                    if (!this.isFirst && mv.getBoundingClientRect().top === 0 && !this.swipe.diff) {
-                        gsap.set(this.$refs.bg, {
-                            position: 'fixed',
-                        });
+                    if (!this.isFirst && mv.getBoundingClientRect().top > -10 && !this.swipe.diff) {
+                        // gsap.set(this.$refs.bg, {
+                        //     position: 'fixed',
+                        // });
                         horizontalLine.forEach((line, index) => {
                             if (index === 0) {
                                 gsap.to(line, {
@@ -217,25 +224,30 @@ export default Vue.extend({
                                     duration: 0.5,
                                     left: '100%',
                                     onComplete: () => {
-                                        gsap.set(this.$refs.bg, {
-                                            position: 'absolute',
-                                        });
+                                        // gsap.set(this.$refs.bg, {
+                                        //     position: 'relative',
+                                        // });
                                         setTimeout(() => {
                                             this.isFirst = false;
-                                            console.log('1回目');
                                         }, 500);
                                     },
                                 });
                             }
                         });
                     }
+                    console.log(mv.getBoundingClientRect().top);
+                    if (mv.getBoundingClientRect().top < -20) {
+                        addClass(circle, hasClass.active);
+                        addClass(box, hasClass.active);
+                    } else {
+                        removeClass(circle, hasClass.active);
+                        removeClass(box, hasClass.active);
+                    }
                 });
             } else {
                 horizontalLine.forEach((line) => {
                     const pinWrap = line.querySelector("[data-horizontal='pin']");
                     const animWrap = pinWrap.querySelector<HTMLElement>("[data-horizontal='anim']");
-                    const circle = document.querySelector('[data-circle]');
-                    const box = document.querySelector('.p-index-box');
                     animWrap.style.height = `${window.innerHeight * 0.5}px`;
                     const xStart = (): number =>
                         pinWrap.querySelector("[data-horizontal='anim']").classList.contains('to-right')

@@ -1,4 +1,5 @@
 import gsap from 'gsap';
+import { isMobile } from '../../modules/isMobile';
 import { lerp } from 'three/src/math/MathUtils';
 
 interface CircleOptions {
@@ -21,6 +22,7 @@ export default class Circle {
         amp: number;
     };
     animFrame: number;
+    isMobile: boolean;
     constructor(props: Partial<CircleOptions> = {}) {
         this.params = { ...defaults, ...props };
         this.elms = {
@@ -31,13 +33,16 @@ export default class Circle {
             current: 0,
             amp: 0.1,
         };
+        this.isMobile = isMobile();
         if (this.elms.circle) this.init();
     }
     init(): void {
         this.rotate();
     }
     rotate(): void {
-        this.scroll.current = window.scrollY * 0.1;
+        this.scroll.current = this.isMobile
+            ? Math.abs(document.querySelector('.p-index-mv').getBoundingClientRect().top)
+            : window.scrollY * 0.1;
         this.scroll.previous = lerp(this.scroll.previous, this.scroll.current, this.scroll.amp);
         this.scroll.previous = Math.floor(this.scroll.previous * 100) / 100;
         const tl = gsap.timeline({
@@ -49,6 +54,12 @@ export default class Circle {
         });
         this.animFrame = requestAnimationFrame(() => this.rotate());
     }
+    // scroll(): void {
+    //     const pageInner = document.querySelector('.p-page__inner');
+    //     pageInner.addEventListener('touchmove', (e: TouchEvent) => {
+    //         e.touches[0].pageY;
+    //     });
+    // }
     cancel(): void {
         cancelAnimationFrame(this.animFrame);
     }
