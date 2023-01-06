@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@types/webpack": "^5.28.0",
+    "caniuse-lite": "^1.0.30001442",
     "core-js": "^3.21.0",
     "nuxt": "^2.15.8",
     "vue": "^2.6.14",
