@@ -130,6 +130,7 @@ const nuxtConfig: NuxtConfig = {
             }
             // eslint-disable-next-line no-extra-boolean-cast
             if (!!config.module) {
+                console.log(!!config.module);
                 config.module.rules.push({
                     test: /\.(vert|frag|glsl)$/i,
                     use: ['raw-loader', 'glslify-loader'],
