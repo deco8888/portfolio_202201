@@ -87,6 +87,11 @@ export default Vue.extend({
             isMobile: isMobile(),
         };
     },
+    watch: {
+        isShow(val: boolean) {
+            if (val) this.init();
+        },
+    },
     async mounted() {
         this.title = new Title();
         // this.title.isFirst = true;
@@ -97,7 +102,7 @@ export default Vue.extend({
         if (!this.isMobile) this.following = new Following();
         this.handleEvent();
         // 画面遷移時に「cancelAnimationFrame」を実行
-        this.$router.beforeEach(async (_to, _from, next) => {
+        this.$router.beforeEach((_to, _from, next) => {
             if (this.title) {
                 this.title.cancel();
                 this.title = null;
@@ -108,11 +113,6 @@ export default Vue.extend({
             }
             next();
         });
-    },
-    watch: {
-        isShow(val: boolean) {
-            if (val) this.init();
-        },
     },
     methods: {
         handleEvent(): void {

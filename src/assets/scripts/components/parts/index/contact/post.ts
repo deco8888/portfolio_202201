@@ -3,7 +3,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import Webgl from '~/assets/scripts/modules/webgl';
 import { radians } from '~/assets/scripts/utils/helper';
-import { GUI } from 'dat.gui';
 import { removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
@@ -22,7 +21,6 @@ export default class Post extends Webgl {
     ctx: CanvasRenderingContext2D;
     animFrame?: number;
     mouse: THREE.Vector2;
-    gui: GUI;
     isMobile: boolean;
     constructor() {
         super();
@@ -42,6 +40,7 @@ export default class Post extends Webgl {
         this.mouse = new Vector2();
         this.isMobile = isMobile();
     }
+    // eslint-disable-next-line require-await
     async init(canvas: HTMLCanvasElement): Promise<void> {
         this.canvas = canvas;
         // 画面サイズを取得
@@ -106,7 +105,7 @@ export default class Post extends Webgl {
         // const posX = this.isMobile ? 1.5 : 0;
         this.three.spotLight.position.set(0, 2, 88);
         this.three.spotLight.angle = radians(-80);
-        const scale = this.isMobile ? 1 : 2;
+        // const scale = this.isMobile ? 1 : 2;
         // this.three.spotLight.scale.set(scale, scale, scale);
         // this.three.spotLightHelper = new SpotLightHelper(this.three.spotLight);
         // this.three.spotLightHelper.add(this.three.spotLight);
@@ -114,10 +113,10 @@ export default class Post extends Webgl {
     }
     createModels(): void {
         const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('/portfolio/draco/');
+        dracoLoader.setDecoderPath('/draco/');
         const gltfLoader = new GLTFLoader();
         gltfLoader.setDRACOLoader(dracoLoader);
-        const objSrc = '/portfolio/draco/objs/post_d.glb';
+        const objSrc = '/draco/objs/post_d.glb';
         gltfLoader.load(objSrc, (obj) => {
             const children = [...obj.scene.children];
             for (const child of children) {

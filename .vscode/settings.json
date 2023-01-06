@@ -3,6 +3,7 @@
     "AYAKA",
     "crossorigin",
     "glsl",
+    "gltf",
     "gsap",
     "interpolant",
     "lerp",

@@ -70,18 +70,17 @@
                 </div>
             </div>
         </div>
-        <TheIndexBalloon :isShow="isActive" :color="'purple'" />
-        <TheIndexBalloon :isShow="isActive" :color="'orange'" />
+        <TheIndexBalloon :is-show="isActive" :color="'purple'" />
+        <TheIndexBalloon :is-show="isActive" :color="'orange'" />
     </section>
 </template>
 
 <script lang="ts" scoped>
 import Vue from 'vue';
 import gsap from 'gsap';
-import BaseImage from '~/components/common/BaseImage.vue';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import TheIndexBalloon from '~/components/parts/index/TheIndexBalloon.vue';
 import Particles from '~/assets/scripts/components/section/index/particles';
-import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import { loadingStore } from '~/store';
@@ -106,7 +105,6 @@ interface MvOptions {
 }
 export default Vue.extend({
     components: {
-        BaseImage,
         TheIndexBalloon,
     },
     props: {
@@ -140,14 +138,14 @@ export default Vue.extend({
             },
         };
     },
-    watch: {
-        loading(val: boolean) {
-            if (val) this.init();
-        },
-    },
     computed: {
         loading(): boolean {
             return loadingStore.getLoading.loaded;
+        },
+    },
+    watch: {
+        loading(val: boolean) {
+            if (val) this.init();
         },
     },
     methods: {
@@ -166,7 +164,7 @@ export default Vue.extend({
             // リサイズ
             window.addEventListener('resize', this.handleResize.bind(this));
             // 画面遷移時に「cancelAnimationFrame」を実行
-            this.$router.beforeEach(async (_to, _from, next) => {
+            this.$router.beforeEach((_to, _from, next) => {
                 this.canvasList.forEach((_, index) => {
                     this.particles[index].cancel();
                 });
@@ -251,7 +249,7 @@ export default Vue.extend({
                     animWrap.style.height = `${window.innerHeight * 0.5}px`;
                     const xStart = (): number =>
                         pinWrap.querySelector("[data-horizontal='anim']").classList.contains('to-right')
-                            ? -document.querySelector<HTMLElement>('.p-page').clientWidth //window.innerWidth
+                            ? -document.querySelector<HTMLElement>('.p-page').clientWidth
                             : 0;
                     const xEnd = (): number =>
                         animWrap.classList.contains('to-right')

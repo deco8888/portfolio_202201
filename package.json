@@ -75,5 +75,8 @@
   "browserslist": [
     "defaults",
     "not dead"
-  ]
+  ],
+  "volta": {
+    "node": "16.19.0"
+  }
 }

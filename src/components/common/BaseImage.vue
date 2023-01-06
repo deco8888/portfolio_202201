@@ -31,20 +31,21 @@ export default Vue.extend({
         width: {
             type: Number,
             required: false,
-            default: '',
+            default: 0,
         },
         height: {
             type: Number,
             required: false,
-            default: '',
+            default: 0,
         },
         decodingAsync: {
             type: Boolean,
             required: false,
-            default: '',
+            default: true,
         },
     },
     computed: {
+        // eslint-disable-next-line vue/return-in-computed-property
         getPcImg(): any {
             if (this.pcImg) return require(`~/assets/images/pc/${this.pcImg}`);
         },

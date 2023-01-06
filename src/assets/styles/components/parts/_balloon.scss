@@ -53,6 +53,7 @@
         height: g.get_vw(300);
     }
     @include g.media('<=phone') {
+        display: none;
         width: 25rem;
         height: 25rem;
     }

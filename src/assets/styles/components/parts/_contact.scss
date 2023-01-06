@@ -66,7 +66,7 @@
         left: 50%;
         height: 0;
         transform: translate(-50%, -50%);
-        z-index: 10000;
+        z-index: 1005;
         // background-color: #7cadd3;
         @include g.media('>phone') {
             top: 60%;
@@ -227,7 +227,7 @@
         will-change: transform;
         transform: scale(0);
         visibility: hidden;
-        z-index: 1005;
+        z-index: 1006;
         cursor: none !important;
         pointer-events: none !important;
         & p {

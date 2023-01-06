@@ -112,25 +112,17 @@ export default class Photo extends Webgl {
         }
         this.setSize();
         // カメラを作成
-        // this.three.camera = this.initCamera();
-        this.elms.canvas.width = this.elms.canvas.clientWidth * 0.5;
-        this.elms.canvas.height = this.elms.canvas.clientHeight * 0.5;
+        this.three.camera = this.initCamera();
+        // this.elms.canvas.width = this.elms.canvas.clientWidth;
+        // this.elms.canvas.height = this.elms.canvas.clientHeight;
 
-        this.three.camera = this.initCamera({
-            width: this.elms.canvas.clientWidth * 2,
-            height: this.elms.canvas.clientHeight * 2,
-        });
+        // this.three.camera = this.initCamera();
         // カメラをシーンに追加
         this.three.scene.add(this.three.camera);
         // レンダラーを作成
-        // this.three.renderer = this.initRenderer();
+        this.three.renderer = this.initRenderer();
         // HTMLに追加
-        this.three.renderer = this.initRenderer({
-            canvas: this.elms.canvas,
-            width: this.elms.canvas.clientWidth * 2,
-            height: this.elms.canvas.clientHeight * 2,
-        });
-        // this.elms.canvas.appendChild(this.three.renderer.domElement);
+        this.elms.canvas.appendChild(this.three.renderer.domElement);
         // ビューポート計算
         this.viewport = this.initViewport();
         // 画像を読み込むs
@@ -148,9 +140,10 @@ export default class Photo extends Webgl {
             if (imageName) await this.texture(index, imageName);
         }
     }
+    // eslint-disable-next-line require-await
     async texture(index: string, imageName: string): Promise<Texture> {
         return new Promise((resolve) => {
-            const imageSrc = `/portfolio/textures/${imageName}`;
+            const imageSrc = `/textures/${imageName}`;
             const textureLoader = new TextureLoader();
             textureLoader.load(imageSrc, async (texture) => {
                 this.three.textureList.push(texture);
@@ -159,6 +152,7 @@ export default class Photo extends Webgl {
             });
         });
     }
+    // eslint-disable-next-line require-await
     async set(index: number): Promise<void> {
         // メッシュを作成(画像)
         this.three.mesh = this.initMesh(index);
@@ -202,7 +196,7 @@ export default class Photo extends Webgl {
                 value: 0.02,
             },
             uIsMobile: {
-                value: this.isMobile ? true : false,
+                value: !!this.isMobile,
             },
         };
         // 分割数
@@ -211,7 +205,7 @@ export default class Photo extends Webgl {
         const geometry = new PlaneBufferGeometry(1, 1, segments, segments);
         // 質感を作成
         const material = new ShaderMaterial({
-            uniforms: uniforms,
+            uniforms,
             vertexShader: photoVertexShader,
             fragmentShader: photoFragmentShader,
             transparent: false,
@@ -260,7 +254,7 @@ export default class Photo extends Webgl {
                 value: new Vector3(1.0, 0.1, 1.0),
             },
             uIsMobile: {
-                value: this.isMobile ? true : false,
+                value: !!this.isMobile,
             },
         };
         // 分割数
@@ -268,7 +262,7 @@ export default class Photo extends Webgl {
         // 形状データを作成
         const bgGeometry = new PlaneBufferGeometry(1, 1, segments, segments);
         const bgMaterial = new ShaderMaterial({
-            uniforms: uniforms,
+            uniforms,
             vertexShader: photoBgVertexShader,
             fragmentShader: photoBgFragmentShader,
             transparent: true,
@@ -304,8 +298,8 @@ export default class Photo extends Webgl {
         }
     }
     updateMesh(index: number): void {
-        const winSizeW = this.elms.canvas.width;
-        const winSizeH = this.elms.canvas.height;
+        const winSizeW = this.winSize.width;
+        const winSizeH = this.winSize.height;
         const mesh = this.meshList[index];
         const rect = this.rectList[index];
         const viewportW = this.viewport.width;
@@ -321,8 +315,8 @@ export default class Photo extends Webgl {
         material.uniforms.uResolution.value = new Vector2(rect.width, rect.height);
     }
     updateBgMesh(index: number): void {
-        const winSizeW = this.elms.canvas.width;
-        const winSizeH = this.elms.canvas.height;
+        const winSizeW = this.winSize.width;
+        const winSizeH = this.winSize.height;
         const bgMeshes = this.bgMeshList[index];
         const rect = this.rectList[index];
         const viewportW = this.viewport.width;
@@ -388,8 +382,10 @@ export default class Photo extends Webgl {
             const material = this.getMaterial(mesh);
             material.dispose();
             mesh.geometry.dispose();
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             for (const [_, bgMesh] of Object.entries(this.bgMeshList[i])) {
                 const bgMaterial = this.getMaterial(bgMesh);
+                // eslint-disable-next-line no-unused-expressions
                 bgMaterial.dispose;
                 bgMesh.geometry.dispose();
             }
@@ -403,10 +399,11 @@ export default class Photo extends Webgl {
         for (const [index, mesh] of Object.entries(this.meshList)) {
             const i = parseInt(index);
             const material = this.getMaterial(mesh);
-            material.uniforms.uIsMobile.value = this.isMobile ? true : false;
+            material.uniforms.uIsMobile.value = !!this.isMobile;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             for (const [_, bgMesh] of Object.entries(this.bgMeshList[i])) {
                 const bgMaterial = this.getMaterial(bgMesh);
-                bgMaterial.uniforms.uIsMobile.value = this.isMobile ? true : false;
+                bgMaterial.uniforms.uIsMobile.value = !!this.isMobile;
             }
         }
     }
@@ -415,13 +412,13 @@ export default class Photo extends Webgl {
         // console.log(document.querySelector('.p-index-study').getBoundingClientRect().top);
         const targetY = window.scrollY - this.elms.mv.clientHeight;
         // const targetY = Math.abs(document.querySelector('.p-index-study').getBoundingClientRect().top);
-        let duration = this.isMobile ? 0 : 0.1;
+        const duration = 0.1;
 
         const studyList = this.elms.horizontalList;
         const scrollArea = this.isMobile
             ? studyList.clientHeight - window.innerHeight
             : studyList.clientWidth - window.innerWidth * 0.5;
-        this.isLast = targetY > scrollArea ? true : false;
+        this.isLast = targetY > scrollArea;
 
         for (const [index, mesh] of Object.entries(this.meshList)) {
             const i = parseInt(index);
@@ -442,7 +439,7 @@ export default class Photo extends Webgl {
                 const timeline = tl.to(
                     mesh.position,
                     {
-                        duration: duration,
+                        duration,
                         x: this.isMobile ? posX : scroll.previous,
                         y: this.isMobile ? posY : posY,
                     },
@@ -455,7 +452,7 @@ export default class Photo extends Webgl {
                     timeline.to(
                         bgMesh.position,
                         {
-                            duration: duration,
+                            duration,
                             x: this.isMobile ? posX + diff : scroll.previous + diff,
                             y: this.isMobile ? posY + diff : posY + diff,
                         },
@@ -510,8 +507,9 @@ export default class Photo extends Webgl {
     handleScroll(): void {
         this.flg.isScroll = true;
         this.flg.isMove = false;
-        const targetY = Math.abs(document.querySelector('.p-index-study').getBoundingClientRect().top);
-        // const targetY = window.scrollY - this.elms.mv.clientHeight;
+        // const targetY = Math.abs(document.querySelector('.p-index-study').getBoundingClientRect().top);
+        const targetY = window.scrollY - this.elms.mv.clientHeight;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (const [index, _] of Object.entries(this.rectList)) {
             const i = parseInt(index);
             // スクロール情報（current/previous/ease）

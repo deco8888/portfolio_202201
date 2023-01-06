@@ -1,6 +1,6 @@
 <template>
     <div :class="['p-index-balloon', `p-index-balloon--${color}`, { 'is-active': isShow }]" data-balloon>
-        <canvas class="p-index-balloon__canvas" data-canvas="balloon" :data-balloon="color" ref="balloon"></canvas>
+        <canvas ref="balloon" class="p-index-balloon__canvas" data-canvas="balloon" :data-balloon="color"></canvas>
     </div>
 </template>
 
@@ -42,7 +42,7 @@ export default Vue.extend({
         this.balloon = new Balloon();
         await this.balloon.init(this.canvas);
         // 画面遷移時に「cancelAnimationFrame」を実行
-        this.$router.beforeEach(async (_to, _from, next) => {
+        this.$router.beforeEach((_to, _from, next) => {
             if (this.balloon) {
                 this.balloon.removeModels();
                 this.balloon = null;
@@ -51,6 +51,7 @@ export default Vue.extend({
         });
     },
     methods: {
+        // eslint-disable-next-line require-await
         async init(): Promise<void> {
             // this.title.isFirst = true;
             this.balloon.setModels();

@@ -1,14 +1,14 @@
 import gsap, { Power2 } from 'gsap';
+import { BufferGeometry, ShaderMaterial } from 'three';
 import { lerp } from '~/assets/scripts/utils/math';
 import Letter from '~/assets/scripts/modules/letter';
-import { BufferGeometry, ShaderMaterial } from 'three';
 
 export default class Title extends Letter {
     speed: number;
 
     constructor() {
         super();
-        this.borderColor = 'rgb(101 141 172)'; //'rgb(81 162 247)';
+        this.borderColor = 'rgb(101 141 172)'; // 'rgb(81 162 247)';
         this.textImage = {
             canvas: null,
             ctx: null,
@@ -39,7 +39,7 @@ export default class Title extends Letter {
         };
         this.color = {
             front: '#facb04',
-            back: '#7caed4', //#5174b3',
+            back: '#7caed4', // #5174b3',
         };
         this.font = {
             wight: 900,
@@ -61,6 +61,7 @@ export default class Title extends Letter {
         this.prepare();
         this.font.size = this.getFontSize();
     }
+    // eslint-disable-next-line require-await
     async prepare(): Promise<void> {
         this.setSize();
         // カメラを作成
@@ -133,6 +134,7 @@ export default class Title extends Letter {
     //         geometryPosition.needsUpdate = true;
     //     }
     // }
+    // eslint-disable-next-line require-await
     async removeTitle(): Promise<void> {
         gsap.to(this.three.object.scale, {
             duration: 0.5,

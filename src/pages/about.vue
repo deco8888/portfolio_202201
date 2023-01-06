@@ -7,7 +7,7 @@
                 <div class="p-page__title-canvas" data-canvas="title"></div>
             </div>
             <TheAboutIntro />
-            <TheAboutHouse :isShow="show" />
+            <TheAboutHouse :is-show="show" />
         </div>
         <TheCursor />
     </div>
@@ -15,11 +15,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import TheTransition from '../components/common/TheTransition.vue';
 import TheAboutIntro from '~/components/section/about/_TheAboutIntro.vue';
 import TheAboutTransition from '~/components/section/about/_TheAboutTransition.vue';
 import TheAboutHouse from '~/components/parts/about/TheAboutHouse.vue';
 import TheCursor from '~/components/common/TheCursor.vue';
-import TheTransition from '../components/common/TheTransition.vue';
 import Title from '~/assets/scripts/components/section/about/title';
 import { debounce } from '~/assets/scripts/utils/debounce';
 import { removeClass } from '~/assets/scripts/utils/classList';

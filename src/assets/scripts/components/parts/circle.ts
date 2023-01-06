@@ -1,6 +1,6 @@
 import gsap from 'gsap';
-import { isMobile } from '../../modules/isMobile';
 import { lerp } from 'three/src/math/MathUtils';
+import { isMobile } from '../../modules/isMobile';
 
 interface CircleOptions {
     circleSelector: string;
@@ -40,9 +40,7 @@ export default class Circle {
         this.rotate();
     }
     rotate(): void {
-        this.scroll.current = this.isMobile
-            ? Math.abs(document.querySelector('.p-index-mv').getBoundingClientRect().top)
-            : window.scrollY * 0.1;
+        this.scroll.current = window.scrollY * 0.1;
         this.scroll.previous = lerp(this.scroll.previous, this.scroll.current, this.scroll.amp);
         this.scroll.previous = Math.floor(this.scroll.previous * 100) / 100;
         const tl = gsap.timeline({

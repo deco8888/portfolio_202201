@@ -3,8 +3,8 @@ import gsap, { Sine, Back } from 'gsap';
 import letterVertexShader from '../glsl/letter/vertexshader.vert';
 import letterFragmentShader from '../glsl/letter/fragmentShader.frag';
 import { lerp } from '../utils/math';
-import Webgl from './webgl';
 import { distance3d } from '../utils/helper';
+import Webgl from './webgl';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 interface ThreeNumber {
@@ -202,6 +202,7 @@ export default class Letter extends Webgl {
         this.particleSizeList = [];
         this.currentScale = 1;
     }
+    // eslint-disable-next-line require-await
     async prepare(): Promise<void> {
         this.setSize();
         this.firstWinSize = this.winSize;
@@ -327,7 +328,7 @@ export default class Letter extends Webgl {
     setAttribute(name: string, array: number[], itemSize: number): void {
         this.three.geometry.setAttribute(name, new Float32BufferAttribute(array, itemSize));
     }
-    async getTitleInfo(): Promise<void> {
+    getTitleInfo():void {
         const width = this.textImage.canvas.width;
         const height = this.textImage.canvas.height;
         const data = this.textImage.data.data;
@@ -341,7 +342,7 @@ export default class Letter extends Webgl {
                 const index = (y * width + x) * 4;
                 let a = data[index + 3] / 255;
                 // const rw = width * 5;
-                this.coord.first.x = 0; //Math.floor(x % rw) / 5;
+                this.coord.first.x = 0; // Math.floor(x % rw) / 5;
                 this.coord.first.y = 0;
                 this.coord.second.x = x - width / 2;
                 this.coord.second.y = -(y - height / 2);
@@ -363,15 +364,15 @@ export default class Letter extends Webgl {
         }
         this.title.firstList = {
             position: this.portfolio ? (this.portfolio.length ? this.portfolio : position.first) : position.first,
-            color: color,
-            alpha: alpha,
-            size: size,
+            color,
+            alpha,
+            size,
         };
         this.title.secondList = {
             position: position.second,
-            color: color,
-            alpha: alpha,
-            size: size,
+            color,
+            alpha,
+            size,
         };
     }
     setAttributeColor(type: string): void {
@@ -426,22 +427,22 @@ export default class Letter extends Webgl {
         if (this.three.points) {
             const geometry = <BufferGeometry>this.three.points.geometry;
             const geometrySize = geometry.attributes.size;
-            const scale = this.winSize.width / this.firstWinSize.width;
+            // const scale = this.winSize.width / this.firstWinSize.width;
             for (let i = 0; i < geometrySize.array.length; i++) {
-                geometrySize.array[i] = this.particleSizeList[i] * scale;
+                // geometrySize.array[i] = this.particleSizeList[i] * scale;
             }
             geometrySize.needsUpdate = true;
         }
     }
-    async getImageDataFirst(): Promise<ImageData> {
-        return new Promise(async (resolve) => {
+    getImageDataFirst(): Promise<ImageData> {
+        return new Promise((resolve) => {
             // await this.getImageData();
             return setTimeout(async () => {
                 return resolve(await this.getImageData());
             }, 100);
         });
     }
-    async getImageData(): Promise<ImageData> {
+    getImageData(): ImageData {
         const c = this.textImage.canvas;
         const ctx = this.textImage.ctx;
         // フォントを設定・取得
@@ -511,8 +512,8 @@ export default class Letter extends Webgl {
     measureTextWidth(text: string): number {
         return this.textImage.ctx.measureText(text).width;
     }
-    adjustSize(width: number, ctx: CanvasRenderingContext2D): number {
-        let w = width;
+    adjustSize(width: number, _: CanvasRenderingContext2D): number {
+        const w = width;
         return w;
     }
     setGap(): number {
@@ -537,7 +538,7 @@ export default class Letter extends Webgl {
             geometryPosition.needsUpdate = true;
         }
     }
-    async initCommonValue(): Promise<void> {
+    initCommonValue(): void {
         this.horizontal = 0;
         this.attributes = {
             position: {
@@ -554,7 +555,7 @@ export default class Letter extends Webgl {
             data: null,
         };
     }
-    async cancel(): Promise<void> {
+    cancel(): Promise<void> {
         return new Promise((resolve) => {
             cancelAnimationFrame(this.animFrame);
             this.three.scene.clear();

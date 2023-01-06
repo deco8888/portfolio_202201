@@ -1,8 +1,8 @@
 import { Vector2, PointLight, AmbientLight, SpotLight, SpotLightHelper } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-import { radians } from '~/assets/scripts/utils/helper';
 import { GUI } from 'dat.gui';
+import { radians } from '~/assets/scripts/utils/helper';
 import { removeClass } from '~/assets/scripts/utils/classList';
 import { hasClass } from '~/assets/scripts/utils/hasClass';
 import Webgl from '~/assets/scripts/modules/webgl';
@@ -42,6 +42,7 @@ export default class Balloon extends Webgl {
         this.mouse = new Vector2();
         this.isMobile = isMobile();
     }
+    // eslint-disable-next-line require-await
     async init(canvas: HTMLCanvasElement): Promise<void> {
         this.canvas = canvas;
         // 画面サイズを取得
@@ -113,13 +114,14 @@ export default class Balloon extends Webgl {
     }
     async createModels(color: string): Promise<void> {
         const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('/portfolio/draco/');
+        dracoLoader.setDecoderPath('/draco/');
         this.gltfLoader = new GLTFLoader();
         this.gltfLoader.setDRACOLoader(dracoLoader);
-        const objSrc = `/portfolio/draco/objs/balloon_${color}_d.glb`;
+        const objSrc = `/draco/objs/balloon_${color}_d.glb`;
         await this.loadModel(objSrc);
         this.render();
     }
+    // eslint-disable-next-line require-await
     async loadModel(objSrc: string): Promise<void> {
         return new Promise<void>((resolve) => {
             this.gltfLoader.load(objSrc, (obj) => {
@@ -127,12 +129,12 @@ export default class Balloon extends Webgl {
                 //     model.castShadow = true;
                 //     model.receiveShadow = true;
                 // });
-                const scale = this.isMobile ? 0.7 : 1;
+                const scale = this.isMobile ? 1 : 1;
                 this.isMobile ? obj.scene.scale.set(scale, scale, scale) : obj.scene.scale.set(scale, scale, scale);
                 this.three.object.add(obj.scene);
-                const posY = this.isMobile ? 0 : 0;
+                // const posY = this.isMobile ? 0 : 0;
                 this.three.object.position.set(0, 0, 0);
-                const angleX = this.isMobile ? radians(8) : radians(20);
+                // const angleX = this.isMobile ? radians(8) : radians(20);
                 this.three.object.rotation.set(0, radians(90), 0);
                 resolve();
             });
@@ -159,7 +161,7 @@ export default class Balloon extends Webgl {
         this.setSize();
         this.initViewport();
         if (this.three.camera) {
-            const posY = this.isMobile ? -2 : -3;
+            const posY = this.isMobile ? -3 : -3;
             this.three.object.position.set(0, posY, 985);
             // カメラのアスペクト比を正す
             this.three.camera.aspect = this.winSize.width / this.winSize.height;

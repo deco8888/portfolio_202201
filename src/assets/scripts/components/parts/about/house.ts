@@ -42,6 +42,7 @@ export default class House extends Webgl {
         // this.gui = new GUI();
         // this.init();
     }
+    // eslint-disable-next-line require-await
     async init(canvas: HTMLCanvasElement): Promise<void> {
         this.canvas = canvas;
         // 画面サイズを取得
@@ -113,10 +114,10 @@ export default class House extends Webgl {
     }
     createModels(): void {
         const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath('/portfolio/draco/');
+        dracoLoader.setDecoderPath('/draco/');
         const gltfLoader = new GLTFLoader();
         gltfLoader.setDRACOLoader(dracoLoader);
-        const objSrc = '/portfolio/draco/objs/house_d.glb';
+        const objSrc = '/draco/objs/house_d.glb';
         gltfLoader.load(objSrc, (obj) => {
             obj.scene.traverse((model) => {
                 model.castShadow = true;
@@ -125,7 +126,7 @@ export default class House extends Webgl {
             const scale = this.isMobile ? 1.5 : 1.5;
             this.isMobile ? obj.scene.scale.set(scale, scale, scale) : obj.scene.scale.set(scale, scale, scale);
             this.three.object.add(obj.scene);
-            const posY = this.isMobile ? -2 : -3;
+            // const posY = this.isMobile ? -2 : -3;
             this.three.object.position.set(0, 0, 990);
             const angleX = this.isMobile ? radians(8) : radians(20);
             this.three.object.rotation.set(angleX, radians(-30), 0);

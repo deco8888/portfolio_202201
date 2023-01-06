@@ -124,7 +124,7 @@ export default class Webgl {
             alpha: true,
             antialias: true, // 物体の輪郭を滑らかにする
         };
-        if (params.canvas) webglParams['canvas'] = params.canvas;
+        if (params.canvas) webglParams.canvas = params.canvas;
         const renderer = new WebGLRenderer(webglParams);
         /**
          * デスクトップでは、メインディスプレイ・サブディスプレイでPixelRatioの異なる可能性がある。

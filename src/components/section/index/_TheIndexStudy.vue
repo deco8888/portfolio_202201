@@ -1,13 +1,11 @@
 <template>
     <section id="study" class="p-index-study" data-study data-scroll>
         <div class="p-index-study__inner js-study-trigger">
-            <!-- <canvas ref="canvas" class="p-index-study__canvas" data-study="canvas"></canvas> -->
+            <div class="p-index-study__canvas" data-study="canvas"></div>
             <div class="p-index-study__wrap" data-horizontal="wrapper" ref="horizontalWrapper">
                 <div class="p-index-study__list" data-horizontal="list" ref="horizontalList">
-                    <canvas ref="canvas" class="p-index-study__canvas" data-study="canvas"></canvas>
                     <a
                         class="p-index-study__image-wrap p-index-study__image-wrap--image1"
-                        href="https://hatarakigai.info/project/"
                         target="_blank"
                         rel=""
                         @mouseenter="mouseenter($event, 0.0)"
@@ -18,7 +16,7 @@
                         <div
                             class="p-index-study__image"
                             data-study="image"
-                            data-study-image="sakura.jpg"
+                            data-study-image="comingsoon.jpg"
                             data-study-link="https://hatarakigai.info/project/"
                         ></div>
                     </a>
@@ -32,7 +30,7 @@
                         <div
                             class="p-index-study__image"
                             data-study="image"
-                            data-study-image="sakura.jpg"
+                            data-study-image="comingsoon.jpg"
                             data-study-link="https://works.yuta-takahashi.dev/"
                         ></div>
                     </a>
@@ -46,7 +44,7 @@
                         <div
                             class="p-index-study__image"
                             data-study="image"
-                            data-study-image="sakura.jpg"
+                            data-study-image="comingsoon.jpg"
                             data-study-link="https://nuxtjs.org/ja/docs/concepts/views/#layouts"
                         ></div>
                     </a>
@@ -89,7 +87,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import gsap from 'gsap';
-import BaseImage from '~/components/common/BaseImage.vue';
 import Expansion from '~/assets/scripts/modules/expansion';
 import Title from '~/assets/scripts/components/parts/index/contact/title';
 import Photo from '~/assets/scripts/components/parts/index/study/photos';
@@ -117,9 +114,6 @@ interface StudyOptions {
 }
 
 export default Vue.extend({
-    components: {
-        BaseImage,
-    },
     props: {
         isClose: {
             type: Boolean,
@@ -145,14 +139,6 @@ export default Vue.extend({
             hoverFlg: false,
         };
     },
-    watch: {
-        isClose(val: boolean) {
-            if (val) this.close();
-        },
-        loading(val: boolean) {
-            if (val) this.init();
-        },
-    },
     computed: {
         loading(): boolean {
             return loadingStore.getLoading.loaded;
@@ -164,9 +150,18 @@ export default Vue.extend({
             };
         },
     },
+    watch: {
+        isClose(val: boolean) {
+            if (val) this.close();
+        },
+        loading(val: boolean) {
+            if (val) this.init();
+        },
+    },
     mounted() {
         if (this.loading) this.init();
         // 画面遷移時に「cancelAnimationFrame」を実行
+        // eslint-disable-next-line require-await
         this.$router.beforeEach(async (_to, _from, next) => {
             if (this.photo) {
                 this.photo.cancelAnimFrame();
@@ -226,7 +221,7 @@ export default Vue.extend({
         },
         moveHorizontally(): void {
             this.elms.horizontalList = document.querySelector("[data-horizontal='list']");
-            const mvHeight = this.elms.mv.clientHeight;
+            // const mvHeight = this.elms.mv.clientHeight;
             if (!this.isMobile) {
                 this.scrollTrigger = gsap.to(this.elms.horizontalList, {
                     x: () =>

@@ -81,11 +81,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Cursor } from '~/assets/scripts/components/parts/common/cursor';
 import gsap, { Power2 } from 'gsap';
+import { Cursor } from '~/assets/scripts/components/parts/common/cursor';
 
 export default Vue.extend({
     mounted() {
+        // eslint-disable-next-line no-new
         new Cursor();
         window.addEventListener('click', () => {
             const arrow = document.querySelector('[data-cursor-arrow]');

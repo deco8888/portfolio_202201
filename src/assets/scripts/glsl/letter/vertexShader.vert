@@ -22,10 +22,10 @@ void main() {
 
     if(uFirst) {
         // 方向
-    // normalize(x)	xを正規化した値を返す
-    // vec3 vertexDirection = vec3(position.x, position.y, position.z) + vec3(uTime);
+        // normalize(x)	xを正規化した値を返す
+        // vec3 vertexDirection = vec3(position.x, position.y, position.z) + vec3(uTime);
         vec3 vertexDirection = vec3(normalize(position.xy), 0.0) + vec3(uTime);
-    // // シームレスノイズ
+        // // シームレスノイズ
         vec3 noise = position * snoise3(vec3(vertexDirection)) * 5.0 * uRatio;
         vec3 diffuse = vertexDirection * 100.0 * uRatio * rand;
         vec3 finalPosition = position + noise + diffuse;

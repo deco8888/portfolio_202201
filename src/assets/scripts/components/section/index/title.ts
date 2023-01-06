@@ -70,7 +70,7 @@ export default class Title extends Letter {
         };
         this.color = {
             front: '#906cd1',
-            back: '#f9b97c', //'#f9b97c', //'#ff9800',
+            back: '#f9b97c', // '#f9b97c', //'#ff9800',
         };
         this.font = {
             wight: 900,
@@ -156,7 +156,7 @@ export default class Title extends Letter {
             const previousX = geometryPosition.getX(i);
             const previousY = geometryPosition.getY(i);
             const lastX = promiseList[i * 2];
-            const lastY = promiseList[i * 2 + 1] + 0; //(this.isStudyArea ? window.innerHeight * 0.5 : 0);
+            const lastY = promiseList[i * 2 + 1] + 0; // (this.isStudyArea ? window.innerHeight * 0.5 : 0);
             const currentX = lerp(previousX, lastX, 0.1);
             const currentY = lerp(previousY, lastY, 0.08);
             geometryPosition.setX(i, currentX);
@@ -173,8 +173,8 @@ export default class Title extends Letter {
         const previous = this.object.previous;
         const current = this.object.current;
         if (this.isStudyArea) {
-            let currentX = lerp(previous.x, current.x, amp);
-            let currentY = lerp(previous.y, current.y, amp);
+            const currentX = lerp(previous.x, current.x, amp);
+            const currentY = lerp(previous.y, current.y, amp);
             if (currentX > horizontal || currentY <= 0) this.getCurrentX(amp);
             if (currentX <= horizontal || currentY > 0) this.getCurrentY(amp);
         }
@@ -208,17 +208,10 @@ export default class Title extends Letter {
         this.onResize();
     }
     rotate() {
-        if (this.isMobile) {
-            this.three.object.rotation.y =
-                document.querySelector('.p-index-mv').getBoundingClientRect().top === 0
-                    ? lerp(this.three.object.rotation.y, 0, 0.1)
-                    : lerp(this.three.object.rotation.y, this.rotation.y, 0.1);
-        } else {
-            this.three.object.rotation.y =
-                window.scrollY === 0
-                    ? lerp(this.three.object.rotation.y, 0, 0.1)
-                    : lerp(this.three.object.rotation.y, this.rotation.y, 0.1);
-        }
+        this.three.object.rotation.y =
+            scrollY === 0
+                ? lerp(this.three.object.rotation.y, 0, 0.1)
+                : lerp(this.three.object.rotation.y, this.rotation.y, 0.1);
     }
     async handleScroll(): Promise<void> {
         const scrollY = this.isMobile
@@ -259,6 +252,7 @@ export default class Title extends Letter {
                 this.textImage.data = await this.getImageData();
                 await this.getTitleInfo();
                 this.isStudyArea = true;
+
                 // if (this.flg) {
                 //     const pointsMaterial = <ShaderMaterial>this.three.points.material;
                 //     pointsMaterial.uniforms.uRatio.value = 0.0;
@@ -328,7 +322,7 @@ export default class Title extends Letter {
         if (this.flg) {
             const pointsMaterial = <ShaderMaterial>this.three.points.material;
             pointsMaterial.uniforms.uRatio.value = 0.0;
-            this.setDiffusion();
+            // this.setDiffusion();
         }
         const geometry = <BufferGeometry>this.three.points.geometry;
         const geometryPosition = geometry.attributes.position;

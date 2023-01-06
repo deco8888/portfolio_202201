@@ -1,18 +1,18 @@
 <template>
     <div class="wrapper">
         <Loading ref="loading" @is-start="startLoading" />
-        <div class="p-page" ref="wrapper">
+        <div ref="wrapper" class="p-page">
             <TheTransition ref="transition" />
             <div class="p-page__canvas" data-canvas="title" data-title="mv"></div>
             <div class="p-page__expansion" data-expansion="canvas">
                 <div class="p-page__expansion-canvas expansion" data-expansion="expansion"></div>
-                <TheIndexContact :isShow="contact.show" @is-close="closeContact" />
+                <TheIndexContact :is-show="contact.show" @is-close="closeContact" />
             </div>
             <div ref="inner" class="p-page__inner">
-                <TheIndexMv :isActive="mv.active" />
+                <TheIndexMv :is-active="mv.active" />
                 <TheCircle />
                 <TheIndexBox />
-                <TheIndexStudy @is-show="showContact" :isClose="contact.close" />
+                <TheIndexStudy :is-close="contact.close" @is-show="showContact" />
             </div>
         </div>
         <TheCursor />
@@ -23,15 +23,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import gsap, { Power4 } from 'gsap';
+import TheCursor from '../components/common/TheCursor.vue';
+import TheTransition from '../components/common/TheTransition.vue';
 import Loading from '~/components/Loading.vue';
 import TheCircle from '~/components/parts/index/TheIndexCircle.vue';
 import TheIndexBox from '~/components/parts/index/TheIndexBox.vue';
 import TheIndexMv from '~/components/section/index/_TheIndexMv.vue';
 import TheIndexStudy from '~/components/section/index/_TheIndexStudy.vue';
 import TheIndexContact from '~/components/parts/index/TheIndexContact.vue';
-import TheCursor from '../components/common/TheCursor.vue';
-import TheTransition from '../components/common/TheTransition.vue';
-import BaseImage from '~/components/common/BaseImage.vue';
 import Title from '~/assets/scripts/components/section/index/title';
 import Attract from '~/assets/scripts/modules/attract';
 import { addClass, removeClass } from '~/assets/scripts/utils/classList';
@@ -40,8 +39,15 @@ import { loadingStore } from '~/store';
 import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 export default Vue.extend({
-    head: {
-        title: 'TOP',
+    components: {
+        Loading,
+        TheCircle,
+        TheIndexBox,
+        TheIndexMv,
+        TheIndexStudy,
+        TheIndexContact,
+        TheCursor,
+        TheTransition,
     },
     data(): {
         title: Title;
@@ -79,33 +85,26 @@ export default Vue.extend({
             },
         };
     },
-    components: {
-        Loading,
-        TheCircle,
-        TheIndexBox,
-        TheIndexMv,
-        TheIndexStudy,
-        TheIndexContact,
-        TheCursor,
-        TheTransition,
-        BaseImage,
-    },
-    watch: {
-        loading(val: boolean) {
-            if (val) this.title.startAnim();
-        },
-        'flg.start': function (val: boolean) {
-            if (val) this.start();
-        },
+    head: {
+        title: 'TOP',
     },
     computed: {
         loading(): boolean {
             return loadingStore.getLoading.loaded;
         },
     },
+    watch: {
+        loading(val: boolean) {
+            if (val) this.title.startAnim();
+        },
+        'flg.start' (val: boolean) {
+            if (val) this.start();
+        },
+    },
     async mounted() {
         this.title = new Title();
         await this.title.init();
+        // eslint-disable-next-line no-new
         new Attract();
         this.handleEvent();
         const onTransition = this.$refs.transition as any;

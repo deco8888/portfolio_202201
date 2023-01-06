@@ -22,7 +22,7 @@ export default Vue.extend({
         this.transition.start();
         this.handleEvent();
         // 画面遷移時に「cancelAnimationFrame」を実行
-        this.$router.beforeEach(async (_to, _from, next) => {
+        this.$router.beforeEach((_to, _from, next) => {
             if (this.transition) {
                 this.transition.dispose();
                 this.transition = null;
