@@ -1,11 +1,11 @@
 import { Color, DoubleSide, Mesh, PlaneBufferGeometry, ShaderMaterial, Vector2 } from 'three';
 import gsap, { Power2 } from 'gsap';
-import Webgl from '~/assets/scripts/modules/webgl';
-import { isMobile } from '~/assets/scripts/modules/isMobile';
 import expansionVertexShader from '../glsl/expansion/vertexshader.vert';
 import expansionFragmentShader from '../glsl/expansion/fragmentShader.frag';
 import { addClass, removeClass } from '../utils/classList';
 import { hasClass } from '../utils/hasClass';
+import Webgl from '~/assets/scripts/modules/webgl';
+import { isMobile } from '~/assets/scripts/modules/isMobile';
 
 interface UniformOptions {
     [uniform: string]: THREE.IUniform;
@@ -59,9 +59,9 @@ export default class Expansion extends Webgl {
         };
         this.isMobile = isMobile();
         this.param = {
-            color1: '#ffffff', //'#70d872', //#f8f3ba',
-            color2: '#f9f5ce', //#f8f3ba',
-            color3: '#b0d3ee', //#f8f3ba',
+            color1: '#ffffff', // '#70d872', //#f8f3ba',
+            color2: '#f9f5ce', // #f8f3ba',
+            color3: '#b0d3ee', // #f8f3ba',
             speed: 1.35,
             ratio: this.isMobile ? 0.15 : 0.26,
             direction: 1,
@@ -173,8 +173,8 @@ export default class Expansion extends Webgl {
         yViewUnit = yViewUnit - viewportH / 2;
 
         // 位置の原点は左上ではなく平面の中心にする
-        let x = xViewUnit + widthViewUnit / 2;
-        let y = -yViewUnit - heightViewUnit / 2;
+        const x = xViewUnit + widthViewUnit / 2;
+        const y = -yViewUnit - heightViewUnit / 2;
 
         // 上記、新しい値を使用し、メッシュを拡大縮小して配置する
         const mesh = this.three.mesh as Mesh;
@@ -206,6 +206,7 @@ export default class Expansion extends Webgl {
         this.update();
         await this.displayInFull();
     }
+    // eslint-disable-next-line require-await
     async openLetter(): Promise<void> {
         return new Promise((resolve) => {
             const tl = gsap.timeline({
@@ -236,6 +237,7 @@ export default class Expansion extends Webgl {
             tl.play();
         });
     }
+    // eslint-disable-next-line require-await
     async closeLetter(): Promise<void> {
         return new Promise((resolve) => {
             const tl = gsap.timeline({
@@ -262,7 +264,7 @@ export default class Expansion extends Webgl {
             tl.play();
         });
     }
-    async displayInFull(): Promise<void> {
+    displayInFull(): Promise<void> {
         // addClass(this.elms.envelope, hasClass.active)
         return new Promise((resolve) => {
             if (this.state === 'full' || this.flg.isAnimating) return;
@@ -357,7 +359,7 @@ export default class Expansion extends Webgl {
             {
                 value: 0,
                 onUpdate: () => {
-                    this.render()
+                    this.render();
                 },
                 onStart: () => {
                     removeClass(this.elms.contactWrap, hasClass.active);
