@@ -1,6 +1,6 @@
+import { BufferGeometry } from 'three';
 import { lerp } from '../../../utils/math';
 import Letter from '~/assets/scripts/modules/letter';
-import { BufferGeometry } from 'three';
 import { distance3d } from '~/assets/scripts/utils/helper';
 
 export default class Title extends Letter {
@@ -66,6 +66,7 @@ export default class Title extends Letter {
         // 描写する
         this.render();
     }
+    // eslint-disable-next-line require-await
     async prepare(): Promise<void> {
         this.setSize();
         this.firstWinSize = {
@@ -100,7 +101,7 @@ export default class Title extends Letter {
         if (this.three.renderer && this.three.camera) this.three.renderer.render(this.three.scene, this.three.camera);
         if (this.three.points) {
             this.update();
-            if (!this.isMobile) this.raycast();
+            // if (!this.isMobile) this.raycast();
         }
         this.animFrame = requestAnimationFrame(this.render.bind(this));
     }

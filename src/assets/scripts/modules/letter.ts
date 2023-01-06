@@ -584,6 +584,7 @@ export default class Letter extends Webgl {
         const geometry = <BufferGeometry>this.three.points.geometry;
         const position = geometry.attributes.position;
         const size = geometry.attributes.size;
+        const arrayList = size.array as unknown as number[];
 
         const rotateY = this.three.object.rotation.y;
         const degree = (rotateY * 180) / Math.PI;
@@ -602,14 +603,14 @@ export default class Letter extends Webgl {
                 const mouseDistance = distance3d(mouseX, mouseY, 0, x2, y2, z2);
                 const upSize = 10 * window.devicePixelRatio;
 
-                if (mouseDistance < 100 && size.array[i] !== upSize) {
-                    size.array[i] = lerp(size.array[i], upSize, 0.1);
+                if (mouseDistance < 100 && arrayList[i] !== upSize) {
+                    arrayList[i] = lerp(arrayList[i], upSize, 0.1);
                 }
             }
         }
         for (let i = 0; i < position.array.length / 3; i++) {
-            if (size.array[i] !== this.particleSize) {
-                size.array[i] = lerp(size.array[i], this.particleSize, 0.1);
+            if (arrayList[i] !== this.particleSize) {
+                arrayList[i] = lerp(size.array[i], this.particleSize, 0.1);
             }
         }
         position.needsUpdate = true;

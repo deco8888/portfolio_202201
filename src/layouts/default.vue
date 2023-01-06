@@ -133,7 +133,6 @@ export default Vue.extend({
                     result.push(word);
                 }
             }
-            console.log({ result });
             return words;
         },
         isBlank(char: string) {
